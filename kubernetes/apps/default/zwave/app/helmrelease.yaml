@@ -1,0 +1,64 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: zwave
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: zwave
+  interval: 1h
+  values:
+    controllers:
+      zwave:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/zwave-js/zwave-js-ui
+              tag: 11.4.1@sha256:0390e45f6e63d4e1e28f8ef2b0a83f3a1ddd266ecc14225778fefaf0efbe49e2
+            env:
+              TZ: America/New_York
+              PORT: &port 80
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+        pod:
+          hostUsers: false
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+          websocket:
+            port: 3000
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /usr/src/app/store
+      tmp:
+        type: emptyDir
