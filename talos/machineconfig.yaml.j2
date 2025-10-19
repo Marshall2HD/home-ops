@@ -47,8 +47,8 @@ machine:
         noatime=True
   install:
     diskSelector:
-      model: WD_BLACK SN770M 1TB
-    image: factory.talos.dev/metal-installer/05b4a47a70bc97786ed83d200567dcc8a13f731b164537ba59d5397d668851fa:v1.11.2
+      model: "WD_BLACK SN770M 1TB"
+    image: factory.talos.dev/metal-installer/a3a23d18d2efe85d7808a2b80155f157ca4da70ade7886fac6ce8b384f6788fe:v1.11.3
     wipe: false
   kernel:
     modules:
@@ -73,6 +73,7 @@ machine:
         bond:
           deviceSelectors:
             - hardwareAddr: 38:05:25:33:8c:*
+              driver: i40e
           mode: active-backup
         dhcp: true
         mtu: 9000
@@ -202,7 +203,7 @@ kind: UserVolumeConfig
 name: local-hostpath
 provisioning:
   diskSelector:
-    match: disk.model == "Micron_7450_MTFDKBA800TFS" && disk.serial == "25124FAE9A64" && !system_disk
+    match: disk.serial == "25124FAE9A64" && !system_disk
   minSize: 800GB
 ---
 apiVersion: v1alpha1
