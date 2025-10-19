@@ -15,3 +15,4 @@ _.file = [
 "pipx:flux-local" = "latest"
 just = "latest"
 cloudflared = "latest"
+flux2 = "latest"
