@@ -8,12 +8,12 @@ Before you start contributing, please make sure you have read and understood our
 
 1. Fork the Repository
 
-First, fork the [repository](https://github.com/onedr0p/home-ops) to your own GitHub account. This will create a copy of the project under your account.
+First, fork the [repository](https://github.com/Marshall2HD/home-ops) to your own GitHub account. This will create a copy of the project under your account.
 
 2. Clone the Repository
 
     ```sh
-    git clone https://github.com/onedr0p/home-ops
+    git clone https://github.com/Marshall2HD/home-ops
     ```
 
 3. Navigate to the project directory 📁
