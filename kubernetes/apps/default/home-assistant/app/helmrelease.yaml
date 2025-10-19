@@ -50,8 +50,6 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
-        supplementalGroups:
-          - 20  # dialout group for serial device access
     service:
       app:
         ports:
@@ -81,9 +79,3 @@ spec:
           - path: /config/.venv
       tmp:
         type: emptyDir
-      usb:
-        type: hostPath
-        hostPath: /dev/serial/by-id/usb-Nabu_Casa_Home_Assistant_Connect_ZBT-1_e2016e063512f011897f0914773d9da9-if00-port0
-        hostPathType: CharDevice
-        globalMounts:
-          - path: /dev/serial/by-id/usb-Nabu_Casa_Home_Assistant_Connect_ZBT-1_e2016e063512f011897f0914773d9da9-if00-port0
