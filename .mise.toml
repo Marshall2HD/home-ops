@@ -14,3 +14,4 @@ _.file = [
 "uv" = "latest"
 "pipx:flux-local" = "latest"
 just = "latest"
+cloudflared = "latest"
