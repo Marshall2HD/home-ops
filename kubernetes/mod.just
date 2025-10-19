@@ -13,6 +13,8 @@ apply-ks ns ks:
 
 [doc('Browse a PVC')]
 browse-pvc namespace claim:
+    #!/usr/bin/env bash
+    export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
     kubectl browse-pvc -n {{ namespace }} -i mirror.gcr.io/alpine:latest {{ claim }}
 
 [doc('Delete local Flux Kustomization')]
