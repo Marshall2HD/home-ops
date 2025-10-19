@@ -7,8 +7,8 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - expanse.internal:9100
-        - pikvm.internal:9100
+        - hypnos.internal:9100
+        - kvm.internal:9100
   metricsPath: /metrics
   relabelings:
     - action: replace
@@ -23,7 +23,7 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - expanse.internal:9633
+        - hypnos.internal:9633
   metricsPath: /metrics
   relabelings:
     - action: replace

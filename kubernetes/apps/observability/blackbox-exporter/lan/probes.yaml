@@ -12,14 +12,8 @@ spec:
     staticConfig:
       static:
         - hypnos.internal
-        - garage-door.internal
-        - hdhomerun.internal
-        - idrac.internal
-        - kiosk.internal
         - kvm.internal
-        - receiver.internal
         - zigbee-controller.internal
-        - zwave-controller.internal
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/probe_v1.json
 apiVersion: monitoring.coreos.com/v1
@@ -33,4 +27,4 @@ spec:
   targets:
     staticConfig:
       static:
-        - expanse.internal:2049
+        - hypnos.internal:2049
