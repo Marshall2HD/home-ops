@@ -64,10 +64,6 @@ spec:
       storage:
         useAllNodes: true
         useAllDevices: false
-        # TODO: Update this to match only 2 of your 3 drives
-        # Run: ls -la /dev/disk/by-id/nvme-Micron*
-        # Then use specific device IDs like:
-        # devicePathFilter: "^/dev/disk/by-id/(nvme-Micron_7450_MTFDKBA800TFS_SERIAL1|nvme-Micron_7450_MTFDKBA800TFS_SERIAL2)$"
         devicePathFilter: "^/dev/disk/by-id/nvme-Micron_7450_MTFDKBA800TFS_(25124FA456CD|25124FA45676)$"
         config:
           osdsPerDevice: "1"
@@ -108,13 +104,11 @@ spec:
         spec:
           metadataPool:
             replicated:
-              size: 1  # Changed from 3 for single node
-              requireSafeReplicaSize: false
+              size: 2  # Changed from 3 for single node
           dataPools:
             - failureDomain: osd  # Changed from 'host' for single node
               replicated:
-                size: 1  # Changed from 3 for single node
-                requireSafeReplicaSize: false
+                size: 2  # Changed from 3 for single node
               name: data0
           metadataServer:
             activeCount: 1
