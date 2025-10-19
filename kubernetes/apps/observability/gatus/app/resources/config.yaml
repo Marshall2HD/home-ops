@@ -44,12 +44,12 @@ ui:
   title: Status | Gatus
   header: Status
   logo: https://avatars.githubusercontent.com/u/213795
-  link: https://github.com/onedr0p
+  link: https://github.com/Marshall2HD
   buttons:
     - name: Github
-      link: https://github.com/onedr0p
+      link: https://github.com/Marshall2HD
     - name: Homelab
-      link: https://github.com/onedr0p/home-ops
+      link: https://github.com/Marshall2HD/home-ops
 
 web:
   port: ${GATUS_WEB_PORT}
