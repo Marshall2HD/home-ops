@@ -36,7 +36,6 @@ spec:
     migStrategy: none
     nfd:
       deploy: false
-    runtimeClassName: nvidia
 
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/helmrepository_v1beta2.json
