@@ -14,7 +14,6 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: nvidia-device-plugin-charts
-        namespace: flux-system
       interval: 15m
   # https://github.com/NVIDIA/k8s-device-plugin/blob/main/deployments/helm/nvidia-device-plugin/values.yaml
   values:
