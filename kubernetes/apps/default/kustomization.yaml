@@ -26,6 +26,7 @@ resources:
   - ./qui/ks.yaml
   - ./radarr/ks.yaml
   - ./recyclarr/ks.yaml
+  - ./sillytavern/ks.yaml
   - ./slskd/ks.yaml
   - ./smtp-relay/ks.yaml
   - ./sonarr/ks.yaml
