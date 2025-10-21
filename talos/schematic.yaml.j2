@@ -13,7 +13,6 @@ customization:
     - module_blacklist=igc # Disable onboard NIC
     - security=none # Less security, faster puter
     - talos.auditd.disabled=1 # Less security, faster puter
-    - nvidia-container-runtime.enabled=true # NVIDIA GPU
   systemExtensions:
     officialExtensions:
       - siderolabs/amd-ucode # AMD CPU microcode
@@ -21,5 +20,5 @@ customization:
       - siderolabs/nfsrahead # NFS Performance
       - siderolabs/thunderbolt # Thunderbolt/USB4 NICs
       - siderolabs/nonfree-kmod-nvidia-production # NVIDIA GPU drivers
-      - siderolabs/nvidia-container-toolkit # NVIDIA GPU support
+      - siderolabs/nvidia-container-toolkit-production # NVIDIA GPU support
       - siderolabs/nvme-cli # NVMe management tools
