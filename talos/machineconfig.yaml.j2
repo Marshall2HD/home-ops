@@ -96,6 +96,7 @@ machine:
   sysctls:
     fs.inotify.max_user_instances: "8192"
     fs.inotify.max_user_watches: "1048576"
+    net.core.bpf_jit_harden: "1"
     net.core.default_qdisc: fq
     net.core.rmem_max: "67108864"
     net.core.wmem_max: "67108864"
