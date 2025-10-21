@@ -1,0 +1,93 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sillytavern
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: sillytavern
+  interval: 1h
+  values:
+    controllers:
+      sillytavern:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/sillytavern/sillytavern
+              tag: 1.13.0
+            env:
+              TZ: America/New_York
+              SILLYTAVERN_LISTEN: "true"
+              SILLYTAVERN_WHITELIST: '["::/0", "0.0.0.0/0"]'
+              SILLYTAVERN_PORT: &port 80
+              SILLYTAVERN_EXTENSIONS_MODELS_CLASSIFICATION: "SamLowe/roberta-base-go_emotions-onnx"
+              SILLYTAVERN_EXTENSIONS_MODELS_EMBEDDING: "mixedbread-ai/mxbai-embed-large-v1"
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+          - "tavern.hades.casa"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /home/node/app/config
+            subPath: config
+          - path: /home/node/app/data
+            subPath: data
+          - path: /home/node/app/plugins
+            subPath: plugins
+          - path: /home/node/app/public/scripts/extensions/third-party
+            subPath: extensions
+      tmp:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 64Mi
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
+          - path: /home/node/app/backups
+            subPath: backups
