@@ -23,7 +23,7 @@ spec:
               TZ: America/New_York
               SILLYTAVERN_LISTEN: "true"
               SILLYTAVERN_WHITELIST: '["::/0", "0.0.0.0/0"]'
-              SILLYTAVERN_PORT: &port 80
+              SILLYTAVERN_PORT: &port 8000
               SILLYTAVERN_EXTENSIONS_MODELS_CLASSIFICATION: "SamLowe/roberta-base-go_emotions-onnx"
               SILLYTAVERN_EXTENSIONS_MODELS_EMBEDDING: "mixedbread-ai/mxbai-embed-large-v1"
             probes:
