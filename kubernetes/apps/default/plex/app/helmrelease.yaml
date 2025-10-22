@@ -50,10 +50,8 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                nvidia.com/gpu: 1
               limits:
                 memory: 16Gi
-                nvidia.com/gpu: 1
     defaultPodOptions:
       runtimeClassName: nvidia
       securityContext:
