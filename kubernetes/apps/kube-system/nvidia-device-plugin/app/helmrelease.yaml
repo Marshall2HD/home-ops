@@ -23,13 +23,3 @@ spec:
     runtimeClassName: nvidia
     nodeSelector:
       nvidia.feature.node.kubernetes.io/gpu: "true"
-    config:
-      name: gpu-sharing-config
-      create: true
-      default: any
-      data:
-        any: |-
-          version: v1
-          sharing:
-            timeSlicing:
-              replicas: 3
