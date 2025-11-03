@@ -67,7 +67,7 @@ spec:
             conditions: ["[STATUS] == 200"]
         hostnames:
           - "{{ .Release.Name }}.hades.casa"
-          - requests.hades.casa
+          - request.hades.casa
         parentRefs:
           - name: envoy-external
             namespace: network
