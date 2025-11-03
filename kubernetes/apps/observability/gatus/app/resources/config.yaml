@@ -43,7 +43,7 @@ storage:
 ui:
   title: Status | Gatus
   header: Status
-  logo: https://avatars.githubusercontent.com/u/213795
+  logo: https://avatars.githubusercontent.com/u/15093189
   link: https://github.com/Marshall2HD
   buttons:
     - name: Github
