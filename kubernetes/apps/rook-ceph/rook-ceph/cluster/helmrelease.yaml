@@ -106,6 +106,7 @@ spec:
       - name: &cephFileSystemName ceph-filesystem
         spec:
           metadataPool:
+            failureDomain: osd  # Changed from 'host' for single node
             replicated:
               size: 2  # Changed from 3 for single node
           dataPools:
