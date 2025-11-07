@@ -6,7 +6,7 @@ metadata:
   name: mc-router
 spec:
   interval: 1h
-  path: ./kubernetes/apps/default/minecraft/mc-router/app
+  path: ./kubernetes/apps/default/minecraft/mc-router/
   prune: true
   sourceRef:
     kind: GitRepository
@@ -33,7 +33,7 @@ spec:
   postBuild:
     substitute:
       APP: paper
-      VOLSYNC_CAPACITY: 15Gi
+      VOLSYNC_CAPACITY: 100Gi
   prune: true
   sourceRef:
     kind: GitRepository
@@ -52,7 +52,7 @@ spec:
     - name: paper
       namespace: default
   interval: 1h
-  path: ./kubernetes/apps/default/minecraft/rcon/app
+  path: ./kubernetes/apps/default/minecraft/rcon/
   prune: true
   sourceRef:
     kind: GitRepository
