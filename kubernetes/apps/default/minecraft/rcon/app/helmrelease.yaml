@@ -56,9 +56,9 @@ spec:
                 path: /spec/template/spec/containers/0/env/-
                 value:
                   name: RWA_WEBSOCKET_URL
-                  value: "ws://10.4.0.131:4327"
+                  value: "wss://rcon.hades.casa:443"
               - op: add
                 path: /spec/template/spec/containers/0/env/-
                 value:
                   name: RWA_WEBSOCKET_URL_SSL
-                  value: "wss://10.4.0.131:4327"
+                  value: "wss://rcon.hades.casa:443"
