@@ -34,13 +34,13 @@ spec:
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
-  name: pikvm
+  name: jetkvm
 spec:
   staticConfigs:
     - targets:
-        - pikvm.internal
-  metricsPath: /api/export/prometheus/metrics
+        - jetkvm.internal
+  metricsPath: /metrics
   relabelings:
     - action: replace
       targetLabel: job
-      replacement: pikvm
+      replacement: jetkvm
