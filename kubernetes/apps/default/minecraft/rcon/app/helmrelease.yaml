@@ -52,12 +52,12 @@ spec:
               kind: Deployment
               name: paper-rcon-web
             patch: |
-              - op: replace
+              - op: add
                 path: /spec/template/spec/containers/0/env/-
                 value:
                   name: RWA_WEBSOCKET_URL
                   value: "ws://10.4.0.131:4327"
-              - op: replace
+              - op: add
                 path: /spec/template/spec/containers/0/env/-
                 value:
                   name: RWA_WEBSOCKET_URL_SSL
