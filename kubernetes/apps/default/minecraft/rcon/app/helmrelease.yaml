@@ -49,3 +49,20 @@ spec:
                 annotations:
                   external-dns.alpha.kubernetes.io/hostname: rcon.hades.casa
                   lbipam.cilium.io/ips: 10.4.0.131
+    - kustomize:
+        patches:
+          - target:
+              version: apps/v1
+              kind: Deployment
+              name: paper-rcon-web
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/env/-
+                value:
+                  name: RWA_WEBSOCKET_URL
+                  value: ws://10.4.0.131:4327
+              - op: add
+                path: /spec/template/spec/containers/0/env/-
+                value:
+                  name: RWA_WEBSOCKET_URL_SSL
+                  value: wss://rcon.hades.casa:4327
