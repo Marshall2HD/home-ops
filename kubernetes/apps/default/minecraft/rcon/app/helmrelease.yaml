@@ -19,8 +19,12 @@ spec:
     service:
       type: LoadBalancer
       annotations:
-        external-dns.alpha.kubernetes.io/hostname: rcon.hades.casa
-        lbipam.cilium.io/ips: 10.4.0.131
+        patch: |-
+              - op: add
+                path: /metadata/annotations
+                value:
+                  external-dns.alpha.kubernetes.io/hostname: rcon.hades.casa
+                  lbipam.cilium.io/ips: 10.4.0.131
       externalTrafficPolicy: Local
     ingress:
       enabled: false
