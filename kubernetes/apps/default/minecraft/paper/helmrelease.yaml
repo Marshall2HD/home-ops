@@ -34,7 +34,7 @@ spec:
               PAPER_CHANNEL: experimental
               PAUSE_WHEN_EMPTY_SECONDS: "600"
               SEED: 1691256543523180978
-              SERVER_NAME: Aether
+              SERVER_NAME: Gaia
               SPAWN_PROTECTION: 0
               TZ: America/New_York
               TYPE: PAPER
