@@ -18,9 +18,8 @@ spec:
     fullnameOverride: paper-rcon-web
     service:
       type: LoadBalancer
-      externalTrafficPolicy: Local
     ingress:
-      enabled: false
+      enabled: true
     rconWeb:
       isAdmin: true
       game: minecraft
@@ -39,28 +38,27 @@ spec:
               version: v1
               kind: Service
               name: paper-rcon-web
-            patch: |-
-              apiVersion: v1
-              kind: Service
-              metadata:
-                name: paper-rcon-web
-                annotations:
-                  external-dns.alpha.kubernetes.io/hostname: rcon.hades.casa
-                  lbipam.cilium.io/ips: 10.4.0.131
+            patch: |
+              - op: add
+                path: /metadata/annotations/lbipam.cilium.io~1ips
+                value: 10.4.0.131
+              - op: add
+                path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
+                value: rcon.hades.casa
     - kustomize:
         patches:
           - target:
-              version: apps/v1
+              version: v1
               kind: Deployment
               name: paper-rcon-web
-            patch: |-
-              - op: add
+            patch: |
+              - op: replace
                 path: /spec/template/spec/containers/0/env/-
                 value:
                   name: RWA_WEBSOCKET_URL
-                  value: ws://10.4.0.131:4327
-              - op: add
+                  value: "ws://10.4.0.131:4327"
+              - op: replace
                 path: /spec/template/spec/containers/0/env/-
                 value:
                   name: RWA_WEBSOCKET_URL_SSL
-                  value: wss://rcon.hades.casa:4327
+                  value: "wss://10.4.0.131:4327"
