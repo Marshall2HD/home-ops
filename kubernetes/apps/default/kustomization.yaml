@@ -18,6 +18,7 @@ resources:
   - ./home-assistant/ks.yaml
   - ./jellyfin/ks.yaml
   - ./jellyseerr/ks.yaml
+  - ./minecraft/ks.yaml
   - ./mosquitto/ks.yaml
   - ./notifier/ks.yaml
   - ./nzbget/ks.yaml
