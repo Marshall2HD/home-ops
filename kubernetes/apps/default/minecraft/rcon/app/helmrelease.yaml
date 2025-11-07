@@ -18,13 +18,6 @@ spec:
     fullnameOverride: paper-rcon-web
     service:
       type: LoadBalancer
-      annotations:
-        patch: |-
-              - op: add
-                path: /metadata/annotations
-                value:
-                  external-dns.alpha.kubernetes.io/hostname: rcon.hades.casa
-                  lbipam.cilium.io/ips: 10.4.0.131
       externalTrafficPolicy: Local
     ingress:
       enabled: false
@@ -41,3 +34,18 @@ spec:
       TZ: America/New_York
       RWA_WEBSOCKET_URL: ws://rcon.hades.casa:4327
       RWA_WEBSOCKET_URL_SSL: wss://rcon.hades.casa:4327
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: Service
+              name: paper-rcon-web
+            patch: |-
+              apiVersion: v1
+              kind: Service
+              metadata:
+                name: paper-rcon-web
+                annotations:
+                  external-dns.alpha.kubernetes.io/hostname: rcon.hades.casa
+                  lbipam.cilium.io/ips: 10.4.0.131
