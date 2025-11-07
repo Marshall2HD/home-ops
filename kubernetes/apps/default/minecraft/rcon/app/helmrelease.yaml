@@ -32,8 +32,6 @@ spec:
       rconPasswordKey: rcon-password
     extraEnv:
       TZ: America/New_York
-      RWA_WEBSOCKET_URL: ws://rcon.hades.casa:4327
-      RWA_WEBSOCKET_URL_SSL: wss://rcon.hades.casa:4327
   postRenderers:
     - kustomize:
         patches:
