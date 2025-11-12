@@ -9,7 +9,7 @@
   "editor.hover.delay": 1500,
   "editor.rulers": [100],
   "editor.stickyScroll.enabled": false,
-  "explorer.autoReveal": false,
+  "explorer.autoReveal": true,
   "files.associations": {
     "**/*.json5": "json5",
   },
@@ -59,8 +59,5 @@
   },
   "[yaml]": {
     "editor.defaultFormatter": "bluebrown.yamlfmt"
-  },
-  "debug.javascript.defaultRuntimeExecutable": {
-    "pwa-node": "/Users/marsh/.local/share/mise/shims/node"
   }
 }
