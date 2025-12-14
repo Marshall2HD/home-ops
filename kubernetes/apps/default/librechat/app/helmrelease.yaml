@@ -52,6 +52,10 @@ spec:
       limits:
         memory: 1Gi
     mongodb:
+      global:
+          security:
+            allowInsecureImages: true
       image:
         registry: cgr.dev
         repository: chainguard/mongodb
+        tag: latest
