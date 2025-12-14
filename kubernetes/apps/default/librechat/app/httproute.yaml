@@ -8,9 +8,8 @@ spec:
   hostnames:
     - librechat.hades.casa
   parentRefs:
-    - name: envoy-internal
+    - name: external
       namespace: network
-      sectionName: https
   rules:
     - backendRefs:
         - name: librechat
