@@ -51,6 +51,8 @@ spec:
         memory: 512Mi
       limits:
         memory: 1Gi
+    librechat-rag-api:
+      enabled: false
     mongodb:
       global:
           security:
