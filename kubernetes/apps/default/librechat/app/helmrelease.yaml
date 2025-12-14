@@ -56,6 +56,6 @@ spec:
           security:
             allowInsecureImages: true
       image:
-        registry: cgr.dev
-        repository: chainguard/mongodb
+        registry: registry-1.docker.io
+        repository: bitnami/mongodb
         tag: latest
