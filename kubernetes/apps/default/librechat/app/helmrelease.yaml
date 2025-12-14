@@ -1,0 +1,119 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: librechat
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: librechat
+  interval: 1h
+  values:
+    replicaCount: 1
+
+    global:
+      librechat:
+        existingSecretName: "librechat-credentials"
+        existingSecretApiKey: OPENAI_API_KEY
+
+    librechat:
+      configEnv:
+        PLUGIN_MODELS: "gpt-4,gpt-4-turbo-preview,gpt-4-0125-preview,gpt-4-1106-preview,gpt-4-0613,gpt-3.5-turbo,gpt-3.5-turbo-0125,gpt-3.5-turbo-1106,gpt-3.5-turbo-0613"
+        DEBUG_PLUGINS: "false"
+        MEILI_NO_ANALYTICS: "true"
+        CUSTOM_FOOTER: "Copyright © 2025 Nyx. All rights reserved."
+
+      existingSecretName: "librechat-credentials"
+
+      configYamlContent: |
+        version: 1.2.9
+        cache: true
+
+        speech:
+          tts:
+            elevenlabs:
+              apiKey: '${ELEVENLABS_API_KEY}'
+              model: 'eleven_v3'
+              voices: ['H2cdv8R2nEdoRT9ji2xP', 'Ttn6dlQvgqQ9d7by8NNT', 'LmHPRoS1O5KyGE3oXRbb', 'I1X1J5pzMOURLxATlhpe']
+          speechTab:
+            conversationMode: true
+            advancedMode: false
+            speechToText:
+              engineSTT: "browser"
+              languageSTT: "English (US)"
+              autoTranscribeAudio: true
+              decibelValue: -45
+              autoSendText: 0
+            textToSpeech:
+              engineTTS: "external"
+              voice: "H2cdv8R2nEdoRT9ji2xP"
+              languageTTS: "en"
+              automaticPlayback: true
+              playbackRate: 1.0
+              cacheTTS: true
+
+
+
+      imageVolume:
+        enabled: true
+        size: 10Gi
+        accessModes: ReadWriteOnce
+
+    image:
+      repository: danny-avila/librechat
+      registry: ghcr.io
+      pullPolicy: IfNotPresent
+      tag: "v0.8.1"
+
+    serviceAccount:
+      create: true
+      automount: true
+
+    podSecurityContext:
+      fsGroup: 2000
+
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1000
+
+    service:
+      type: ClusterIP
+      port: 3080
+      targetPort: 3080
+      containerPort: 3080
+
+    ingress:
+      enabled: true
+      className: ""
+      annotations:
+        external-dns.alpha.kubernetes.io/target: envoy-internal.network.svc.cluster.local
+      hosts:
+        - host: "librechat.hades.casa"
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls: []
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 3080
+
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 3080
+
+    updateStrategy:
+      type: RollingUpdate
