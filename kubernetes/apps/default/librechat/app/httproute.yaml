@@ -12,5 +12,5 @@ spec:
       namespace: network
   rules:
     - backendRefs:
-        - name: librechat
+        - name: librechat-librechat
           port: 3080
