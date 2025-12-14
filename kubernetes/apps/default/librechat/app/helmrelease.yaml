@@ -51,3 +51,7 @@ spec:
         memory: 512Mi
       limits:
         memory: 1Gi
+    mongodb:
+      image:
+        registry: cgr.dev
+        repository: chainguard/mongodb
