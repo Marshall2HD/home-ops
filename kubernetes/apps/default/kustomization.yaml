@@ -20,6 +20,7 @@ resources:
   - ./jellyfin/ks.yaml
   - ./jellyseerr/ks.yaml
   - ./librechat/ks.yaml
+  - ./localai/ks.yaml
   - ./minecraft/ks.yaml
   - ./mosquitto/ks.yaml
   - ./notifier/ks.yaml

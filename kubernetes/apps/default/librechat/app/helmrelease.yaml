@@ -3,33 +3,26 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: librechat
+  name: &app librechat
 spec:
+  interval: 1h
   chartRef:
     kind: OCIRepository
-    name: librechat
-  interval: 1h
+    name: *app
   values:
-    replicaCount: 1
-
     global:
       librechat:
-        existingSecretName: "librechat-credentials"
+        existingSecretName: librechat-credentials-env
         existingSecretApiKey: OPENAI_API_KEY
-
     librechat:
       configEnv:
-        PLUGIN_MODELS: "gpt-4,gpt-4-turbo-preview,gpt-4-0125-preview,gpt-4-1106-preview,gpt-4-0613,gpt-3.5-turbo,gpt-3.5-turbo-0125,gpt-3.5-turbo-1106,gpt-3.5-turbo-0613"
+        CUSTOM_FOOTER: "Copyright © 2025 Nyx. All rights reserved."
         DEBUG_PLUGINS: "false"
         MEILI_NO_ANALYTICS: "true"
-        CUSTOM_FOOTER: "Copyright © 2025 Nyx. All rights reserved."
-
-      existingSecretName: "librechat-credentials"
-
+      existingSecretName: librechat-credentials-env
       configYamlContent: |
         version: 1.2.9
         cache: true
-
         speech:
           tts:
             elevenlabs:
@@ -52,68 +45,9 @@ spec:
               automaticPlayback: true
               playbackRate: 1.0
               cacheTTS: true
-
-
-
-      imageVolume:
-        enabled: true
-        size: 10Gi
-        accessModes: ReadWriteOnce
-
-    image:
-      repository: danny-avila/librechat
-      registry: ghcr.io
-      pullPolicy: IfNotPresent
-      tag: "v0.8.1"
-
-    serviceAccount:
-      create: true
-      automount: true
-
-    podSecurityContext:
-      fsGroup: 2000
-
-    securityContext:
-      capabilities:
-        drop:
-        - ALL
-      runAsNonRoot: true
-      runAsUser: 1000
-
-    service:
-      type: ClusterIP
-      port: 3080
-      targetPort: 3080
-      containerPort: 3080
-
-    ingress:
-      enabled: true
-      className: ""
-      annotations:
-        external-dns.alpha.kubernetes.io/target: envoy-internal.network.svc.cluster.local
-      hosts:
-        - host: "librechat.hades.casa"
-          paths:
-            - path: /
-              pathType: ImplementationSpecific
-      tls: []
-
     resources:
       requests:
         cpu: 100m
         memory: 512Mi
       limits:
         memory: 1Gi
-
-    livenessProbe:
-      httpGet:
-        path: /health
-        port: 3080
-
-    readinessProbe:
-      httpGet:
-        path: /health
-        port: 3080
-
-    updateStrategy:
-      type: RollingUpdate
