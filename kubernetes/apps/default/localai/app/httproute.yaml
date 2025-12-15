@@ -9,8 +9,7 @@ spec:
   parentRefs:
     - name: envoy-internal
       namespace: network
-      sectionName: https
   rules:
     - backendRefs:
         - name: localai
-          port: 8080
+          port: 80
