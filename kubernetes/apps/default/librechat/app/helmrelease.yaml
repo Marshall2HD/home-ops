@@ -10,15 +10,16 @@ spec:
     kind: OCIRepository
     name: *app
   values:
+    global:
+      librechat:
+        existingSecretName: librechat-credentials-env
+        existingSecretApiKey: OPENAI_API_KEY
     librechat:
       configEnv:
+        PLUGIN_MODELS: ""
         CUSTOM_FOOTER: "Copyright © 2025 Nyx. All rights reserved."
         DEBUG_PLUGINS: "false"
         MEILI_NO_ANALYTICS: "true"
-        DEEPSEEK_API_KEY: "${DEEPSEEK_API_KEY}"
-        OPENROUTER_KEY: "${OPENROUTER_KEY}"
-        MOONSHOT_API_KEY: "${MOONSHOT_API_KEY}"
-        ELEVENLABS_API_KEY: "${ELEVENLABS_API_KEY}"
       existingSecretName: librechat-credentials-env
       configYamlContent: |
         version: 1.3.1
