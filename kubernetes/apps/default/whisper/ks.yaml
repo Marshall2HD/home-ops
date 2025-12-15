@@ -3,21 +3,19 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: localai
+  name: whisper
 spec:
   components:
     - ../../../../components/volsync
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
-    - name: nvidia-device-plugin
-      namespace: kube-system
   interval: 1h
-  path: ./kubernetes/apps/default/localai/app
+  path: ./kubernetes/apps/default/whisper/app
   postBuild:
     substitute:
-      APP: localai
-      VOLSYNC_CAPACITY: 50Gi
+      APP: whisper
+      VOLSYNC_CAPACITY: 5Gi
   prune: true
   sourceRef:
     kind: GitRepository

@@ -20,7 +20,7 @@ resources:
   - ./jellyfin/ks.yaml
   - ./jellyseerr/ks.yaml
   - ./librechat/ks.yaml
-  - ./localai/ks.yaml
+  - ./ollama/ks.yaml
   - ./minecraft/ks.yaml
   - ./mosquitto/ks.yaml
   - ./notifier/ks.yaml
@@ -38,5 +38,6 @@ resources:
   - ./tautulli/ks.yaml
   - ./thelounge/ks.yaml
 #  - ./tqm/ks.yaml
+  - ./whisper/ks.yaml
   - ./zigbee/ks.yaml
 #  - ./zwave/ks.yaml
