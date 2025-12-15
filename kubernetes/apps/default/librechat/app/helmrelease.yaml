@@ -57,10 +57,10 @@ spec:
               apiKey: "sk-local"
               baseURL: "http://localai.default.svc.cluster.local:8080/v1"
               models:
-                default: ["Cydonia-24B-v4.3-GGUF", "Magidonia-24B-v4.3-GGUF"]
+                default: ["cydonia-24b-4.3", "magidonia-24b-4.3"]
                 fetch: false
               titleConvo: true
-              titleModel: "Cydonia-24B-v4.3-GGUF"
+              titleModel: "cydonia-24b-4.3"
               modelDisplayLabel: "LocalAI"
         speech:
           stt:
