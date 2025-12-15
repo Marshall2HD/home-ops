@@ -18,6 +18,8 @@ spec:
               repository: localai/localai
               tag: master-gpu-nvidia-cuda-12
             env:
+              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_VISIBLE_DEVICES: all
               DEBUG: "true"
               LOCALAI_SINGLE_ACTIVE_BACKEND: "true"
               MODELS_PATH: /models
