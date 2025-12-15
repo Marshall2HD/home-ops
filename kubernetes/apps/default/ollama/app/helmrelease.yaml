@@ -64,7 +64,7 @@ spec:
                 memory: 2Gi
                 nvidia.com/gpu: 1
               limits:
-                memory: 16Gi
+                memory: 24Gi
                 nvidia.com/gpu: 1
     defaultPodOptions:
       runtimeClassName: nvidia
