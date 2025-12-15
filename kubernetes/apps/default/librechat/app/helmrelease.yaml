@@ -10,10 +10,6 @@ spec:
     kind: OCIRepository
     name: *app
   values:
-    global:
-      librechat:
-        existingSecretName: librechat-credentials-env
-        existingSecretApiKey: OPENAI_API_KEY
     librechat:
       configEnv:
         PLUGIN_MODELS: ""
@@ -27,7 +23,7 @@ spec:
         endpoints:
           custom:
             - name: "Deepseek"
-              apiKey: "${DEEPSEEK_API_KEY}"
+              apiKey: "$${DEEPSEEK_API_KEY}"
               baseURL: "https://api.deepseek.com/v1"
               models:
                 default: ["deepseek-chat", "deepseek-coder", "deepseek-reasoner"]
@@ -37,7 +33,7 @@ spec:
               modelDisplayLabel: "Deepseek"
 
             - name: "OpenRouter"
-              apiKey: "${OPENROUTER_KEY}"
+              apiKey: "$${OPENROUTER_KEY}"
               baseURL: "https://openrouter.ai/api/v1"
               models:
                 default: ["meta-llama/llama-3-70b-instruct"]
@@ -48,7 +44,7 @@ spec:
               modelDisplayLabel: "OpenRouter"
 
             - name: "Moonshot"
-              apiKey: "${MOONSHOT_API_KEY}"
+              apiKey: "$${MOONSHOT_API_KEY}"
               baseURL: "https://api.moonshot.ai/v1"
               models:
                 default: ["kimi-k2", "kimi-k2-thinking", "kimi-k2-turbo", "kimi-k2-thinking-turbo"]
@@ -74,7 +70,7 @@ spec:
               apiKey: 'sk-local'
           tts:
             elevenlabs:
-              apiKey: '${ELEVENLABS_API_KEY}'
+              apiKey: '$${ELEVENLABS_API_KEY}'
               model: 'eleven_v3'
               voices: ['H2cdv8R2nEdoRT9ji2xP', 'Ttn6dlQvgqQ9d7by8NNT', 'LmHPRoS1O5KyGE3oXRbb', 'I1X1J5pzMOURLxATlhpe']
           speechTab:
