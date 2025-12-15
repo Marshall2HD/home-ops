@@ -25,6 +25,26 @@ spec:
         cache: true
         endpoints:
           custom:
+            - name: "Deepseek"
+              apiKey: "${DEEPSEEK_API_KEY}"
+              baseURL: "https://api.deepseek.com/v1"
+              models:
+                default: ["deepseek-chat", "deepseek-coder", "deepseek-reasoner"]
+                fetch: false
+              titleConvo: true
+              titleModel: "deepseek-chat"
+              modelDisplayLabel: "Deepseek"
+
+            - name: "OpenRouter"
+              apiKey: "${OPENROUTER_KEY}"
+              baseURL: "https://openrouter.ai/api/v1"
+              models:
+                default: ["meta-llama/llama-3-70b-instruct"]
+                fetch: true
+              titleConvo: true
+              titleModel: "meta-llama/llama-3-70b-instruct"
+              dropParams: ["stop"]
+              modelDisplayLabel: "OpenRouter"
 
             - name: "Moonshot"
               apiKey: "${MOONSHOT_API_KEY}"
