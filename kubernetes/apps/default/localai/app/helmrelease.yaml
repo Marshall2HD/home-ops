@@ -15,19 +15,21 @@ spec:
       interval: 15m
   values:
     replicaCount: 1
+    fullnameOverride: localai
     deployment:
       image:
         repository: quay.io/go-skynet/local-ai
         tag: v3.8.0-aio-gpu-nvidia-cuda-12
       env:
-        threads: 8
-        contextSize: 8192
+        threads: 4
+        F16: true
+        API_KEY: "sk-local"
       modelsPath: /models
     runtimeClassName: nvidia
     persistence:
       models:
         enabled: true
-        existingClaim: localai
+        existingClaim: *app
     resources:
       requests:
         cpu: 500m
