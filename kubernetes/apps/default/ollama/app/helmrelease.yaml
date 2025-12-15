@@ -20,6 +20,7 @@ spec:
               repository: docker.io/ollama/ollama
               tag: 0.13.3
             env:
+              HOME: /config
               OLLAMA_HOST: "0.0.0.0"
               OLLAMA_ORIGINS: "*"
               OLLAMA_MODELS: &modelPath "/models"
@@ -54,7 +55,9 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities:
+                drop:
+                  - "ALL"
             resources:
               requests:
                 cpu: 500m
@@ -86,10 +89,14 @@ spec:
             namespace: network
             sectionName: https
     persistence:
-      data:
+      config:
+        type: emptyDir
+        globalMounts:
+          - path: /config
+      models:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
-          - path: /.ollama
+          - path: *modelPath
       tmp:
         type: emptyDir
         globalMounts:
