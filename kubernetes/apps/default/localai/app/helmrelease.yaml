@@ -20,6 +20,10 @@ spec:
               repository: localai/localai
               tag: v3.8.0-gpu-nvidia-cuda-12
             env:
+              F16: "true"
+              THREADS: "4"
+              CONTEXT_SIZE: "8192"
+              API_KEY: "sk-local"
               DEBUG: "true"
               NVIDIA_DRIVER_CAPABILITIES: all
               NVIDIA_VISIBLE_DEVICES: all
@@ -72,6 +76,13 @@ spec:
         ports:
           http:
             port: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
     persistence:
       models:
         existingClaim: "{{ .Release.Name }}"
