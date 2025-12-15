@@ -30,6 +30,7 @@ spec:
               titleConvo: true
               titleModel: "deepseek-chat"
               modelDisplayLabel: "Deepseek"
+
             - name: "OpenRouter"
               apiKey: "${OPENROUTER_KEY}"
               baseURL: "https://openrouter.ai/api/v1"
@@ -40,6 +41,7 @@ spec:
               titleModel: "meta-llama/llama-3-70b-instruct"
               dropParams: ["stop"]
               modelDisplayLabel: "OpenRouter"
+
             - name: "Moonshot"
               apiKey: "${MOONSHOT_API_KEY}"
               baseURL: "https://api.moonshot.ai/v1"
@@ -49,6 +51,7 @@ spec:
               titleConvo: true
               titleModel: "kimi-k2"
               modelDisplayLabel: "Moonshot"
+
             - name: "LocalAI"
               apiKey: "sk-local"
               baseURL: "http://localai.default.svc.cluster.local:8080/v1"
@@ -63,6 +66,7 @@ spec:
             openai:
               url: 'http://localai.default.svc.cluster.local:8080/v1/audio/transcriptions'
               model: 'whisper-large-turbo-q8_0'
+              apiKey: 'sk-local'
           tts:
             elevenlabs:
               apiKey: '${ELEVENLABS_API_KEY}'
