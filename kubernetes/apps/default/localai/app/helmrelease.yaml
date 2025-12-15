@@ -1,113 +1,43 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: &app localai
 spec:
   interval: 1h
-  chartRef:
-    kind: OCIRepository
-    name: *app
+  chart:
+    spec:
+      chart: local-ai
+      version: 3.4.2
+      sourceRef:
+        kind: HelmRepository
+        name: *app
+      interval: 15m
   values:
-    controllers:
-      localai:
-        containers:
-          app:
-            image:
-              repository: localai/localai
-              tag: master-gpu-nvidia-cuda-12
-            env:
-              NVIDIA_DRIVER_CAPABILITIES: all
-              NVIDIA_VISIBLE_DEVICES: all
-              DEBUG: "true"
-              LOCALAI_SINGLE_ACTIVE_BACKEND: "true"
-              MODELS_PATH: /models
-              TZ: America/New_York
-            probes:
-              liveness:
-                enabled: true
-                custom: true
-                spec:
-                  failureThreshold: 120
-                  httpGet:
-                    path: /readyz
-                    port: &port 8080
-                  initialDelaySeconds: 60
-                  periodSeconds: 60
-                  timeoutSeconds: 10
-              readiness:
-                enabled: true
-                custom: true
-                spec:
-                  failureThreshold: 60
-                  httpGet:
-                    path: /readyz
-                    port: *port
-                  initialDelaySeconds: 30
-                  periodSeconds: 30
-                  timeoutSeconds: 10
-              startup:
-                enabled: true
-                custom: true
-                spec:
-                  failureThreshold: 120
-                  httpGet:
-                    path: /readyz
-                    port: *port
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 10
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
-              capabilities:
-                add:
-                  - CHOWN
-                  - SETGID
-                  - SETUID
-                drop:
-                  - ALL
-            resources:
-              requests:
-                cpu: 500m
-                memory: 2Gi
-                nvidia.com/gpu: 1
-              limits:
-                memory: 8Gi
-                nvidia.com/gpu: 1
-    defaultPodOptions:
-      runtimeClassName: nvidia
-      securityContext:
-        fsGroup: 0
-        fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 0
-        runAsNonRoot: false
-        runAsUser: 0
-    service:
-      app:
-        controller: localai
-        ports:
-          http:
-            port: *port
-    route:
-      app:
-        hostnames:
-          - "{{ .Release.Name }}.hades.casa"
-        parentRefs:
-          - name: envoy-internal
-            namespace: network
-            sectionName: https
+    replicaCount: 1
+    deployment:
+      image:
+        repository: quay.io/go-skynet/local-ai
+        tag: v3.8.0-aio-gpu-nvidia-cuda-12
+      env:
+        threads: 8
+        contextSize: 8192
+      modelsPath: /models
+    runtimeClassName: nvidia
     persistence:
-      backends:
-        type: emptyDir
-        globalMounts:
-          - path: /backends
       models:
-        existingClaim: "{{ .Release.Name }}"
-        globalMounts:
-          - path: /models
-      tmp:
-        type: emptyDir
-        globalMounts:
-          - path: /tmp
+        enabled: true
+        existingClaim: localai
+    resources:
+      requests:
+        cpu: 500m
+        memory: 2Gi
+        nvidia.com/gpu: 1
+      limits:
+        memory: 24Gi
+        nvidia.com/gpu: 1
+    service:
+      type: ClusterIP
+      ports:
+        http:
+          port: 8080
