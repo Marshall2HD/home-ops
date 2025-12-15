@@ -86,12 +86,11 @@ spec:
             namespace: network
             sectionName: https
     persistence:
-      models:
+      data:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
-          - path: *modelPath
+          - path: /.ollama
       tmp:
         type: emptyDir
         globalMounts:
           - path: /tmp
-          - path: /root/.ollama
