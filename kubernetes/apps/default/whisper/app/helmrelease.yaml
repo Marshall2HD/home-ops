@@ -3,29 +3,26 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app ollama
+  name: &app whisper
 spec:
   chartRef:
     kind: OCIRepository
-    name: ollama
+    name: whisper
   interval: 1h
   values:
     controllers:
-      ollama:
+      whisper:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
-              repository: docker.io/ollama/ollama
-              tag: 0.13.3
+              repository: onerahmet/openai-whisper-asr-webservice
+              tag: v1.9.1-gpu
             env:
-              OLLAMA_HOST: "0.0.0.0"
-              OLLAMA_ORIGINS: "*"
-              OLLAMA_MODELS: &modelPath "/models"
-              OLLAMA_KEEP_ALIVE: "24h"
-              OLLAMA_LOAD_TIMEOUT: "600"
-              OLLAMA_CONTEXT_LENGTH: "8192"
+              ASR_DEVICE: cuda
+              ASR_MODEL: large-v3
+              ASR_ENGINE: faster_whisper
               NVIDIA_DRIVER_CAPABILITIES: all
               NVIDIA_VISIBLE_DEVICES: all
             probes:
@@ -35,7 +32,7 @@ spec:
                 spec:
                   httpGet:
                     path: /
-                    port: &port 11434
+                    port: &port 9000
                   initialDelaySeconds: 30
                   periodSeconds: 10
                   timeoutSeconds: 5
@@ -50,18 +47,18 @@ spec:
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 5
-                  failureThreshold: 30
+                  failureThreshold: 60
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
-                cpu: 500m
-                memory: 2Gi
+                cpu: 100m
+                memory: 512Mi
                 nvidia.com/gpu: 1
               limits:
-                memory: 16Gi
+                memory: 8Gi
                 nvidia.com/gpu: 1
     defaultPodOptions:
       runtimeClassName: nvidia
@@ -86,12 +83,11 @@ spec:
             namespace: network
             sectionName: https
     persistence:
-      models:
+      cache:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
-          - path: *modelPath
+          - path: /root/.cache/whisper
       tmp:
         type: emptyDir
         globalMounts:
           - path: /tmp
-          - path: /root/.ollama
