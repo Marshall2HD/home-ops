@@ -25,11 +25,17 @@ spec:
         F16: true
         API_KEY: "sk-local"
       modelsPath: /models
+      modelsVolume:
+        enabled: true
+        pvc:
+          enabled: true
+          existingClaim: localai
     runtimeClassName: nvidia
     persistence:
       models:
-        enabled: true
-        existingClaim: *app
+        enabled: false
+      output:
+        enabled: false
     resources:
       requests:
         cpu: 500m
