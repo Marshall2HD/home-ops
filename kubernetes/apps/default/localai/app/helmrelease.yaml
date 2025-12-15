@@ -24,6 +24,8 @@ spec:
         threads: 4
         F16: true
         API_KEY: "sk-local"
+        NVIDIA_DRIVER_CAPABILITIES: all
+        NVIDIA_VISIBLE_DEVICES: all
       modelsPath: /models
       modelsVolume:
         enabled: true
