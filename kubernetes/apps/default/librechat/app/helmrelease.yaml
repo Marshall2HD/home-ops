@@ -53,15 +53,16 @@ spec:
               titleModel: "kimi-k2"
               modelDisplayLabel: "Moonshot"
 
-            - name: "LocalAI"
-              apiKey: "sk-local"
-              baseURL: "http://localai.default.svc.cluster.local:8080/v1"
+            - name: "Ollama"
+              apiKey: "ollama"
+              baseURL: "http://ollama.default.svc.cluster.local:11434/v1"
               models:
-                default: ["cydonia-24b-4.3", "magidonia-24b-4.3"]
-                fetch: false
+                default: ["hf.co/TheDrummer/Cydonia-24B-v4.3-GGUF:Q5_K_M", "hf.co/TheDrummer/Magidonia-24B-v4.3-GGUF:Q5_K_M"]
+                fetch: true
               titleConvo: true
-              titleModel: "cydonia-24b-4.3"
-              modelDisplayLabel: "LocalAI"
+              titleModel: "hf.co/TheDrummer/Cydonia-24B-v4.3-GGUF:Q5_K_M"
+              modelDisplayLabel: "Ollama"
+
         speech:
           stt:
             openai:
