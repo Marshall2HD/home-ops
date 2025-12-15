@@ -10,23 +10,59 @@ spec:
     kind: OCIRepository
     name: *app
   values:
-    global:
-      librechat:
-        existingSecretName: librechat-credentials-env
-        existingSecretApiKey: OPENAI_API_KEY
     librechat:
       configEnv:
         CUSTOM_FOOTER: "Copyright © 2025 Nyx. All rights reserved."
         DEBUG_PLUGINS: "false"
         MEILI_NO_ANALYTICS: "true"
       existingSecretName: librechat-credentials-env
-      envFrom:
-        - secretRef:
-            name: librechat-credentials-env
       configYamlContent: |
         version: 1.3.1
         cache: true
+        endpoints:
+          custom:
+            - name: "Deepseek"
+              apiKey: "${DEEPSEEK_API_KEY}"
+              baseURL: "https://api.deepseek.com/v1"
+              models:
+                default: ["deepseek-chat", "deepseek-coder", "deepseek-reasoner"]
+                fetch: false
+              titleConvo: true
+              titleModel: "deepseek-chat"
+              modelDisplayLabel: "Deepseek"
+            - name: "OpenRouter"
+              apiKey: "${OPENROUTER_KEY}"
+              baseURL: "https://openrouter.ai/api/v1"
+              models:
+                default: ["meta-llama/llama-3-70b-instruct"]
+                fetch: true
+              titleConvo: true
+              titleModel: "meta-llama/llama-3-70b-instruct"
+              dropParams: ["stop"]
+              modelDisplayLabel: "OpenRouter"
+            - name: "Moonshot"
+              apiKey: "${MOONSHOT_API_KEY}"
+              baseURL: "https://api.moonshot.ai/v1"
+              models:
+                default: ["kimi-k2", "kimi-k2-thinking", "kimi-k2-turbo", "kimi-k2-thinking-turbo"]
+                fetch: false
+              titleConvo: true
+              titleModel: "kimi-k2"
+              modelDisplayLabel: "Moonshot"
+            - name: "LocalAI"
+              apiKey: "sk-local"
+              baseURL: "http://localai.default.svc.cluster.local:8080/v1"
+              models:
+                default: ["Cydonia-24B-v4.3-GGUF", "Magidonia-24B-v4.3-GGUF"]
+                fetch: false
+              titleConvo: true
+              titleModel: "Cydonia-24B-v4.3-GGUF"
+              modelDisplayLabel: "LocalAI"
         speech:
+          stt:
+            openai:
+              url: 'http://localai.default.svc.cluster.local:8080/v1/audio/transcriptions'
+              model: 'whisper-large-turbo-q8_0'
           tts:
             elevenlabs:
               apiKey: '${ELEVENLABS_API_KEY}'
@@ -36,7 +72,7 @@ spec:
             conversationMode: true
             advancedMode: false
             speechToText:
-              engineSTT: "browser"
+              engineSTT: "openai"
               languageSTT: "English (US)"
               autoTranscribeAudio: true
               decibelValue: -45
