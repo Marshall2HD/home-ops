@@ -10,8 +10,17 @@ customization:
     - intel_iommu=on # PCI Passthrough
     - iommu=pt # PCI Passthrough
     - mitigations=off # Less security, faster puter
-    - module_blacklist=igc # Disable onboard NIC
     - security=none # Less security, faster puter
+    - sysctl.kernel.kexec_load_disabled=1  # Security hardening
+    - amdgpu.ppfeaturemask=0xffffffff      # Enable all AMD GPU features
+    - amd_pstate=active                    # Better CPU frequency scaling for Zen 5
+    - amd_iommu=on                         # Enable IOMMU
+    - iommu=pt                             # Passthrough mode for performance
+    - amd_pstate.shared_mem=1              # Shared memory for P-State driver
+    - initcall_blacklist=acpi_cpufreq_init # Prevent conflict with amd_pstate
+    - nvidia-drm.modeset=1                 # Enable DRM kernel mode setting
+    - nvidia.NVreg_EnableGpuFirmware=1     # Enable GPU firmware
+    - nvidia.NVreg_PreserveVideoMemoryAllocations=1  # GPU memory persistence
     - talos.auditd.disabled=1 # Less security, faster puter
   systemExtensions:
     officialExtensions:
@@ -21,4 +30,3 @@ customization:
       - siderolabs/thunderbolt # Thunderbolt/USB4 NICs
       - siderolabs/nonfree-kmod-nvidia-production # NVIDIA GPU drivers
       - siderolabs/nvidia-container-toolkit-production # NVIDIA GPU support
-      - siderolabs/nvme-cli # NVMe management tools

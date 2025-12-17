@@ -21,10 +21,6 @@ spec:
           "ips": ["10.9.0.13/24"],
           "mac": "3e:d0:83:c0:8e:13"
         }]
-    securityContext:
-      readOnlyRootFilesystem: true
-      allowPrivilegeEscalation: false
-      capabilities: {add: ["NET_RAW"]}
     config:
       modules:
         http_2xx:
@@ -55,7 +51,7 @@ spec:
       rules:
         - alert: VpnProbeFailed
           expr: |-
-            probe_success == 0
+            probe_success{service="blackbox-exporter-vpn"} == 0
           for: 15m
           labels:
             severity: critical

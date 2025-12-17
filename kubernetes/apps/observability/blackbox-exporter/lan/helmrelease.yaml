@@ -11,10 +11,6 @@ spec:
   interval: 1h
   values:
     fullnameOverride: blackbox-exporter-lan
-    securityContext:
-      readOnlyRootFilesystem: true
-      allowPrivilegeEscalation: false
-      capabilities: {add: ["NET_RAW"]}
     config:
       modules:
         http_2xx:
@@ -45,7 +41,7 @@ spec:
       rules:
         - alert: LanProbeFailed
           expr: |-
-            probe_success == 0
+            probe_success{service="blackbox-exporter-lan"} == 0
           for: 15m
           labels:
             severity: critical

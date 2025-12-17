@@ -19,4 +19,4 @@ sops:
     mac: ENC[AES256_GCM,data:Gvg+FQGB4WtGEplxbnmJiAKNymPzUQwd2ZsApZin0Zd6wH7efRpddTdo8PsAGAlsZPR23u9M0AHifF7Od0XI8GXFtpgRIW4Sq1B9C3kjoYFIdpIDVZ/AyS9rBqm4EPoevDULjlPhVWU8gTvja7I7GdFNAT0qgXqrKmPLQA4atDc=,iv:Y7+8UeKqRkmBfBeO2t2aEiXusdp4D/0hqDejmL1ujKk=,tag:01e/9S4iUstZwwV68O03lA==,type:str]
     encrypted_regex: ^(data|stringData)$
     mac_only_encrypted: true
-    version: 3.10.2
+    version: 3.11.0

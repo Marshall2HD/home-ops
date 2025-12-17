@@ -24,18 +24,17 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-            sectionName: https
     cephClusterSpec:
       cephConfig:
         global:
-          bdev_enable_discard: "true"
-          bdev_async_discard_threads: "1"
-          osd_class_update_on_start: "false"
+          bdev_enable_discard: "true" # quote
+          bdev_async_discard_threads: "1" # quote
+          osd_class_update_on_start: "false" # quote
           osd_pool_default_size: "2"
           osd_pool_default_min_size: "1"
           device_failure_prediction_mode: local # requires mgr module
       mon:
-        count: 1
+        count: 1 # Single Node
         allowMultiplePerNode: false
       cleanupPolicy:
         wipeDevicesFromOtherClusters: true
@@ -50,7 +49,7 @@ spec:
         ssl: false
         prometheusEndpoint: http://prometheus-operated.observability.svc.cluster.local:9090
       mgr:
-        count: 1
+        count: 1 # Single Node
         modules:
           - name: diskprediction_local
             enabled: true
@@ -62,8 +61,17 @@ spec:
             enabled: true
       network:
         provider: host
+        addressRanges:
+          public:
+            - 169.254.255.0/24
+          cluster:
+            - 169.254.255.0/24
         connections:
           requireMsgr2: true
+      resources:
+        osd:
+          limits:
+            memory: 8Gi
       storage:
         useAllNodes: true
         useAllDevices: false
