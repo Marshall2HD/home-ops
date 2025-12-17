@@ -9,17 +9,15 @@ default:
 
 [doc('Apply local Flux Kustomization')]
 apply-ks ns ks:
-    just k8s render-local-ks "{{ ns }}" "{{ ks }}" | kubectl apply --server-side --field-manager=kustomize-controller -f /dev/stdin
+    just kube render-local-ks "{{ ns }}" "{{ ks }}" | kubectl apply --server-side --force-conflicts --field-manager=kustomize-controller -f /dev/stdin
 
 [doc('Browse a PVC')]
 browse-pvc namespace claim:
-    #!/usr/bin/env bash
-    export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
     kubectl browse-pvc -n {{ namespace }} -i mirror.gcr.io/alpine:latest {{ claim }}
 
 [doc('Delete local Flux Kustomization')]
 delete-ks ns ks:
-    just k8s render-local-ks "{{ ns }}" "{{ ks }}" | kubectl delete -f /dev/stdin
+    just kube render-local-ks "{{ ns }}" "{{ ks }}" | kubectl delete -f /dev/stdin
 
 [doc('Open a shell on a node')]
 node-shell node:

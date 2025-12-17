@@ -17,7 +17,7 @@ spec:
           app:
             image:
               repository: ghcr.io/alexxit/go2rtc
-              tag: 1.9.12@sha256:baef0aa19d759fcfd31607b34ce8eaf039d496282bba57731e6ae326896d7640
+              tag: 1.9.13@sha256:f394f6329f5389a4c9a7fc54b09fdec9621bbb78bf7a672b973440bbdfb02241
             probes:
               liveness: &probes
                 enabled: true
@@ -73,7 +73,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-            sectionName: https
         rules:
           - backendRefs:
               - identifier: app
@@ -104,10 +103,6 @@ spec:
                 - rtspx://192.168.1.1:7441/dFl352XtCUFREtRz
               porch:
                 - rtspx://192.168.1.1:7441/ezkTDbaOR71GUE67
-              living_room:
-                - rtspx://192.168.1.1:7441/6yxwoNNfNeg3iNAQ
-              basement:
-                - rtspx://192.168.1.1:7441/ugTfZ3GQFk0lNUN0
     persistence:
       config-file:
         type: configMap

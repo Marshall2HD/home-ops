@@ -48,12 +48,19 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: {drop: ["ALL"]}
             resources:
+              # Onedr0ps intel iGPU implementation #
+              # claims:
+              #  - name: gpu
               requests:
                 cpu: 100m
               limits:
                 memory: 16Gi
     defaultPodOptions:
       runtimeClassName: nvidia
+      # Onedr0ps intel iGPU implementation #
+      # resourceClaims:
+      #   - name: gpu
+      #     resourceClaimTemplateName: plex
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -79,7 +86,6 @@ spec:
         parentRefs:
           - name: envoy-external
             namespace: network
-            sectionName: https
         rules:
           - # Ref: https://forums.plex.tv/t/external-srt-subtitles-are-not-working-w-reverse-proxy/886540
             backendRefs:

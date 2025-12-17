@@ -36,8 +36,8 @@ spec:
               repository: ghcr.io/twin/gatus
               tag: v5.33.1@sha256:7121b5916c069eac6e266875d4984ec9262d84bd1274963939b358b32476d25b
             env:
-              GATUS_CONFIG_PATH: /config
               GATUS_DELAY_START_SECONDS: 5
+              GATUS_CONFIG_PATH: /config
               GATUS_WEB_PORT: &port 80
               TZ: America/New_York
             envFrom:
@@ -59,7 +59,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {add: ["NET_RAW"], drop: ["ALL"]}
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 100m
@@ -72,7 +72,12 @@ spec:
               accessMode: ReadWriteOnce
               size: 5Gi
     defaultPodOptions:
-      hostUsers: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
     service:
       app:
         ports:
@@ -85,15 +90,13 @@ spec:
     route:
       app:
         annotations:
-          gatus.home-operations.com/endpoint: |-
-            conditions: ["[STATUS] == 200"]
+          gatus.home-operations.com/enabled: "false"
         hostnames:
           - "{{ .Release.Name }}.hades.casa"
           - status.hades.casa
         parentRefs:
           - name: envoy-external
             namespace: network
-            sectionName: https
     rbac:
       roles:
         gatus:
