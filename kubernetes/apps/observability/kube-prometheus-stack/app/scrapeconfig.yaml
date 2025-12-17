@@ -8,7 +8,6 @@ spec:
   staticConfigs:
     - targets:
         - hypnos.internal:9100
-        - kvm.internal:9100
   metricsPath: /metrics
   relabelings:
     - action: replace
