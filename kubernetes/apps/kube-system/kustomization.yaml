@@ -19,4 +19,4 @@ resources:
   - ./reloader/ks.yaml
   - ./node-feature-discovery/ks.yaml
   - ./nvidia-device-plugin/ks.yaml
-  - ./spegel/ks.yaml
+  # - ./spegel/ks.yaml # Not useful for single-node cluster
