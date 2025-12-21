@@ -14,6 +14,3 @@ _.file = [
 "aqua:helm/helm" = "3.19.4"
 "uv" = "latest"
 "pipx:flux-local" = "latest"
-just = "latest"
-cloudflared = "latest"
-flux2 = "latest"
