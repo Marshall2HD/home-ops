@@ -48,7 +48,7 @@ machine:
   install:
     diskSelector:
       model: "WD_BLACK SN770M 1TB"
-    image: factory.talos.dev/metal-installer/cc720ffb8efc8f12637b8660a86448a88b3f89f516995fb9c67bf80564e723b1:v1.11.6
+    image: factory.talos.dev/metal-installer/42fdee009d412edb7870db7e49523c6913fbe15ac6e5c3c70c5d403b4be50e89:v1.11.6
     wipe: false
   kernel:
     modules:
@@ -96,6 +96,7 @@ machine:
   sysctls:
     fs.inotify.max_user_instances: "8192"
     fs.inotify.max_user_watches: "1048576"
+    net.core.bpf_jit_harden: "1" # REQUIRED FOR NVIDIA GPU SUPPORT
     net.core.default_qdisc: fq
     net.core.rmem_max: "67108864"
     net.core.wmem_max: "67108864"

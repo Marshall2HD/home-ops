@@ -16,6 +16,7 @@ spec:
         CUSTOM_FOOTER: "Copyright © 2025 Nyx. All rights reserved."
         DEBUG_PLUGINS: "false"
         MEILI_NO_ANALYTICS: "true"
+        ALLOW_REGISTRATION: "false"
       existingSecretName: librechat-credentials-env
       configYamlContent: |
         version: 1.3.1
