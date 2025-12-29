@@ -30,8 +30,8 @@ spec:
                     port: *port
                   initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1   # Might have to increase
-                  failureThreshold: 3 # Might have to increase
+                  timeoutSeconds: 1
+                  failureThreshold: 3
               readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
