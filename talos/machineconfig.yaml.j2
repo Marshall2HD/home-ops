@@ -26,7 +26,6 @@ machine:
       enabled: true
     {% endif %}
     rbac: true
-    stableHostname: true
   files:
     - op: create
       path: /etc/cri/conf.d/20-customization.part
@@ -63,33 +62,12 @@ machine:
     defaultRuntimeSeccompProfileEnabled: true
     disableManifestsDirectory: true
     extraConfig:
-      featureGates:
-        ImageVolume: true
       maxPods: 250
       serializeImagePulls: false
     image: ghcr.io/siderolabs/kubelet:v1.35.0
     nodeIP:
       validSubnets:
         - 10.4.0.0/24
-  network:
-    interfaces:
-      - interface: bond0
-        bond:
-          deviceSelectors:
-            - hardwareAddr: 38:05:25:33:8c:*
-              driver: i40e
-          mode: active-backup
-        dhcp: true
-        mtu: 9000
-        vlans:
-          - # IOT
-            vlanId: 7
-            dhcp: false
-            mtu: 9000
-          - # VPN
-            vlanId: 9
-            dhcp: false
-            mtu: 9000
   nodeLabels:
     node.kubernetes.io/gpu: "true"
     topology.kubernetes.io/region: main
@@ -117,10 +95,6 @@ machine:
     user.max_user_namespaces: "11255"
     vm.nr_hugepages: "1024"
   token: op://kubernetes/talos/MACHINE_TOKEN
-  udev:
-    rules:
-      - # Thunderbolt - Disable Power Management
-        ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{power/control}="on"
 cluster:
   ca:
     crt: op://kubernetes/talos/CLUSTER_CA_CRT
@@ -164,7 +138,7 @@ cluster:
     disablePodSecurityPolicy: true
     extraArgs:
       enable-aggregator-routing: "true"
-      feature-gates: ImageVolume=true,MutatingAdmissionPolicy=true
+      feature-gates: MutatingAdmissionPolicy=true
       runtime-config: admissionregistration.k8s.io/v1beta1=true
     image: registry.k8s.io/kube-apiserver:v1.35.0
   controllerManager:
@@ -209,6 +183,39 @@ cluster:
   serviceAccount:
     key: op://kubernetes/talos/CLUSTER_SERVICEACCOUNT_KEY
   {% endif %}
+---
+apiVersion: v1alpha1
+kind: LinkAliasConfig
+name: net0
+selector:
+  match: link.driver == "i40e" && mac(link.permanent_addr).startsWith("38:05:25:33:8c:")
+---
+apiVersion: v1alpha1
+kind: BondConfig
+name: bond0
+links:
+  - net0
+bondMode: active-backup
+mtu: 9000
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: bond0
+clientIdentifier: mac
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.7
+vlanID: 7
+parent: bond0
+mtu: 9000
+---
+apiVersion: v1alpha1
+kind: VLANConfig
+name: bond0.9
+vlanID: 9
+parent: bond0
+mtu: 9000
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
