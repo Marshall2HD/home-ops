@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: docker.io/ollama/ollama
-              tag: 0.13.5
+              tag: 0.14.2
             env:
               HOME: /config
               OLLAMA_HOST: "0.0.0.0"
