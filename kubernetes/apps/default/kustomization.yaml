@@ -9,10 +9,10 @@ components:
 
 resources:
   - ./namespace.yaml
+  - ./agregarr/ks.yaml
   - ./atuin/ks.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
-  - ./cross-seed/ks.yaml
   - ./flaresolverr/ks.yaml
   - ./go2rtc/ks.yaml
   - ./home-assistant/ks.yaml
@@ -35,7 +35,6 @@ resources:
   - ./smtp-relay/ks.yaml
   - ./sonarr/ks.yaml
   - ./tautulli/ks.yaml
-#  - ./tqm/ks.yaml
+  - ./thelounge/ks.yaml
   - ./whisper/ks.yaml
   - ./zigbee/ks.yaml
-#  - ./zwave/ks.yaml

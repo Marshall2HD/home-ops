@@ -21,18 +21,27 @@ spec:
               NZBGET__PORT: &port 80
               TZ: America/New_York
             probes:
-              liveness: &probes
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
                     path: /jsonrpc/status
                     port: *port
-                  initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -43,14 +52,6 @@ spec:
               limits:
                 memory: 8Gi
     defaultPodOptions:
-      annotations:
-        k8s.v1.cni.cncf.io/networks: |-
-          [{
-            "name": "vpn",
-            "namespace": "kube-system",
-            "ips": ["10.9.0.11/24"],
-            "mac": "a6:3e:4f:09:e4:9c"
-          }]
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -77,7 +78,6 @@ spec:
         server: hypnos.internal
         path: /mnt/Elysium/Media
         globalMounts:
-          - path: /media/Downloads/nzbget
-            subPath: Downloads/nzbget
+          - path: /media
       tmp:
         type: emptyDir
