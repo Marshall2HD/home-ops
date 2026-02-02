@@ -24,8 +24,11 @@ spec:
               SILLYTAVERN_LISTEN: "true"
               SILLYTAVERN_WHITELIST: '["::/0", "0.0.0.0/0"]'
               SILLYTAVERN_PORT: &port 8000
+              SILLYTAVERN_ENABLESERVERPLUGINS: "true"
               SILLYTAVERN_EXTENSIONS_MODELS_CLASSIFICATION: "SamLowe/roberta-base-go_emotions-onnx"
               SILLYTAVERN_EXTENSIONS_MODELS_EMBEDDING: "mixedbread-ai/mxbai-embed-large-v1"
+              CLAUDE_OAUTH_PROXY_BIND: "0.0.0.0"
+              CLAUDE_OAUTH_PROXY_PORT: &proxyPort 8787
             probes:
               liveness:
                 enabled: true
@@ -45,7 +48,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -58,6 +61,8 @@ spec:
         ports:
           http:
             port: *port
+          proxy:
+            port: *proxyPort
     route:
       app:
         hostnames:
@@ -67,6 +72,17 @@ spec:
           - name: envoy-internal
             namespace: network
             sectionName: https
+      proxy:
+        hostnames:
+          - "tavern-proxy.hades.casa"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: proxy
     persistence:
       data:
         existingClaim: "{{ .Release.Name }}"
@@ -79,6 +95,8 @@ spec:
             subPath: plugins
           - path: /home/node/app/public/scripts/extensions/third-party
             subPath: extensions
+          - path: /home/node/.claude
+            subPath: claude
       tmp:
         type: emptyDir
         medium: Memory
