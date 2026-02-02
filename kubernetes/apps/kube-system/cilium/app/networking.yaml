@@ -7,7 +7,7 @@ metadata:
 spec:
   allowFirstLastIPs: "No"
   blocks:
-    - cidr: 10.4.0.0/24
+    - cidr: 10.8.0.0/24
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/ciliumbgpadvertisement_v2.json
 apiVersion: cilium.io/v2
@@ -24,7 +24,7 @@ spec:
           - LoadBalancerIP
       selector:
         matchExpressions:
-          - {key: somekey, operator: NotIn, values: ["never-used-value"]}
+          - { key: somekey, operator: NotIn, values: ["never-used-value"] }
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/ciliumbgppeerconfig_v2.json
 apiVersion: cilium.io/v2
@@ -64,7 +64,7 @@ metadata:
   name: kube-api
   annotations:
     external-dns.alpha.kubernetes.io/hostname: k8s.hades.casa
-    lbipam.cilium.io/ips: 10.4.0.120
+    lbipam.cilium.io/ips: 10.8.0.120
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local

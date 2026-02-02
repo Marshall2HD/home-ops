@@ -31,7 +31,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 10m
@@ -52,7 +52,7 @@ spec:
       streams:
         type: LoadBalancer
         annotations:
-          lbipam.cilium.io/ips: 10.4.0.124
+          lbipam.cilium.io/ips: 10.8.0.124
         externalTrafficPolicy: Local
         ports:
           streams-rtsp:
@@ -88,7 +88,7 @@ spec:
             webrtc:
               listen: :8555
               candidates:
-                - 10.4.0.124:8555
+                - 10.8.0.124:8555
                 - stun:8555
               ice_servers:
                 - urls:

@@ -33,7 +33,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 10m
@@ -59,7 +59,7 @@ spec:
           external-dns.alpha.kubernetes.io/hostname: mosquitto.hades.casa
           gatus.home-operations.com/endpoint: |-
             group: services
-          lbipam.cilium.io/ips: 10.4.0.129
+          lbipam.cilium.io/ips: 10.8.0.129
         externalTrafficPolicy: Local
         ports:
           mqtt:
