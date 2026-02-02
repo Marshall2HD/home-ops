@@ -29,6 +29,7 @@ spec:
               SILLYTAVERN_EXTENSIONS_MODELS_EMBEDDING: "mixedbread-ai/mxbai-embed-large-v1"
               CLAUDE_OAUTH_PROXY_BIND: "0.0.0.0"
               CLAUDE_OAUTH_PROXY_PORT: &proxyPort 8787
+              CLAUDE_OAUTH_PROXY_ALLOW_NON_LOCAL: "true"
             probes:
               liveness:
                 enabled: true
