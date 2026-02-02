@@ -48,7 +48,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
@@ -81,7 +81,7 @@ spec:
       # bittorrent:
       #   type: LoadBalancer
       #   annotations:
-      #     lbipam.cilium.io/ips: 10.4.0.123
+      #     lbipam.cilium.io/ips: 10.8.0.123
       #   externalTrafficPolicy: Local
       #   ports:
       #     bittorrent-tcp:

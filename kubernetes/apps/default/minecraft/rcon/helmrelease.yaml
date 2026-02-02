@@ -41,7 +41,7 @@ spec:
             patch: |
               - op: add
                 path: /metadata/annotations/lbipam.cilium.io~1ips
-                value: 10.4.0.131
+                value: 10.8.0.131
               - op: add
                 path: /metadata/annotations/external-dns.alpha.kubernetes.io~1hostname
                 value: rcon.hades.casa
@@ -56,9 +56,9 @@ spec:
                 path: /spec/template/spec/containers/0/env/-
                 value:
                   name: RWA_WEBSOCKET_URL
-                  value: "ws://10.4.0.131:4327"
+                  value: "ws://10.8.0.131:4327"
               - op: add
                 path: /spec/template/spec/containers/0/env/-
                 value:
                   name: RWA_WEBSOCKET_URL_SSL
-                  value: "wss://10.4.0.131:4327"
+                  value: "wss://10.8.0.131:4327"

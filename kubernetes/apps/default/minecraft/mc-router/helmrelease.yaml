@@ -14,5 +14,5 @@ spec:
         type: LoadBalancer
         annotations:
           external-dns.alpha.kubernetes.io/hostname: mc-router.hades.casa
-          lbipam.cilium.io/ips: 10.4.0.130
+          lbipam.cilium.io/ips: 10.8.0.130
         externalTrafficPolicy: Local

@@ -39,7 +39,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 10m
@@ -55,7 +55,7 @@ spec:
         type: LoadBalancer
         annotations:
           external-dns.alpha.kubernetes.io/hostname: smtp-relay.hades.casa
-          lbipam.cilium.io/ips: 10.4.0.122
+          lbipam.cilium.io/ips: 10.8.0.122
         externalTrafficPolicy: Local
         ports:
           smtp:
