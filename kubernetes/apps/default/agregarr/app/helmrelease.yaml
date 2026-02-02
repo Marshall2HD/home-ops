@@ -3,26 +3,25 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: qbittorrent
+  name: agregarr
 spec:
   chartRef:
     kind: OCIRepository
-    name: qbittorrent
+    name: agregarr
   interval: 1h
   values:
     controllers:
-      qbittorrent:
+      agregarr:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
-              repository: ghcr.io/home-operations/qbittorrent
-              tag: 5.1.4@sha256:56ecd30a7f5e1357daf5eea2a6935134d329b7b268a3a9b9c67041b65fb87fc6
+              repository: ghcr.io/agregarr/agregarr
+              tag: v2.3.0@sha256:87ea4f00479e3ed9108edb2ed39596d68cf122f7fc09b5cff7c32da725857bd0
             env:
+              PORT: &port 80
               TZ: America/New_York
-              QBT_WEBUI_PORT: &port 80
-              QBT_TORRENTING_PORT: &torrentPort 50470
             probes:
               liveness:
                 enabled: true
@@ -35,7 +34,7 @@ spec:
                 custom: true
                 spec:
                   httpGet:
-                    path: /api/v2/app/version
+                    path: /api/v1/status
                     port: *port
                   periodSeconds: 10
                   timeoutSeconds: 5
@@ -45,15 +44,15 @@ spec:
                 spec:
                   failureThreshold: 30
                   periodSeconds: 10
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 1Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: {drop: ["ALL"]}
-            resources:
-              requests:
-                cpu: 100m
-              limits:
-                memory: 12Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -63,20 +62,9 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
     service:
       app:
-        forceRename: "{{ .Release.Name }}"
-        primary: true
         ports:
           http:
             port: *port
-      bittorrent:
-        type: LoadBalancer
-        annotations:
-          lbipam.cilium.io/ips: 10.4.0.123
-        externalTrafficPolicy: Local
-        ports:
-          bittorrent-tcp:
-            port: *torrentPort
-            protocol: TCP
     route:
       app:
         hostnames:
@@ -84,18 +72,10 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
-      media:
-        type: nfs
-        server: hypnos.internal
-        path: /mnt/Elysium/Media
         globalMounts:
-          - path: /media
+          - path: /app/config
       tmp:
         type: emptyDir
