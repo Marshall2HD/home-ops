@@ -59,13 +59,11 @@ spec:
             enabled: true
           - name: rook
             enabled: true
-      # network:
-      #   provider: host
-      #   addressRanges:
-      #     public:
-      #       - 10.4.0.0/24
-      #     cluster:
-      #       - 10.4.0.0/24
+      network:
+        provider: host
+        addressRanges:
+          public:
+            - 10.4.0.0/24
         connections:
           requireMsgr2: true
       resources:
