@@ -67,8 +67,8 @@ spec:
         speech:
           stt:
             openai:
-              url: 'http://localai.default.svc.cluster.local:8080/v1/audio/transcriptions'
-              model: 'whisper-large-turbo-q8_0'
+              url: 'http://speaches.default.svc.cluster.local:8080/v1/audio/transcriptions'
+              model: 'istupakov/parakeet-tdt-0.6b-v3-onnx'
               apiKey: 'sk-local'
           tts:
             elevenlabs:
@@ -101,8 +101,8 @@ spec:
       enabled: false
     mongodb:
       global:
-          security:
-            allowInsecureImages: true
+        security:
+          allowInsecureImages: true
       image:
         registry: registry-1.docker.io
         repository: bitnami/mongodb

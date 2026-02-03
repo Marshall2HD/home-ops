@@ -36,5 +36,5 @@ resources:
   - ./sonarr/ks.yaml
   - ./tautulli/ks.yaml
   - ./thelounge/ks.yaml
-  - ./whisper/ks.yaml
+  - ./speaches/ks.yaml
   - ./zigbee/ks.yaml
