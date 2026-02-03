@@ -22,6 +22,7 @@ spec:
             env:
               WHISPER__INFERENCE_DEVICE: cuda
               PRELOAD_MODELS: '["istupakov/parakeet-tdt-0.6b-v3-onnx"]'
+              LOOPBACK_HOST_URL: "http://localhost:8000"
             probes:
               liveness: &probes
                 enabled: true
