@@ -17,22 +17,19 @@ spec:
         containers:
           app:
             image:
-              repository: onerahmet/openai-whisper-asr-webservice
-              tag: v1.9.1-gpu
+              repository: ghcr.io/speaches-ai/speaches
+              tag: latest-cuda
             env:
-              ASR_DEVICE: cuda
-              ASR_MODEL: large-v3
-              ASR_ENGINE: faster_whisper
-              NVIDIA_DRIVER_CAPABILITIES: all
-              NVIDIA_VISIBLE_DEVICES: all
+              WHISPER__INFERENCE_DEVICE: cuda
+              PRELOAD_MODELS: '["istupakov/parakeet-tdt-0.6b-v3-onnx"]'
             probes:
               liveness: &probes
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /
-                    port: &port 9000
+                    path: /health
+                    port: &port 8000
                   initialDelaySeconds: 30
                   periodSeconds: 10
                   timeoutSeconds: 5
@@ -42,7 +39,7 @@ spec:
                 enabled: true
                 spec:
                   httpGet:
-                    path: /
+                    path: /health
                     port: *port
                   initialDelaySeconds: 0
                   periodSeconds: 10
@@ -76,7 +73,7 @@ spec:
       cache:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
-          - path: /root/.cache/whisper
+          - path: /home/ubuntu/.cache/huggingface/hub
       tmp:
         type: emptyDir
         globalMounts:
