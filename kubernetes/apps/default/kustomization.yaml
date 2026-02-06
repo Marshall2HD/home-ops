@@ -13,16 +13,17 @@ resources:
   - ./atuin/ks.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
+  - ./cobalt/ks.yaml
   - ./flaresolverr/ks.yaml
   - ./go2rtc/ks.yaml
   - ./home-assistant/ks.yaml
   - ./jellyfin/ks.yaml
   - ./librechat/ks.yaml
-  - ./ollama/ks.yaml
   - ./minecraft/ks.yaml
   - ./mosquitto/ks.yaml
   - ./notifier/ks.yaml
   - ./nzbget/ks.yaml
+  # - ./ollama/ks.yaml
   - ./plex/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
@@ -36,5 +37,6 @@ resources:
   - ./sonarr/ks.yaml
   - ./tautulli/ks.yaml
   - ./thelounge/ks.yaml
+  - ./vllm/ks.yaml
   - ./speaches/ks.yaml
   - ./zigbee/ks.yaml
