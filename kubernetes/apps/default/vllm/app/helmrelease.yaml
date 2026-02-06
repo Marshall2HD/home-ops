@@ -34,6 +34,16 @@ spec:
     routerSpec:
       enabled: true
       replicaCount: 1
+      route:
+        main:
+          enabled: true
+          apiVersion: gateway.networking.k8s.io/v1
+          kind: HTTPRoute
+          hostnames:
+            - vllm.hades.casa
+          parentRefs:
+            - name: envoy-internal
+              namespace: network
 
     servingEngineSpec:
       runtimeClassName: nvidia
@@ -89,12 +99,3 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
-
-    ingress:
-      enabled: true
-      className: internal
-      hosts:
-        - host: vllm.hades.casa
-          paths:
-            - path: /
-              pathType: Prefix
