@@ -10,7 +10,7 @@ releases:
   - name: cilium
     namespace: kube-system
     chart: oci://quay.io/cilium/charts/cilium
-    version: 1.18.6
+    version: 1.19.0
     values:
       - ./templates/values.yaml.gotmpl
     hooks:
@@ -55,7 +55,7 @@ releases:
   - name: cert-manager
     namespace: cert-manager
     chart: oci://quay.io/jetstack/charts/cert-manager
-    version: v1.19.2
+    version: v1.19.3
     values:
       - ./templates/values.yaml.gotmpl
     needs:
@@ -64,7 +64,7 @@ releases:
   - name: external-secrets
     namespace: external-secrets
     chart: oci://ghcr.io/external-secrets/charts/external-secrets
-    version: 1.3.1
+    version: 2.0.0
     values:
       - ./templates/values.yaml.gotmpl
     needs:
