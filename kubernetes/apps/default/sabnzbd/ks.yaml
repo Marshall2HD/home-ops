@@ -3,21 +3,19 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: nzbget
+  name: sabnzbd
 spec:
   components:
     - ../../../../components/nfs-scaler
     - ../../../../components/volsync
   dependsOn:
-    - name: multus-networks
-      namespace: kube-system
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
-  path: ./kubernetes/apps/default/nzbget/app
+  path: ./kubernetes/apps/default/sabnzbd/app
   postBuild:
     substitute:
-      APP: nzbget
+      APP: sabnzbd
       VOLSYNC_CAPACITY: 1Gi
   prune: true
   sourceRef:

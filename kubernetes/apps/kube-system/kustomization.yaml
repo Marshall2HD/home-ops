@@ -19,3 +19,4 @@ resources:
   - ./node-feature-discovery/ks.yaml
   - ./nvidia-device-plugin/ks.yaml
   # - ./spegel/ks.yaml # Not useful for single-node cluster
+  # - ./irqbalance/ks.yaml # Not useful for single-node cluster
