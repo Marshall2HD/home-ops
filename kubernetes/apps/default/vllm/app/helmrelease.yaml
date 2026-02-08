@@ -56,7 +56,8 @@ spec:
           replicaCount: 1
 
           requestCPU: 4
-          requestMemory: 24Gi
+          requestMemory: 2Gi
+          limitMemory: 24Gi
           requestGPU: 1
 
           pvcStorage: 50Gi
