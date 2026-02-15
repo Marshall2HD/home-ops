@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/sillytavern/sillytavern
-              tag: staging@sha256:f284230c1a6c6601f1e829e7cdcb2b04b7e8ae79008dee649571e8fcec7582f2
+              tag: staging@sha256:5653edd9a1421286f66375cbe5df2b838b4a76f7a4b3abf31253e97cb27aa365
             env:
               TZ: America/New_York
               SILLYTAVERN_LISTEN: "true"
