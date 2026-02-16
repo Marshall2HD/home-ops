@@ -20,15 +20,44 @@ spec:
               repository: docker.io/robertlordhood/chaptarr
               tag: develop@sha256:aacff19da6128c1fe6881544cb85a457d6593201ea8433bb405df023c5d13a62
             env:
+              CHAPTARR__APP__INSTANCENAME: Chaptarr
+              CHAPTARR__APP__THEME: dark
+              CHAPTARR__AUTH__METHOD: External
+              CHAPTARR__AUTH__REQUIRED: DisabledForLocalAddresses
+              CHAPTARR__LOG__DBENABLED: "False"
+              CHAPTARR__LOG__LEVEL: info
+              CHAPTARR__SERVER__PORT: &port 80
+              CHAPTARR__UPDATE__BRANCH: develop
               TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
             probes:
-              liveness: &probes
-                enabled: false
-              readiness: *probes
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
@@ -45,7 +74,7 @@ spec:
       app:
         ports:
           http:
-            port: &port 8789
+            port: *port
     route:
       app:
         hostnames:
