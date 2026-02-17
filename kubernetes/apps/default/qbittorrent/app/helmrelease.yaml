@@ -46,21 +46,21 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 100m
               limits:
                 memory: 8Gi
     defaultPodOptions:
-      annotations:
-        k8s.v1.cni.cncf.io/networks: |-
-          [{
-            "name": "vpn",
-            "namespace": "kube-system",
-            "ips": ["10.9.0.10/24"],
-            "mac": "32:0b:d8:1f:b6:e4"
-          }]
+      # annotations:
+      #   k8s.v1.cni.cncf.io/networks: |-
+      #     [{
+      #       "name": "vpn",
+      #       "namespace": "kube-system",
+      #       "ips": ["10.9.0.10/24"],
+      #       "mac": "32:0b:d8:1f:b6:e4"
+      #     }]
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
