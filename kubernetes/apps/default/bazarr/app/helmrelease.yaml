@@ -77,7 +77,7 @@ spec:
         existingClaim: "{{ .Release.Name }}"
       media:
         type: nfs
-        server: expanse.internal
+        server: hypnos.internal
         path: /mnt/Elysium/Media
         globalMounts:
           - path: /media
