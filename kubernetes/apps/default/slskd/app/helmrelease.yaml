@@ -57,7 +57,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
@@ -130,8 +130,8 @@ spec:
             subPath: slskd.yml
       media:
         type: nfs
-        server: hypnos.internal
-        path: /mnt/Elysium/Media
+        server: expanse.internal
+        path: /mnt/eros/Media
         globalMounts:
           - path: /media
       tmp:
