@@ -44,7 +44,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
@@ -65,7 +65,7 @@ spec:
     route:
       app:
         hostnames:
-          - "{{ .Release.Name }}.hades.casa"
+          - "{{ .Release.Name }}.turbo.ac"
         parentRefs:
           - name: envoy-internal
             namespace: network
@@ -94,8 +94,8 @@ spec:
             subPath: repository.config
       repository:
         type: nfs
-        server: hypnos.internal
-        path: /mnt/Asphodel/VolsyncKopia
+        server: expanse.internal
+        path: /mnt/eros/Kopia
         globalMounts:
           - path: /repository
       tmpfs:

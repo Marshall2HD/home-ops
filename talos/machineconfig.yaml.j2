@@ -18,12 +18,12 @@ machine:
       port: 7445
     {% if ENV.IS_CONTROLLER %}
     kubernetesTalosAPIAccess:
+      enabled: true
       allowedKubernetesNamespaces:
         - actions-runner-system
         - system-upgrade
       allowedRoles:
         - os:admin
-      enabled: true
     {% endif %}
     rbac: true
   files:
@@ -42,8 +42,10 @@ machine:
         [ NFSMount_Global_Options ]
         nfsvers=4.2
         hard=True
-        nconnect=16
+        nconnect=8
         noatime=True
+        rsize=1048576
+        wsize=1048576
   install:
     diskSelector:
       model: "WD_BLACK SN770M 1TB"
