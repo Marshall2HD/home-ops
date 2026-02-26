@@ -5,7 +5,8 @@
       "mcp__acp__Write",
       "mcp__acp__Edit",
       "Bash(kubectl get:*)",
-      "Bash(kubectl patch:*)"
+      "Bash(kubectl patch:*)",
+      "Bash(just kube:*)"
     ]
   }
 }

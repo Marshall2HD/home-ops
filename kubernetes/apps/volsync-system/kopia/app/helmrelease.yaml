@@ -65,7 +65,7 @@ spec:
     route:
       app:
         hostnames:
-          - "{{ .Release.Name }}.turbo.ac"
+          - "{{ .Release.Name }}.hades.casa"
         parentRefs:
           - name: envoy-internal
             namespace: network
@@ -95,7 +95,7 @@ spec:
       repository:
         type: nfs
         server: expanse.internal
-        path: /mnt/eros/Kopia
+        path: /mnt/Asphodel/VolsyncKopia
         globalMounts:
           - path: /repository
       tmpfs:
