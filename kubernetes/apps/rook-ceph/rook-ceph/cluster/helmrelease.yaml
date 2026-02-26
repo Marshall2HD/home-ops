@@ -35,11 +35,6 @@ spec:
         modules:
           - name: pg_autoscaler
             enabled: true
-      network:
-        provider: host
-        addressRanges:
-          public:
-            - 10.4.0.0/24
         connections:
           requireMsgr2: true
       resources:
@@ -69,9 +64,9 @@ spec:
     cephBlockPools:
       - name: ceph-blockpool
         spec:
-          failureDomain: osd  # Changed from 'host' for single node
+          failureDomain: osd # Changed from 'host' for single node
           replicated:
-            size: 2  # Mirror across 2 drives
+            size: 2 # Mirror across 2 drives
         storageClass:
           enabled: true
           name: ceph-block
