@@ -8,6 +8,7 @@ spec:
   components:
     - ../../../../components/volsync
   dependsOn:
+    - name: librechat-mongodb-volsync
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
@@ -16,6 +17,33 @@ spec:
     substitute:
       APP: librechat
       VOLSYNC_CAPACITY: 25Gi
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: default
+  wait: false
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: librechat-mongodb-volsync
+spec:
+  components:
+    - ../../../../components/volsync
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+  interval: 1h
+  path: ./kubernetes/apps/default/librechat/mongodb-volsync
+  postBuild:
+    substitute:
+      APP: librechat-mongodb
+      VOLSYNC_CAPACITY: 8Gi
+      VOLSYNC_PUID: "1001"
+      VOLSYNC_PGID: "1001"
   prune: true
   sourceRef:
     kind: GitRepository

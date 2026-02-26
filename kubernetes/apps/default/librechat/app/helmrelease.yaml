@@ -107,3 +107,5 @@ spec:
         registry: registry-1.docker.io
         repository: bitnami/mongodb
         tag: latest
+      persistence:
+        existingClaim: librechat-mongodb
