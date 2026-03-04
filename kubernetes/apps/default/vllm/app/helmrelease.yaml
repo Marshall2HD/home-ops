@@ -81,8 +81,6 @@ spec:
           env:
             - name: TZ
               value: America/New_York
-            - name: HF_HOME
-              value: "/data"
             - name: NVIDIA_DRIVER_CAPABILITIES
               value: all
             - name: NVIDIA_VISIBLE_DEVICES
