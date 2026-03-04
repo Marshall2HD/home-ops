@@ -13,13 +13,13 @@ spec:
     librechat:
       configEnv:
         ENDPOINTS: "openAI,agents,assistants,azureOpenAI,google,anthropic,bingAI,custom"
-        CUSTOM_FOOTER: "Copyright © 2025 Nyx. All rights reserved."
+        CUSTOM_FOOTER: "Copyright © 2026 Nyx. All rights reserved."
         DEBUG_PLUGINS: "false"
         MEILI_NO_ANALYTICS: "true"
         ALLOW_REGISTRATION: "false"
       existingSecretName: librechat-credentials-env
       configYamlContent: |
-        version: 1.3.1
+        version: 1.3.4
         cache: true
         endpoints:
           custom:
@@ -37,10 +37,10 @@ spec:
               apiKey: "$${OPENROUTER_KEY}"
               baseURL: "https://openrouter.ai/api/v1"
               models:
-                default: ["meta-llama/llama-3-70b-instruct"]
+                default: ["anthropic/claude-sonnet-4.6"]
                 fetch: true
               titleConvo: true
-              titleModel: "meta-llama/llama-3-70b-instruct"
+              titleModel: "anthropic/claude-haiku-4.5"
               dropParams: ["stop"]
               modelDisplayLabel: "OpenRouter"
 
@@ -48,45 +48,51 @@ spec:
               apiKey: "$${MOONSHOT_API_KEY}"
               baseURL: "https://api.moonshot.ai/v1"
               models:
-                default: ["kimi-k2-0905-preview", "kimi-k2-thinking", "kimi-k2-turbo-preview", "kimi-k2-thinking-turbo"]
+                default: ["kimi-k2.5"]
                 fetch: true
               titleConvo: true
-              titleModel: "kimi-k2-0905-preview"
+              titleModel: "kimi-k2.5"
               modelDisplayLabel: "Moonshot"
 
-            - name: "Ollama"
-              apiKey: "ollama"
-              baseURL: "http://ollama.default.svc.cluster.local:11434/v1"
+            - name: "VLLM"
+              apiKey: "none"
+              baseURL: "http://vllm-vllm-stack-router.default.svc.cluster.local/v1"
               models:
-                default: ["hf.co/TheDrummer/Cydonia-24B-v4.3-GGUF:Q5_K_M", "hf.co/TheDrummer/Magidonia-24B-v4.3-GGUF:Q5_K_M"]
+                default: ["Qwen/Qwen3.5-9B"]
                 fetch: true
               titleConvo: true
-              titleModel: "hf.co/TheDrummer/Cydonia-24B-v4.3-GGUF:Q5_K_M"
-              modelDisplayLabel: "Ollama"
+              titleModel: "Qwen/Qwen3.5-9B"
+              modelDisplayLabel: "VLLM"
 
         speech:
-          stt:
-            openai:
-              url: 'http://speaches.default.svc.cluster.local:8080/v1/audio/transcriptions'
-              model: 'istupakov/parakeet-tdt-0.6b-v3-onnx'
-              apiKey: 'sk-local'
           tts:
             elevenlabs:
               apiKey: '$${ELEVENLABS_API_KEY}'
               model: 'eleven_v3'
-              voices: ['H2cdv8R2nEdoRT9ji2xP', 'Ttn6dlQvgqQ9d7by8NNT', 'LmHPRoS1O5KyGE3oXRbb', 'I1X1J5pzMOURLxATlhpe']
+              voices:
+                - 'm3yAHyFEFKtbCIM5n7GF'  # Ash
+                - 'WtA85syCrJwasGeHGH2p'  # Ember
+                - 'xNtG3W2oqJs0cJZuTyBc'  # Chloe
+                - 'nDJIICjR9zfJExIFeSCN'  # Emmaline
+                - '54Cze5LrTSyLgbO6Fhlc'  # Cat
+                - '56bWURjYFHyYyVf490Dp'  # Emma
+                - 'lcMyyd2HUfFzxdCaC4Ta'  # Lucy
+                - '4tRn1lSkEn13EVTuqb0g'  # Serafina
+                - 'k7EgWWVjhSqofE4pWBQp'  # Artemis (custom)
+                - 'g16aPq2qEOrGJ6r4hIXP'  # Necro (custom)
+                - 'YiFO1DkSpmfVSGxQ4aUi'  # Deadlock (custom)
           speechTab:
             conversationMode: true
             advancedMode: false
             speechToText:
-              engineSTT: "openai"
+              engineSTT: "browser"
               languageSTT: "English (US)"
               autoTranscribeAudio: true
               decibelValue: -45
               autoSendText: 0
             textToSpeech:
-              engineTTS: "external"
-              voice: "H2cdv8R2nEdoRT9ji2xP"
+              engineTTS: "elevenlabs"
+              voice: "m3yAHyFEFKtbCIM5n7GF"
               languageTTS: "en"
               automaticPlayback: false
               playbackRate: 1.0
@@ -106,6 +112,6 @@ spec:
       image:
         registry: registry-1.docker.io
         repository: bitnami/mongodb
-        tag: latest
+        tag: 8.0
       persistence:
         existingClaim: librechat-mongodb

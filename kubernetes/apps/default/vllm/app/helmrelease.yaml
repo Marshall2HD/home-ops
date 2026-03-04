@@ -49,10 +49,10 @@ spec:
       runtimeClassName: nvidia
 
       modelSpec:
-        - name: qwen-7b
+        - name: qwen-9b
           repository: vllm/vllm-openai
           tag: v0.8.0
-          modelURL: Qwen/Qwen2.5-7B-Instruct
+          modelURL: Qwen/Qwen3.5-9B
           replicaCount: 1
 
           requestCPU: 4

@@ -38,6 +38,6 @@ resources:
   - ./sonarr/ks.yaml
   - ./tautulli/ks.yaml
   - ./thelounge/ks.yaml
-  # - ./vllm/ks.yaml
+  - ./vllm/ks.yaml
   - ./speaches/ks.yaml
   - ./zigbee/ks.yaml
