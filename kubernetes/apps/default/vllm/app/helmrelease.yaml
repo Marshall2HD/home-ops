@@ -75,6 +75,8 @@ spec:
             dtype: float16
             extraArgs:
               - "--trust-remote-code"
+              - "--hf-overrides"
+              - '{"model_type":"qwen3_5"}'
               - "--reasoning-parser"
               - "qwen3"
               - "--override-generation-config"
