@@ -52,7 +52,7 @@ spec:
         - name: qwen-9b
           repository: vllm/vllm-openai
           tag: v0.8.0
-          modelURL: Qwen/Qwen3.5-9B
+          modelURL: lukey03/Qwen3.5-9B-abliterated
           replicaCount: 1
 
           requestCPU: 4
