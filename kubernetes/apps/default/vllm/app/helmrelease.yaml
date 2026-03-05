@@ -29,10 +29,6 @@ spec:
       name: vllm-secret
       valuesKey: HF_TOKEN
       targetPath: servingEngineSpec.modelSpec[0].hf_token
-    - kind: Secret
-      name: vllm-secret
-      valuesKey: HF_TOKEN
-      targetPath: servingEngineSpec.modelSpec[1].hf_token
 
   values:
     routerSpec:
@@ -53,10 +49,10 @@ spec:
       runtimeClassName: nvidia
 
       modelSpec:
-        - name: qwen-9b
+        - name: qwen-9b-reasoning-distilled
           repository: vllm/vllm-openai
-          tag: v0.8.0
-          modelURL: lukey03/Qwen3.5-9B-abliterated
+          tag: nightly@sha256:e38b62beee4c79cbc9ce0a9d2865fe9dabbc383e172b2f7d8f68892d36f74c5d
+          modelURL: Jackrong/Qwen3.5-9B-Claude-4.6-Opus-Reasoning-Distilled
           replicaCount: 1
 
           requestCPU: 4
@@ -71,55 +67,13 @@ spec:
           vllmConfig:
             enableChunkedPrefill: true
             enablePrefixCaching: true
-            maxModelLen: 4096
             dtype: float16
             extraArgs:
               - "--disable-log-requests"
-              - "--gpu-memory-utilization"
-              - "0.90"
-              - "--max-num-seqs"
-              - "32"
-
-          shmSize: 8Gi
-
-          env:
-            - name: TZ
-              value: America/New_York
-            - name: NVIDIA_DRIVER_CAPABILITIES
-              value: all
-            - name: NVIDIA_VISIBLE_DEVICES
-              value: all
-
-          nodeSelector:
-            nvidia.feature.node.kubernetes.io/gpu: "true"
-
-          tolerations:
-            - key: nvidia.com/gpu
-              operator: Exists
-              effect: NoSchedule
-
-        - name: qwen-9b-abliterated
-          repository: vllm/vllm-openai
-          tag: v0.8.0
-          modelURL: lukey03/Qwen3.5-9B-abliterated
-          replicaCount: 1
-
-          requestCPU: 4
-          requestMemory: 2Gi
-          limitMemory: 24Gi
-          requestGPU: 1
-
-          pvcStorage: 50Gi
-          pvcAccessMode:
-            - ReadWriteOnce
-
-          vllmConfig:
-            enableChunkedPrefill: true
-            enablePrefixCaching: true
-            maxModelLen: 4096
-            dtype: float16
-            extraArgs:
-              - "--disable-log-requests"
+              - "--reasoning-parser"
+              - "qwen3"
+              - "--override-generation-config"
+              - '{"temperature":1.0,"top_p":0.95,"top_k":20,"min_p":0.0,"presence_penalty":1.5,"repetition_penalty":1.0,"max_new_tokens":81920}'
               - "--gpu-memory-utilization"
               - "0.90"
               - "--max-num-seqs"
