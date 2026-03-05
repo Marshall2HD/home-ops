@@ -57,7 +57,7 @@ spec:
         - name: qwen-9b-reasoning-distilled
           repository: vllm/vllm-openai
           tag: nightly@sha256:e38b62beee4c79cbc9ce0a9d2865fe9dabbc383e172b2f7d8f68892d36f74c5d
-          modelURL: Jackrong/Qwen3.5-9B-Claude-4.6-Opus-Reasoning-Distilled
+          modelURL: lukey03/Qwen3.5-9B-abliterated
           replicaCount: 1
 
           requestCPU: 4
