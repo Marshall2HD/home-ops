@@ -34,6 +34,11 @@ spec:
     routerSpec:
       enabled: true
       replicaCount: 1
+      resources:
+        requests:
+          memory: 500Mi
+        limits:
+          memory: 2Gi
       route:
         main:
           enabled: true
