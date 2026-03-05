@@ -56,7 +56,7 @@ spec:
       modelSpec:
         - name: qwen-3-5-9b-abliterated
           repository: vllm/vllm-openai
-          tag: nightly@sha256:e38b62beee4c79cbc9ce0a9d2865fe9dabbc383e172b2f7d8f68892d36f74c5d
+          tag: cu130-nightly
           modelURL: lukey03/Qwen3.5-9B-abliterated
           replicaCount: 1
 
