@@ -74,7 +74,6 @@ spec:
             enablePrefixCaching: true
             dtype: float16
             extraArgs:
-              - "--disable-log-requests"
               - "--reasoning-parser"
               - "qwen3"
               - "--override-generation-config"
