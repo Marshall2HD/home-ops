@@ -54,10 +54,10 @@ spec:
       runtimeClassName: nvidia
 
       modelSpec:
-        - name: qwen-3-5-9b-abliterated
+        - name: qwen-3-5-9b
           repository: vllm/vllm-openai
           tag: cu130-nightly
-          modelURL: lukey03/Qwen3.5-9B-abliterated
+          modelURL: Qwen/Qwen3.5-9B
           replicaCount: 1
 
           requestCPU: 4
