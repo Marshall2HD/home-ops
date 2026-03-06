@@ -75,6 +75,7 @@ spec:
             dtype: float16
             extraArgs:
               - "--trust-remote-code"
+              - "--enforce-eager"
               - "--reasoning-parser"
               - "qwen3"
               - "--override-generation-config"
