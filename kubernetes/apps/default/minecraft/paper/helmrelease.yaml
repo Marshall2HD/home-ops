@@ -27,7 +27,7 @@ spec:
               EULA: true
               FORCE_GAMEMODE: true
               ICON: https://i.imgur.com/1Pzv8xx.png
-              MAX_MEMORY: 8G
+              MAX_MEMORY: 10G
               MODE: survival
               MOTD: "Powered by 100% §kVOID §r energy.§r\n                     (っ◕‿◕)っ"
               OVERRIDE_ICON: true
@@ -38,8 +38,8 @@ spec:
               SPAWN_PROTECTION: 0
               TZ: America/New_York
               TYPE: PAPER
-              USE_AIKAR_FLAGS: true
               USE_MEOWICE_FLAGS: true
+              USE_MEOWICE_GRAALVM_FLAGS: true
               VERSION: 1.21.10
               VIEW_DISTANCE: 32
             envFrom:
@@ -75,7 +75,7 @@ spec:
                 cpu: 100m
                 memory: 256Mi
               limits:
-                memory: 8Gi
+                memory: 10Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
