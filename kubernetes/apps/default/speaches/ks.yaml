@@ -15,7 +15,7 @@ spec:
   postBuild:
     substitute:
       APP: speaches
-      VOLSYNC_CAPACITY: 5Gi
+      VOLSYNC_CAPACITY: 15Gi
   prune: true
   sourceRef:
     kind: GitRepository
