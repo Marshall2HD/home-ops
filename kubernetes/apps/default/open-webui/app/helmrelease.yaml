@@ -20,6 +20,8 @@ spec:
               repository: ghcr.io/open-webui/open-webui
               tag: v0.8.10
             env:
+              DATA_DIR: /app/backend/data
+              HOME: /app/backend/data
               ENABLE_OPENAI_API: "true"
               OPENAI_API_BASE_URLS: "http://vllm-vllm-stack-router.default.svc.cluster.local/v1"
               OPENAI_API_KEYS: "not-needed"
