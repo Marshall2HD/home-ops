@@ -59,8 +59,6 @@ spec:
         ports:
           http:
             port: *port
-          proxy:
-            port: *proxyPort
     route:
       app:
         hostnames:
