@@ -63,6 +63,7 @@ spec:
       app:
         hostnames:
           - "{{ .Release.Name }}.hades.casa"
+          - tavern.hades.casa
         parentRefs:
           - name: envoy-internal
             namespace: network
