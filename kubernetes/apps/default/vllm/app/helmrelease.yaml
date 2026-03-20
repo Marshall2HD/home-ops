@@ -77,7 +77,7 @@ spec:
               - "--quantization"
               - "fp8"
               - "--max-model-len"
-              - "262144"
+              - "200000"
               - "--reasoning-parser"
               - "qwen3"
               - "--override-generation-config"
