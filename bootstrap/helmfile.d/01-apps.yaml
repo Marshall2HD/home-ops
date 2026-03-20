@@ -43,15 +43,6 @@ releases:
     needs:
       - kube-system/cilium
 
-  - name: spegel
-    namespace: kube-system
-    chart: oci://ghcr.io/spegel-org/helm-charts/spegel
-    version: 0.6.0
-    values:
-      - ./templates/values.yaml.gotmpl
-    needs:
-      - kube-system/coredns
-
   - name: cert-manager
     namespace: cert-manager
     chart: oci://quay.io/jetstack/charts/cert-manager
@@ -59,7 +50,7 @@ releases:
     values:
       - ./templates/values.yaml.gotmpl
     needs:
-      - kube-system/spegel
+      - kube-system/coredns
 
   - name: external-secrets
     namespace: external-secrets
