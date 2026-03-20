@@ -44,7 +44,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
@@ -95,7 +95,7 @@ spec:
       repository:
         type: nfs
         server: hypnos.internal
-        path: /mnt/Asphodel/VolsyncKopia
+        path: /mnt/Asphodel/Kopia
         globalMounts:
           - path: /repository
       tmpfs:

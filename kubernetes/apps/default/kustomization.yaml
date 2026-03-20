@@ -13,9 +13,11 @@ resources:
   - ./atuin/ks.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
+  - ./brrpolice/ks.yaml
   - ./chaptarr/ks.yaml
   - ./cobalt/ks.yaml
   - ./flaresolverr/ks.yaml
+  - ./deduparr/ks.yaml
   - ./decluttarr/ks.yaml
   - ./go2rtc/ks.yaml
   - ./home-assistant/ks.yaml

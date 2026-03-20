@@ -31,7 +31,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 10m
@@ -74,32 +74,33 @@ spec:
           - backendRefs:
               - identifier: app
                 port: 80
-    configMaps:
-      config:
-        data:
-          go2rtc.yaml: |-
-            log:
-              streams: error # Prevent log spam from UniFi Protect
-            api:
-              listen: :80
-              origin: "*"
-            rtsp:
-              listen: :554
-            webrtc:
-              listen: :8555
-              candidates:
-                - 10.8.0.124:8555
-                - stun:8555
-              ice_servers:
-                - urls:
-                    - stun:stun.cloudflare.com:3478
-            streams:
-              driveway:
-                - rtspx://192.168.1.1:7441/SB74mRIu1CkoPcEq
-              garage:
-                - rtspx://192.168.1.1:7441/dFl352XtCUFREtRz
-              porch:
-                - rtspx://192.168.1.1:7441/ezkTDbaOR71GUE67
+    # Left as example for future me
+    # configMaps:
+    #   config:
+    #     data:
+    #       go2rtc.yaml: |-
+    #         log:
+    #           streams: error # Prevent log spam from UniFi Protect
+    #         api:
+    #           listen: :80
+    #           origin: "*"
+    #         rtsp:
+    #           listen: :554
+    #         webrtc:
+    #           listen: :8555
+    #           candidates:
+    #             - 10.8.0.124:8555
+    #             - stun:8555
+    #           ice_servers:
+    #             - urls:
+    #                 - stun:stun.cloudflare.com:3478
+    #         streams:
+    #           driveway:
+    #             - rtspx://10.1.0.1:7441/SB74mRIu1CkoPcEq
+    #           garage:
+    #             - rtspx://10.1.0.1:7441/dFl352XtCUFREtRz
+    #           porch:
+    #             - rtspx://10.1.0.1:7441/ezkTDbaOR71GUE67
     persistence:
       config-file:
         type: configMap
