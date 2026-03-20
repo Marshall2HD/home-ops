@@ -74,6 +74,8 @@ spec:
           vllmConfig:
             extraArgs:
               - "--enforce-eager"
+              - "--quantization"
+              - "fp8"
               - "--max-model-len"
               - "262144"
               - "--reasoning-parser"
