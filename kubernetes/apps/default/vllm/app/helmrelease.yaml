@@ -73,6 +73,7 @@ spec:
 
           vllmConfig:
             extraArgs:
+              - "--enforce-eager"
               - "--max-model-len"
               - "262144"
               - "--reasoning-parser"
