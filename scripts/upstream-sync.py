@@ -50,6 +50,11 @@ REPLACEMENTS = [
     ("192.168.70.", "10.7.0."),     # IoT / Home Assistant VLAN (multus iot network, HASS trusted proxy)
     ("192.168.90.", "10.9.0."),     # VPN network (multus vpn network, blackbox-exporter)
 
+    # ── VLAN interface names ──────────────────────────────────────
+    # His bond VLANs use 2-digit IDs (bond0.70), ours use single-digit (bond0.7).
+    ("bond0.70", "bond0.7"),        # IoT VLAN (multus iot network)
+    ("bond0.90", "bond0.9"),        # VPN VLAN (multus vpn network)
+
     # ── Node IPs ───────────────────────────────────────────────────
     # His nodes are 192.168.42.10-12, ours are 10.4.0.10-12.
     ("192.168.42.10", "10.4.0.10"),  # k8s-0 node
@@ -109,6 +114,13 @@ SKIP_FILES = [
     # Kustomization: our custom app list (chaptarr, cobalt, librechat, minecraft, etc.)
     # gets blown away if overwritten. The script can't merge resource lists.
     "apps/default/kustomization.yaml",
+
+    # kube-system kustomization: we use nvidia-device-plugin + node-feature-discovery,
+    # he uses intel-gpu-resource-driver. We also don't run spegel or descheduler (single-node).
+    "apps/kube-system/kustomization.yaml",
+
+    # Blackbox probes: he has 3 JetKVMs and 3 k8s nodes, we have 1 of each.
+    "apps/observability/blackbox-exporter/lan/probes.yaml",
 
     # Resource limits: we run leaner than onedr0p on these.
     # qbittorrent: we use 1Gi request / 8Gi limit, he uses no request / 32Gi limit.
