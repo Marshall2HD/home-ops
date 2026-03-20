@@ -58,8 +58,8 @@ spec:
       modelSpec:
         - name: qwen-3-5-9b
           repository: vllm/vllm-openai
-          tag: cu130-nightly
-          modelURL: Qwen/Qwen3.5-9B
+          tag: nightly@sha256:97aaaad8846ebf431b6ac2ee2fc24dec7791c6405393f450e970f9a2d60739c4
+          modelURL: DavidAU/Qwen3.5-9B-Deckard-Claude-DIMOE-Uncensored-Heretic-Thinking
           replicaCount: 1
 
           requestCPU: 4
@@ -72,20 +72,13 @@ spec:
             - ReadWriteOnce
 
           vllmConfig:
-            enableChunkedPrefill: true
-            enablePrefixCaching: true
-            dtype: float16
             extraArgs:
-              - "--trust-remote-code"
-              - "--enforce-eager"
+              - "--max-model-len"
+              - "262144"
               - "--reasoning-parser"
               - "qwen3"
               - "--override-generation-config"
-              - '{"temperature":1.0,"top_p":0.95,"top_k":20,"min_p":0.0,"presence_penalty":1.5,"repetition_penalty":1.0,"max_new_tokens":81920}'
-              - "--gpu-memory-utilization"
-              - "0.90"
-              - "--max-num-seqs"
-              - "32"
+              - '{"temperature":1.0,"top_p":0.95,"top_k":20,"min_p":0.0,"presence_penalty":1.5,"repetition_penalty":1.0}'
 
           shmSize: 8Gi
 
