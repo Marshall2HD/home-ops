@@ -31,8 +31,11 @@ spec:
                 fi
                 TEMP_PATH="${MODEL_PATH}.downloading"
                 echo "Downloading model..."
-                wget -c -O "$TEMP_PATH" "$MODEL_URL"
+                wget --header="Authorization: Bearer $HF_TOKEN" -c -O "$TEMP_PATH" "$MODEL_URL"
                 mv "$TEMP_PATH" "$MODEL_PATH"
+            envFrom:
+              - secretRef:
+                  name: llama-secret
         containers:
           app:
             image:
