@@ -13,7 +13,7 @@ spec:
     controllers:
       llama:
         type: statefulset
-        strategy: Recreate
+        strategy: OnDelete
         initContainers:
           download-model:
             image:
