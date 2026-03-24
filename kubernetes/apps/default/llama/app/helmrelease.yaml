@@ -1,0 +1,122 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app llama
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: llama
+  interval: 1h
+  values:
+    controllers:
+      llama:
+        type: statefulset
+        strategy: Recreate
+        initContainers:
+          download-model:
+            image:
+              repository: alpine
+              tag: 3.21
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                MODEL_PATH="/models/Qwen3.5-27B-UD-Q4_K_XL.gguf"
+                MODEL_URL="https://huggingface.co/unsloth/Qwen3.5-27B-UD-GGUF/resolve/main/Qwen3.5-27B-UD-Q4_K_XL.gguf"
+                echo "Checking/downloading model..."
+                wget -c -O "$MODEL_PATH" "$MODEL_URL"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/ggml-org/llama.cpp
+              tag: server-cuda-b8496
+            args:
+              - "-m"
+              - "/models/Qwen3.5-27B-UD-Q4_K_XL.gguf"
+              - "--host"
+              - "0.0.0.0"
+              - "--port"
+              - "8080"
+              - "--ctx-size"
+              - "100000"
+              - "--n-gpu-layers"
+              - "-1"
+              - "--alias"
+              - "Qwen3.5-27B"
+              - "--temp"
+              - "1.0"
+              - "--top-p"
+              - "0.95"
+              - "--top-k"
+              - "20"
+              - "--min-p"
+              - "0.0"
+              - "--presence-penalty"
+              - "1.5"
+              - "--repeat-penalty"
+              - "1.0"
+            env:
+              TZ: America/New_York
+              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_VISIBLE_DEVICES: all
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 8080
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 120
+            resources:
+              requests:
+                cpu: 4
+                memory: 2Gi
+                nvidia.com/gpu: 1
+              limits:
+                memory: 24Gi
+                nvidia.com/gpu: 1
+        statefulset:
+          volumeClaimTemplates:
+            - name: models
+              storageClass: ceph-block
+              accessMode: ReadWriteOnce
+              size: 30Gi
+              globalMounts:
+                - path: /models
+    defaultPodOptions:
+      runtimeClassName: nvidia
+      nodeSelector:
+        nvidia.feature.node.kubernetes.io/gpu: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
