@@ -54,15 +54,15 @@ spec:
               titleModel: "kimi-k2.5"
               modelDisplayLabel: "Moonshot"
 
-            - name: "VLLM"
+            - name: "Llama"
               apiKey: "none"
-              baseURL: "http://vllm-vllm-stack-router.default.svc.cluster.local/v1"
+              baseURL: "http://llama.default.svc.cluster.local:8080/v1"
               models:
-                default: ["Qwen/Qwen3.5-9B"]
+                default: ["Qwen3.5-27B"]
                 fetch: true
               titleConvo: true
-              titleModel: "Qwen/Qwen3.5-9B"
-              modelDisplayLabel: "VLLM"
+              titleModel: "Qwen3.5-27B"
+              modelDisplayLabel: "Llama"
 
             - name: "Metaxu"
               apiKey: "oauth"
