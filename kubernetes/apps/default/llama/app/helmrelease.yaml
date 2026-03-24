@@ -22,10 +22,17 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - |
+                set -e
                 MODEL_PATH="/models/Qwen3.5-27B-UD-Q4_K_XL.gguf"
                 MODEL_URL="https://huggingface.co/unsloth/Qwen3.5-27B-UD-GGUF/resolve/main/Qwen3.5-27B-UD-Q4_K_XL.gguf"
-                echo "Checking/downloading model..."
-                wget -c -O "$MODEL_PATH" "$MODEL_URL"
+                if [ -f "$MODEL_PATH" ]; then
+                  echo "Model already exists, skipping download"
+                  exit 0
+                fi
+                TEMP_PATH="${MODEL_PATH}.downloading"
+                echo "Downloading model..."
+                wget -c -O "$TEMP_PATH" "$MODEL_URL"
+                mv "$TEMP_PATH" "$MODEL_PATH"
         containers:
           app:
             image:
