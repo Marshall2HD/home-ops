@@ -6,7 +6,9 @@
       "mcp__acp__Edit",
       "Bash(kubectl get:*)",
       "Bash(kubectl patch:*)",
-      "Bash(just kube:*)"
+      "Bash(just kube:*)",
+      "Bash(kubectl:*)",
+      "Bash(talosctl:*)"
     ]
   }
 }
