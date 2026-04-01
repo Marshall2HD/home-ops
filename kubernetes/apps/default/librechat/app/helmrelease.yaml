@@ -58,10 +58,10 @@ spec:
               apiKey: "none"
               baseURL: "http://llama.default.svc.cluster.local:8080/v1"
               models:
-                default: ["Qwen3.5-27B"]
+                default: ["Qwen3.5-35B-A3B"]
                 fetch: true
               titleConvo: true
-              titleModel: "Qwen3.5-27B"
+              titleModel: "Qwen3.5-35B-A3B"
               modelDisplayLabel: "Llama"
 
             - name: "Metaxu"
