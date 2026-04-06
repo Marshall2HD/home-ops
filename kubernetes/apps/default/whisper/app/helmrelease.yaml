@@ -63,6 +63,13 @@ spec:
               globalMounts:
                 - path: /models
     defaultPodOptions:
+      # TODO: update parakeet-api image to use uid 1000 to match cluster convention, then update these values
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
       runtimeClassName: nvidia
       nodeSelector:
         nvidia.feature.node.kubernetes.io/gpu: "true"
