@@ -1,0 +1,86 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app whisper
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  interval: 1h
+  values:
+    controllers:
+      whisper:
+        type: statefulset
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/marshall2hd/parakeet-api
+              tag: latest
+            env:
+              TZ: America/New_York
+              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_VISIBLE_DEVICES: all
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: &port 8000
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 120
+            resources:
+              requests:
+                cpu: 1
+                memory: 2Gi
+                nvidia.com/gpu: 1
+              limits:
+                memory: 8Gi
+                nvidia.com/gpu: 1
+        statefulset:
+          volumeClaimTemplates:
+            - name: models
+              storageClass: ceph-block
+              accessMode: ReadWriteOnce
+              size: 50Gi
+              globalMounts:
+                - path: /models
+    defaultPodOptions:
+      runtimeClassName: nvidia
+      nodeSelector:
+        nvidia.feature.node.kubernetes.io/gpu: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
