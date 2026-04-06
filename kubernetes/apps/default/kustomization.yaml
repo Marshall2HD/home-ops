@@ -26,6 +26,7 @@ resources:
   - ./mosquitto/ks.yaml
   - ./notifier/ks.yaml
   - ./open-webui/ks.yaml
+  - ./parakeet/ks.yaml
   - ./plex/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
