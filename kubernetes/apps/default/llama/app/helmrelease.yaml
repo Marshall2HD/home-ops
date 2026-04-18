@@ -69,7 +69,6 @@ spec:
               - "--parallel"
               - "1"
               - "--jinja"
-              - "--mlock"
               - "--threads"
               - "8"
               - "--ctx-size"
@@ -121,15 +120,11 @@ spec:
             resources:
               requests:
                 cpu: 4
-                memory: 40Gi
+                memory: 4Gi
                 nvidia.com/gpu: 1
               limits:
-                memory: 48Gi
+                memory: 32Gi
                 nvidia.com/gpu: 1
-            securityContext:
-              capabilities:
-                add:
-                  - IPC_LOCK  # required for --mlock
         statefulset:
           volumeClaimTemplates:
             - name: models
