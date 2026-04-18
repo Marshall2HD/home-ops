@@ -127,7 +127,7 @@ spec:
             - name: models
               storageClass: ceph-block
               accessMode: ReadWriteOnce
-              size: 50Gi
+              size: 30Gi  # PVC already expanded to 50Gi manually; K8s forbids volumeClaimTemplates edits
               globalMounts:
                 - path: /models
     defaultPodOptions:
