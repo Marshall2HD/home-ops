@@ -9,6 +9,7 @@ spec:
     kind: OCIRepository
     name: llama
   interval: 1h
+  timeout: 1h
   values:
     controllers:
       llama:
