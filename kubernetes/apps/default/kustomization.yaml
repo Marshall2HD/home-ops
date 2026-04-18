@@ -43,4 +43,5 @@ resources:
   - ./tautulli/ks.yaml
   - ./thelounge/ks.yaml
   - ./trtllm/ks.yaml
+  - ./llama/ks.yaml
   - ./zigbee/ks.yaml
