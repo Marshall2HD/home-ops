@@ -15,11 +15,11 @@ spec:
         type: statefulset
         strategy: RollingUpdate
         initContainers:
-          # 1. Pull HF weights. Skip if already present.
+          # Pull HF weights once; serve container will load directly.
           01-download-model:
             image: &trtllmImage
               repository: nvcr.io/nvidia/tensorrt-llm/release
-              tag: 0.21.0  # TODO: pin to latest release that supports Qwen3 MoE
+              tag: 0.21.0  # PyTorch / LLM-API backend path
             command: ["/bin/bash", "-c"]
             args:
               - |
@@ -32,83 +32,11 @@ spec:
                 fi
                 mkdir -p "${SRC_DIR}"
                 huggingface-cli download "${HF_REPO}" \
-                  --local-dir "${SRC_DIR}" \
-                  --exclude "*.gguf" "original/*"
+                  --local-dir "${SRC_DIR}"
                 touch "${SRC_DIR}/.complete"
             envFrom:
               - secretRef:
                   name: trtllm-secret
-          # 2. Quantize HF -> TRT-LLM checkpoint (INT4 AWQ + FP16 compute).
-          02-quantize:
-            image: *trtllmImage
-            command: ["/bin/bash", "-c"]
-            args:
-              - |
-                set -euo pipefail
-                SRC_DIR="/workspace/hf/Qwen3.6-35B-A3B"
-                CKPT_DIR="/workspace/ckpt/awq-int4"
-                if [ -f "${CKPT_DIR}/.complete" ]; then
-                  echo "AWQ checkpoint present, skipping."
-                  exit 0
-                fi
-                mkdir -p "${CKPT_DIR}"
-                # Unified quantize.py handles Qwen MoE; calibration pulled from HF datasets.
-                python /app/tensorrt_llm/examples/quantization/quantize.py \
-                  --model_dir "${SRC_DIR}" \
-                  --output_dir "${CKPT_DIR}" \
-                  --dtype float16 \
-                  --qformat int4_awq \
-                  --awq_block_size 128 \
-                  --kv_cache_dtype int8 \
-                  --calib_size 512
-                touch "${CKPT_DIR}/.complete"
-            envFrom:
-              - secretRef:
-                  name: trtllm-secret
-            resources:
-              requests:
-                cpu: 4
-                memory: 32Gi
-                nvidia.com/gpu: 1
-              limits:
-                memory: 64Gi
-                nvidia.com/gpu: 1
-          # 3. Build TRT engines. GPU-specific (SM89/L4).
-          03-build-engine:
-            image: *trtllmImage
-            command: ["/bin/bash", "-c"]
-            args:
-              - |
-                set -euo pipefail
-                CKPT_DIR="/workspace/ckpt/awq-int4"
-                ENGINE_DIR="/workspace/engines/l4-awq-int4"
-                if [ -f "${ENGINE_DIR}/.complete" ]; then
-                  echo "Engine present, skipping."
-                  exit 0
-                fi
-                mkdir -p "${ENGINE_DIR}"
-                trtllm-build \
-                  --checkpoint_dir "${CKPT_DIR}" \
-                  --output_dir "${ENGINE_DIR}" \
-                  --gemm_plugin auto \
-                  --moe_plugin auto \
-                  --use_paged_context_fmha enable \
-                  --use_fused_mlp enable \
-                  --max_batch_size 8 \
-                  --max_input_len 8192 \
-                  --max_seq_len 16384 \
-                  --max_num_tokens 8192
-                touch "${ENGINE_DIR}/.complete"
-                # Free disk once engine is built.
-                rm -rf /workspace/hf
-            resources:
-              requests:
-                cpu: 4
-                memory: 32Gi
-                nvidia.com/gpu: 1
-              limits:
-                memory: 64Gi
-                nvidia.com/gpu: 1
         containers:
           app:
             image: *trtllmImage
@@ -116,12 +44,15 @@ spec:
             args:
               - |
                 exec trtllm-serve \
-                  /workspace/engines/l4-awq-int4 \
+                  /workspace/hf/Qwen3.6-35B-A3B \
                   --host 0.0.0.0 \
                   --port 8000 \
-                  --tokenizer /workspace/ckpt/awq-int4 \
-                  --max_batch_size 8 \
-                  --kv_cache_free_gpu_memory_fraction 0.9
+                  --backend pytorch \
+                  --max_batch_size 4 \
+                  --max_num_tokens 4096 \
+                  --kv_cache_free_gpu_memory_fraction 0.85 \
+                  --trust_remote_code \
+                  --extra_llm_api_options /config/llm-api.yaml
             env:
               TZ: America/New_York
               NVIDIA_DRIVER_CAPABILITIES: all
@@ -144,18 +75,18 @@ spec:
                   httpGet:
                     path: /health
                     port: *port
-                  initialDelaySeconds: 30
+                  initialDelaySeconds: 60
                   periodSeconds: 15
                   timeoutSeconds: 5
-                  # Build steps on first boot can take 30-60m; bump if needed.
+                  # First boot: HF download + model load can take a while.
                   failureThreshold: 240
             resources:
               requests:
                 cpu: 4
-                memory: 4Gi
+                memory: 8Gi
                 nvidia.com/gpu: 1
               limits:
-                memory: 24Gi
+                memory: 48Gi
                 nvidia.com/gpu: 1
         statefulset:
           volumeClaimTemplates:
@@ -173,6 +104,26 @@ spec:
         - key: nvidia.com/gpu
           operator: Exists
           effect: NoSchedule
+    configMaps:
+      llm-api:
+        data:
+          llm-api.yaml: |
+            cuda_graph_config:
+              enable_padding: true
+              max_batch_size: 4
+            kv_cache_config:
+              enable_block_reuse: true
+              free_gpu_memory_fraction: 0.85
+            moe_config:
+              backend: CUTLASS
+    persistence:
+      llm-api:
+        type: configMap
+        name: "{{ .Release.Name }}-llm-api"
+        globalMounts:
+          - path: /config/llm-api.yaml
+            subPath: llm-api.yaml
+            readOnly: true
     service:
       app:
         controller: *app
