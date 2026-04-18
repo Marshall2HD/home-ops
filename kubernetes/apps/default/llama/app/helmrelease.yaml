@@ -23,10 +23,10 @@ spec:
             args:
               - |
                 set -e
-                MODEL_PATH="/models/Qwen3.5-35B-A3B-UD-Q4_K_XL.gguf"
-                MODEL_URL="https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF/resolve/main/Qwen3.5-35B-A3B-UD-Q4_K_XL.gguf"
-                MMPROJ_PATH="/models/Qwen3.5-35B-A3B-mmproj-F16.gguf"
-                MMPROJ_URL="https://huggingface.co/unsloth/Qwen3.5-35B-A3B-GGUF/resolve/main/mmproj-F16.gguf"
+                MODEL_PATH="/models/Qwen3.6-35B-A3B-UD-Q8_K_XL.gguf"
+                MODEL_URL="https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen3.6-35B-A3B-UD-Q8_K_XL.gguf"
+                MMPROJ_PATH="/models/Qwen3.6-35B-A3B-mmproj-F16.gguf"
+                MMPROJ_URL="https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/resolve/main/mmproj-F16.gguf"
 
                 # This PVC is dedicated to the active model, so prune stale weights first.
                 find /models -maxdepth 1 -type f -name "Qwen3*.gguf" ! -name "$(basename "$MODEL_PATH")" -print -delete
@@ -59,9 +59,9 @@ spec:
               tag: server-cuda-b8496
             args:
               - "-m"
-              - "/models/Qwen3.5-35B-A3B-UD-Q4_K_XL.gguf"
+              - "/models/Qwen3.6-35B-A3B-UD-Q8_K_XL.gguf"
               - "--mmproj"
-              - "/models/Qwen3.5-35B-A3B-mmproj-F16.gguf"
+              - "/models/Qwen3.6-35B-A3B-mmproj-F16.gguf"
               - "--host"
               - "0.0.0.0"
               - "--port"
@@ -75,7 +75,7 @@ spec:
               - "--n-gpu-layers"
               - "-1"
               - "--alias"
-              - "Qwen3.5-35B-A3B"
+              - "Qwen3.6-35B-A3B"
               - "--temp"
               - "1.0"
               - "--top-p"
@@ -127,7 +127,7 @@ spec:
             - name: models
               storageClass: ceph-block
               accessMode: ReadWriteOnce
-              size: 30Gi
+              size: 50Gi
               globalMounts:
                 - path: /models
     defaultPodOptions:
