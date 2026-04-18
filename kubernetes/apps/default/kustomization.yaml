@@ -42,6 +42,5 @@ resources:
   - ./sonarr/ks.yaml
   - ./tautulli/ks.yaml
   - ./thelounge/ks.yaml
-  # - ./trtllm/ks.yaml  # disabled: legacy AWQ pipeline doesn't support qwen3_5_moe; PyTorch path untested on L4
   - ./llama/ks.yaml
   - ./zigbee/ks.yaml
