@@ -24,7 +24,7 @@ spec:
             args:
               - |
                 set -euo pipefail
-                HF_REPO="HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive"
+                HF_REPO="unsloth/Qwen3.6-35B-A3B"
                 SRC_DIR="/workspace/hf/${HF_REPO##*/}"
                 if [ -f "${SRC_DIR}/.complete" ]; then
                   echo "HF weights present, skipping."
@@ -45,7 +45,7 @@ spec:
             args:
               - |
                 set -euo pipefail
-                SRC_DIR="/workspace/hf/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive"
+                SRC_DIR="/workspace/hf/Qwen3.6-35B-A3B"
                 CKPT_DIR="/workspace/ckpt/awq-int4"
                 if [ -f "${CKPT_DIR}/.complete" ]; then
                   echo "AWQ checkpoint present, skipping."
