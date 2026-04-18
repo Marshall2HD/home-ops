@@ -19,7 +19,7 @@ spec:
           01-download-model:
             image: &trtllmImage
               repository: nvcr.io/nvidia/tensorrt-llm/release
-              tag: 0.21.0  # PyTorch / LLM-API backend path
+              tag: 1.2.0  # PyTorch / LLM-API backend path
             command: ["/bin/bash", "-c"]
             args:
               - |
