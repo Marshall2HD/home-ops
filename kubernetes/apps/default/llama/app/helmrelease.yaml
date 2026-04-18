@@ -68,6 +68,10 @@ spec:
               - "8080"
               - "--parallel"
               - "1"
+              - "--jinja"
+              - "--mlock"
+              - "--threads"
+              - "8"
               - "--ctx-size"
               - "100000"
               - "--flash-attn"
@@ -117,11 +121,15 @@ spec:
             resources:
               requests:
                 cpu: 4
-                memory: 2Gi
+                memory: 40Gi
                 nvidia.com/gpu: 1
               limits:
-                memory: 24Gi
+                memory: 48Gi
                 nvidia.com/gpu: 1
+            securityContext:
+              capabilities:
+                add:
+                  - IPC_LOCK  # required for --mlock
         statefulset:
           volumeClaimTemplates:
             - name: models
