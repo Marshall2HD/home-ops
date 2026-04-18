@@ -24,7 +24,7 @@ spec:
             args:
               - |
                 set -euo pipefail
-                HF_REPO="unsloth/Qwen3.6-35B-A3B"
+                HF_REPO="Qwen/Qwen3.6-35B-A3B-FP8"
                 SRC_DIR="/workspace/hf/${HF_REPO##*/}"
                 if [ -f "${SRC_DIR}/.complete" ]; then
                   echo "HF weights present, skipping."
@@ -44,13 +44,14 @@ spec:
             args:
               - |
                 exec trtllm-serve \
-                  /workspace/hf/Qwen3.6-35B-A3B \
+                  /workspace/hf/Qwen3.6-35B-A3B-FP8 \
                   --host 0.0.0.0 \
                   --port 8000 \
                   --backend pytorch \
-                  --max_batch_size 4 \
-                  --max_num_tokens 4096 \
-                  --kv_cache_free_gpu_memory_fraction 0.85 \
+                  --max_batch_size 1 \
+                  --max_num_tokens 8192 \
+                  --max_seq_len 204800 \
+                  --kv_cache_free_gpu_memory_fraction 0.90 \
                   --trust_remote_code \
                   --extra_llm_api_options /config/llm-api.yaml
             env:
@@ -110,10 +111,11 @@ spec:
           llm-api.yaml: |
             cuda_graph_config:
               enable_padding: true
-              max_batch_size: 4
+              max_batch_size: 1
             kv_cache_config:
               enable_block_reuse: true
-              free_gpu_memory_fraction: 0.85
+              free_gpu_memory_fraction: 0.90
+              dtype: fp8
             moe_config:
               backend: CUTLASS
     persistence:
