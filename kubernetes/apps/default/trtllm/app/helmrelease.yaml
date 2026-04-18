@@ -16,7 +16,7 @@ spec:
         strategy: RollingUpdate
         initContainers:
           # 1. Pull HF weights. Skip if already present.
-          download-model:
+          01-download-model:
             image: &trtllmImage
               repository: nvcr.io/nvidia/tensorrt-llm/release
               tag: 0.21.0  # TODO: pin to latest release that supports Qwen3 MoE
@@ -39,7 +39,7 @@ spec:
               - secretRef:
                   name: trtllm-secret
           # 2. Quantize HF -> TRT-LLM checkpoint (INT4 AWQ + FP16 compute).
-          quantize:
+          02-quantize:
             image: *trtllmImage
             command: ["/bin/bash", "-c"]
             args:
@@ -74,7 +74,7 @@ spec:
                 memory: 64Gi
                 nvidia.com/gpu: 1
           # 3. Build TRT engines. GPU-specific (SM89/L4).
-          build-engine:
+          03-build-engine:
             image: *trtllmImage
             command: ["/bin/bash", "-c"]
             args:
