@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: docker.io/robertlordhood/chaptarr
-              tag: develop@sha256:1148ae82565dc4d9542d42829ac7e9f6d51e5e87162b36516023f5a4899c71c6
+              tag: develop@sha256:8dbe03f172fdc2cfd8b49d42bf7b97b1794524edbe91a3741be9d4cf471540ff
             env:
               CHAPTARR__APP__INSTANCENAME: Chaptarr
               CHAPTARR__APP__THEME: dark
