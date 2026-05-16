@@ -6,8 +6,8 @@ metadata:
   name: plex
 spec:
   components:
-    - ../../../../components/nfs-scaler
     - ../../../../components/volsync
+    - ../../../../components/zeroscaler
   dependsOn:
     - name: nvidia-device-plugin
       namespace: kube-system

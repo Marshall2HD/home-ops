@@ -3,7 +3,7 @@ version: v1alpha1
 machine:
   ca:
     crt: op://kubernetes/talos/MACHINE_CA_CRT
-    {% if ENV.IS_CONTROLLER %}
+    {% if ENV.CONTROLPLANE %}
     key: op://kubernetes/talos/MACHINE_CA_KEY
     {% endif %}
   features:
@@ -16,7 +16,7 @@ machine:
     kubePrism:
       enabled: true
       port: 7445
-    {% if ENV.IS_CONTROLLER %}
+    {% if ENV.CONTROLPLANE %}
     kubernetesTalosAPIAccess:
       enabled: true
       allowedKubernetesNamespaces:
@@ -33,7 +33,6 @@ machine:
         [plugins."io.containerd.cri.v1.images"]
           discard_unpacked_layers = false
         [plugins."io.containerd.cri.v1.runtime"]
-          cdi_spec_dirs = ["/var/cdi/static", "/var/cdi/dynamic"]
           device_ownership_from_security_context = true
     - op: overwrite
       path: /etc/nfsmount.conf
@@ -48,8 +47,8 @@ machine:
         wsize=1048576
   install:
     diskSelector:
-      model: "WD_BLACK SN770M 1TB"
-    image: factory.talos.dev/metal-installer/3c6456c2c04ec7b19f014a648cb6e39b6c41bf167585e5aa37c233a9249534a7:v1.12.6
+      model: MK000480GWCEV
+    image: factory.talos.dev/metal-installer/{{ ENV.SCHEMATIC }}:v1.13.2
     wipe: false
   kernel:
     modules:
@@ -64,9 +63,9 @@ machine:
     defaultRuntimeSeccompProfileEnabled: true
     disableManifestsDirectory: true
     extraConfig:
-      maxPods: 250
+      maxPods: 250 # Single Node Cluster Tweak.
       serializeImagePulls: false
-    image: ghcr.io/siderolabs/kubelet:v1.35.2
+    image: ghcr.io/siderolabs/kubelet:v1.36.1
     nodeIP:
       validSubnets:
         - 10.4.0.0/24
@@ -100,7 +99,7 @@ machine:
 cluster:
   ca:
     crt: op://kubernetes/talos/CLUSTER_CA_CRT
-    {% if ENV.IS_CONTROLLER %}
+    {% if ENV.CONTROLPLANE %}
     key: op://kubernetes/talos/CLUSTER_CA_KEY
     {% endif %}
   clusterName: main
@@ -124,7 +123,7 @@ cluster:
       - 10.43.0.0/16
   secret: op://kubernetes/talos/CLUSTER_SECRET
   token: op://kubernetes/talos/CLUSTER_TOKEN
-  {% if ENV.IS_CONTROLLER %}
+  {% if ENV.CONTROLPLANE %}
   aggregatorCA:
     crt: op://kubernetes/talos/CLUSTER_AGGREGATORCA_CRT
     key: op://kubernetes/talos/CLUSTER_AGGREGATORCA_KEY
@@ -140,13 +139,13 @@ cluster:
     disablePodSecurityPolicy: true
     extraArgs:
       enable-aggregator-routing: "true"
-      feature-gates: MutatingAdmissionPolicy=true
-      runtime-config: admissionregistration.k8s.io/v1beta1=true
-    image: registry.k8s.io/kube-apiserver:v1.35.2
+      feature-gates: HPAScaleToZero=true
+    image: registry.k8s.io/kube-apiserver:v1.36.1
   controllerManager:
     extraArgs:
       bind-address: 0.0.0.0
-    image: registry.k8s.io/kube-controller-manager:v1.35.2
+      feature-gates: HPAScaleToZero=true
+    image: registry.k8s.io/kube-controller-manager:v1.36.1
   coreDNS:
     disabled: true
   etcd:
@@ -159,7 +158,7 @@ cluster:
       listen-metrics-urls: http://0.0.0.0:2381
   proxy:
     disabled: true
-    image: registry.k8s.io/kube-proxy:v1.35.2
+    image: registry.k8s.io/kube-proxy:v1.36.1
   scheduler:
     config:
       apiVersion: kubescheduler.config.k8s.io/v1
@@ -180,7 +179,7 @@ cluster:
                     whenUnsatisfiable: ScheduleAnyway
     extraArgs:
       bind-address: 0.0.0.0
-    image: registry.k8s.io/kube-scheduler:v1.35.2
+    image: registry.k8s.io/kube-scheduler:v1.36.1
   secretboxEncryptionSecret: op://kubernetes/talos/CLUSTER_SECRETBOXENCRYPTIONSECRET
   serviceAccount:
     key: op://kubernetes/talos/CLUSTER_SERVICEACCOUNT_KEY
@@ -230,4 +229,4 @@ provisioning:
 apiVersion: v1alpha1
 kind: WatchdogTimerConfig
 device: /dev/watchdog0
-timeout: 10m
+timeout: 5m

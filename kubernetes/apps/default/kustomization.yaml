@@ -14,12 +14,8 @@ resources:
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
   - ./brrpolice/ks.yaml
-  - ./chaptarr/ks.yaml
-  - ./cobalt/ks.yaml
   - ./deduparr/ks.yaml
-  - ./decluttarr/ks.yaml
-  - ./flaresolverr/ks.yaml
-  # - ./go2rtc/ks.yaml
+  - ./go2rtc/ks.yaml
   - ./home-assistant/ks.yaml
   - ./librechat/ks.yaml
   - ./minecraft/ks.yaml
@@ -43,3 +39,4 @@ resources:
   - ./tautulli/ks.yaml
   - ./thelounge/ks.yaml
   - ./zigbee/ks.yaml
+  - ./zwave/ks.yaml

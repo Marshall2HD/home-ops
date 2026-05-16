@@ -50,21 +50,14 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              capabilities: { drop: ["ALL"] }
             resources:
-              # Onedr0ps intel iGPU implementation #
-              # claims:
-              #  - name: gpu
               requests:
                 cpu: 100m
               limits:
                 memory: 16Gi
     defaultPodOptions:
       runtimeClassName: nvidia
-      # Onedr0ps intel iGPU implementation #
-      # resourceClaims:
-      #   - name: gpu
-      #     resourceClaimTemplateName: plex
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
