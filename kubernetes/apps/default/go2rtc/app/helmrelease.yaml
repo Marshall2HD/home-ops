@@ -74,6 +74,12 @@ spec:
           - backendRefs:
               - identifier: app
                 port: 80
+    configMaps:
+      config:
+        data:
+          go2rtc.yaml: |-
+            api:
+              listen: :80
     # Left as example for future me
     # configMaps:
     #   config:
