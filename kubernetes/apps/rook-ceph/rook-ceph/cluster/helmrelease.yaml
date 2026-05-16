@@ -31,6 +31,7 @@ spec:
         ssl: false
         prometheusEndpoint: http://prometheus-operated.o11y.svc.cluster.local:9090
       mgr:
+        count: 1 # Single Node
         modules:
           - name: pg_autoscaler
             enabled: true
@@ -43,6 +44,9 @@ spec:
             memory: 8Gi # Required for bootstrap
       storage:
         useAllDevices: false
+        devicePathFilter: "^/dev/disk/by-id/nvme-Micron_7450_MTFDKBA800TFS_(25124FA456CD|25124FA45676)$"
+        config:
+          osdsPerDevice: "1"
         useAllNodes: true
     monitoring:
       enabled: true
