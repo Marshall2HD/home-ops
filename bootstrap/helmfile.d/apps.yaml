@@ -57,7 +57,7 @@ releases:
     values:
       - ./templates/values.yaml.gotmpl
     needs:
-      - kube-system/spegel
+      - kube-system/coredns
 
   - name: external-secrets
     namespace: external-secrets

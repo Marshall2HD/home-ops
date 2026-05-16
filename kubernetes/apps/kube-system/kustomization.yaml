@@ -18,4 +18,3 @@ resources:
   - ./nvidia-device-plugin/ks.yaml
   - ./snapshot-controller/ks.yaml
   - ./reloader/ks.yaml
-  - ./spegel/ks.yaml
