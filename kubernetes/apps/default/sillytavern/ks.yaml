@@ -5,7 +5,7 @@ metadata:
   name: sillytavern
 spec:
   components:
-    - ../../../../components/nfs-scaler
+    - ../../../../components/zeroscaler
     - ../../../../components/volsync
   dependsOn:
     - name: rook-ceph-cluster
