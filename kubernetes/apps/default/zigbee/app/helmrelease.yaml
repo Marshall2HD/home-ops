@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       zigbee:
+        strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -75,9 +76,8 @@ spec:
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
+                memory: 64Mi
                 cpu: 10m
-              limits:
-                memory: 2Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
