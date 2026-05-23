@@ -44,7 +44,7 @@ jobs:
               })
           json.dump(item, open(dst, 'w'))
           PY2
-          op item edit cloudflare --vault Kubernetes --template "$RUNNER_TEMP/cloudflare-updated.json" >/dev/null
+          op item edit cloudflare --vault Kubernetes --template "$RUNNER_TEMP/cloudflare-updated.json" < /dev/null >/dev/null
           op item get cloudflare --vault Kubernetes --format json > "$RUNNER_TEMP/cloudflare-verify.json"
           python3 - <<'PY2'
           import json, os
