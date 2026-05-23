@@ -25,15 +25,31 @@ jobs:
           CLOUDFLARE_SCHEMA_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           test -n "$CLOUDFLARE_SCHEMA_TOKEN"
-          op item edit cloudflare --vault Kubernetes "CLOUDFLARE_SCHEMA_TOKEN[concealed]=$CLOUDFLARE_SCHEMA_TOKEN" >/dev/null
           op item get cloudflare --vault Kubernetes --format json > "$RUNNER_TEMP/cloudflare-item.json"
           python3 - <<'PY2'
           import json, os
-          item = json.load(open(os.environ['RUNNER_TEMP'] + '/cloudflare-item.json'))
+          src = os.environ['RUNNER_TEMP'] + '/cloudflare-item.json'
+          dst = os.environ['RUNNER_TEMP'] + '/cloudflare-updated.json'
+          item = json.load(open(src))
+          token = os.environ['CLOUDFLARE_SCHEMA_TOKEN']
           for field in item.get('fields', []):
               if field.get('label') == 'CLOUDFLARE_SCHEMA_TOKEN':
-                  print('CLOUDFLARE_SCHEMA_TOKEN_PRESENT=' + str(bool(field.get('value'))).lower())
-                  raise SystemExit(0 if field.get('value') else 1)
-          print('CLOUDFLARE_SCHEMA_TOKEN_PRESENT=false')
-          raise SystemExit(1)
+                  field['value'] = token
+                  break
+          else:
+              item.setdefault('fields', []).append({
+                  'label': 'CLOUDFLARE_SCHEMA_TOKEN',
+                  'type': 'CONCEALED',
+                  'value': token,
+              })
+          json.dump(item, open(dst, 'w'))
+          PY2
+          op item edit cloudflare --vault Kubernetes --template "$RUNNER_TEMP/cloudflare-updated.json" >/dev/null
+          op item get cloudflare --vault Kubernetes --format json > "$RUNNER_TEMP/cloudflare-verify.json"
+          python3 - <<'PY2'
+          import json, os
+          item = json.load(open(os.environ['RUNNER_TEMP'] + '/cloudflare-verify.json'))
+          ok = any(field.get('label') == 'CLOUDFLARE_SCHEMA_TOKEN' and field.get('value') for field in item.get('fields', []))
+          print('CLOUDFLARE_SCHEMA_TOKEN_PRESENT=' + str(ok).lower())
+          raise SystemExit(0 if ok else 1)
           PY2
