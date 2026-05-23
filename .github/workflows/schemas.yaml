@@ -23,14 +23,6 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Load Secrets
-        id: load-secrets
-        uses: 1password/load-secrets-action@92467eb28f72e8255933372f1e0707c567ce2259 # v4.0.0
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          CLOUDFLARE_ACCOUNT_TAG: op://kubernetes/cloudflare/CLOUDFLARE_ACCOUNT_TAG
-          CLOUDFLARE_SCHEMA_TOKEN: op://kubernetes/cloudflare/CLOUDFLARE_SCHEMA_TOKEN
-
       - name: Install crd-schema-publisher
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -42,8 +34,8 @@ jobs:
 
       - name: Run crd-schema-publisher
         env:
-          CLOUDFLARE_API_TOKEN: ${{ steps.load-secrets.outputs.CLOUDFLARE_SCHEMA_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ steps.load-secrets.outputs.CLOUDFLARE_ACCOUNT_TAG }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CF_PAGES_PROJECT: kubernetes-schemas
         run: |-
           mkdir -p "$RUNNER_TEMP/crd-schemas"
