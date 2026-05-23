@@ -1,0 +1,39 @@
+---
+name: Sync Cloudflare Schema Token
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Sync token into 1Password
+    runs-on: home-ops-runner
+    steps:
+      - name: Install 1Password CLI
+        run: |
+          curl -fsSL https://cache.agilebits.com/dist/1P/op2/pkg/v2.34.0/op_linux_amd64_v2.34.0.zip -o "$RUNNER_TEMP/op.zip"
+          unzip -o -q "$RUNNER_TEMP/op.zip" -d "$RUNNER_TEMP/op"
+          chmod +x "$RUNNER_TEMP/op/op"
+          echo "$RUNNER_TEMP/op" >> "$GITHUB_PATH"
+
+      - name: Copy GitHub Cloudflare token to 1Password
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          CLOUDFLARE_SCHEMA_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          test -n "$CLOUDFLARE_SCHEMA_TOKEN"
+          op item edit cloudflare --vault Kubernetes "CLOUDFLARE_SCHEMA_TOKEN[concealed]=$CLOUDFLARE_SCHEMA_TOKEN" >/dev/null
+          op item get cloudflare --vault Kubernetes --format json > "$RUNNER_TEMP/cloudflare-item.json"
+          python3 - <<'PY2'
+          import json, os
+          item = json.load(open(os.environ['RUNNER_TEMP'] + '/cloudflare-item.json'))
+          for field in item.get('fields', []):
+              if field.get('label') == 'CLOUDFLARE_SCHEMA_TOKEN':
+                  print('CLOUDFLARE_SCHEMA_TOKEN_PRESENT=' + str(bool(field.get('value'))).lower())
+                  raise SystemExit(0 if field.get('value') else 1)
+          print('CLOUDFLARE_SCHEMA_TOKEN_PRESENT=false')
+          raise SystemExit(1)
+          PY2
