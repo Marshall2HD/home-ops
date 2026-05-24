@@ -18,6 +18,20 @@ sonarr:
       series: plex-imdb
     quality_definition:
       type: series
+      # Animation-safe minimums: TRaSH defaults reject legit efficient 1080p animation.
+      qualities:
+        - name: WEBRip-720p
+          min: 4
+        - name: WEBDL-720p
+          min: 4
+        - name: Bluray-720p
+          min: 5
+        - name: WEBRip-1080p
+          min: 8
+        - name: WEBDL-1080p
+          min: 8
+        - name: Bluray-1080p
+          min: 10
     quality_profiles:
       - trash_id: c4cadd6b35b95f62c3d47a408e53e2f7 # WEB-2160p (Combined)
         reset_unmatched_scores:
