@@ -71,8 +71,6 @@ spec:
         data:
           config.yaml: |-
             ingress:
-              - hostname: webhook.nix.casa
-                service: http://10.4.0.178:8644
               - hostname: webhook.hermes.falkerie.com
                 service: http://10.4.0.178:8644
               - hostname: "*.hades.casa"
