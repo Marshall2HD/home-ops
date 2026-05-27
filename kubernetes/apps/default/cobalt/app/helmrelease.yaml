@@ -22,7 +22,7 @@ spec:
             env:
               API_LISTEN_ADDRESS: 0.0.0.0
               API_PORT: &port 9000
-              API_URL: https://api.cobalt.hades.casa
+              API_URL: https://cobalt.hades.casa
               CORS_WILDCARD: "1"
               TZ: America/New_York
             envFrom:
@@ -75,7 +75,6 @@ spec:
       app:
         hostnames:
           - "{{ .Release.Name }}.hades.casa"
-          - "api.{{ .Release.Name }}.hades.casa"
         parentRefs:
           - name: envoy-internal
             namespace: network
