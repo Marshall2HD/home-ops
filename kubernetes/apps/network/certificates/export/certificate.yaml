@@ -8,6 +8,8 @@ spec:
   dnsNames:
     - hades.casa
     - "*.hades.casa"
+    - "*.hindsight.hades.casa"
+    - "*.cobalt.hades.casa"
   duration: 160h
   issuerRef:
     kind: ClusterIssuer
