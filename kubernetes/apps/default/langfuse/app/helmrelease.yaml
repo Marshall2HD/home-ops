@@ -1,0 +1,174 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: langfuse
+spec:
+  interval: 1h
+  chart:
+    spec:
+      # renovate: registryUrl=https://langfuse.github.io/langfuse-k8s
+      chart: langfuse
+      version: 1.5.32
+      sourceRef:
+        kind: HelmRepository
+        name: langfuse-charts
+      interval: 15m
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    fullnameOverride: langfuse
+    global:
+      security:
+        allowInsecureImages: true
+
+    langfuse:
+      deployment:
+        strategy:
+          type: RollingUpdate
+          rollingUpdate:
+            maxSurge: 0
+            maxUnavailable: 1
+      pod:
+        annotations:
+          reloader.stakater.com/auto: "true"
+      logging:
+        level: info
+        format: text
+      salt:
+        secretKeyRef:
+          name: langfuse-secret
+          key: salt
+      encryptionKey:
+        secretKeyRef:
+          name: langfuse-secret
+          key: encryption-key
+      features:
+        telemetryEnabled: false
+        signUpDisabled: false
+        experimentalFeaturesEnabled: false
+      nextauth:
+        url: https://langfuse.hades.casa
+        secret:
+          secretKeyRef:
+            name: langfuse-secret
+            key: nextauth-secret
+      web:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            memory: 2Gi
+        pdb:
+          create: false
+        livenessProbe:
+          initialDelaySeconds: 60
+          failureThreshold: 6
+        readinessProbe:
+          initialDelaySeconds: 30
+          failureThreshold: 12
+      worker:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            memory: 2Gi
+        pdb:
+          create: false
+        livenessProbe:
+          initialDelaySeconds: 60
+          failureThreshold: 6
+
+    postgresql:
+      deploy: true
+      auth:
+        username: langfuse
+        database: langfuse
+        existingSecret: langfuse-secret
+        secretKeys:
+          adminPasswordKey: postgresql-password
+          userPasswordKey: postgresql-password
+      architecture: standalone
+      primary:
+        persistence:
+          existingClaim: langfuse-postgresql
+          storageClass: ceph-block
+          size: 1Gi
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            memory: 1Gi
+
+    redis:
+      deploy: true
+      architecture: standalone
+      auth:
+        existingSecret: langfuse-secret
+        existingSecretPasswordKey: redis-password
+      primary:
+        extraFlags:
+          - --maxmemory-policy noeviction
+        persistence:
+          enabled: true
+          storageClass: ceph-block
+          size: 1Gi
+        resources:
+          requests:
+            cpu: 25m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+
+    clickhouse:
+      deploy: true
+      logLevel: warning
+      clusterEnabled: false
+      shards: 1
+      replicaCount: 1
+      auth:
+        existingSecret: langfuse-secret
+        existingSecretKey: clickhouse-password
+      zookeeper:
+        enabled: false
+      persistence:
+        storageClass: ceph-block
+        size: 10Gi
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          memory: 4Gi
+
+    s3:
+      deploy: true
+      bucket: langfuse
+      defaultBuckets: langfuse
+      region: auto
+      forcePathStyle: true
+      auth:
+        existingSecret: langfuse-secret
+        rootUserSecretKey: s3-user
+        rootPasswordSecretKey: s3-password
+      persistence:
+        storageClass: ceph-block
+        size: 5Gi
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
