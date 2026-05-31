@@ -134,7 +134,7 @@ spec:
         HINDSIGHT_API_AUDIT_LOG_ENABLED: "true"
         HINDSIGHT_API_METRICS_INCLUDE_BANK_ID: "true"
         HINDSIGHT_API_OTEL_TRACES_ENABLED: "true"
-        HINDSIGHT_API_OTEL_EXPORTER_OTLP_ENDPOINT: "http://langfuse.nix.casa/api/public/otel"
+        HINDSIGHT_API_OTEL_EXPORTER_OTLP_ENDPOINT: "https://langfuse.hades.casa/api/public/otel"
         HINDSIGHT_API_OTEL_SERVICE_NAME: "hindsight-api"
 
         HINDSIGHT_CP_DATAPLANE_API_URL: "https://ui.hindsight.hades.casa"
