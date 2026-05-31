@@ -114,10 +114,10 @@ spec:
         HINDSIGHT_API_TEXT_SEARCH_EXTENSION: vchord
 
         HINDSIGHT_API_LLM_PROVIDER: openrouter
-        HINDSIGHT_API_LLM_MODEL: openai/gpt-oss-20b
+        HINDSIGHT_API_LLM_MODEL: openai/gpt-oss-120b
         HINDSIGHT_API_LLM_BASE_URL: https://openrouter.ai/api/v1
         HINDSIGHT_API_LLM_DEFAULT_HEADERS: '{"X-Whois":"hindsight-api-home-ops","X-Application":"hindsight-api-home-ops"}'
-        HINDSIGHT_API_LLM_EXTRA_BODY: '{"provider":{"only":["Groq"]}}'
+        HINDSIGHT_API_LLM_EXTRA_BODY: '{"provider":{"only":["Cerebras"]}}'
         HINDSIGHT_API_LLM_MAX_CONCURRENT: "3"
 
         HINDSIGHT_API_EMBEDDINGS_PROVIDER: litellm-sdk
