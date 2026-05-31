@@ -54,7 +54,7 @@ spec:
           key: encryption-key
       features:
         telemetryEnabled: false
-        signUpDisabled: false
+        signUpDisabled: true
         experimentalFeaturesEnabled: false
       nextauth:
         url: https://langfuse.hades.casa
