@@ -52,7 +52,7 @@ spec:
                 cpu: 100m
                 memory: 4Gi
               limits:
-                memory: 32Gi
+                memory: 12Gi
     defaultPodOptions:
       terminationGracePeriodSeconds: 300
       securityContext:
