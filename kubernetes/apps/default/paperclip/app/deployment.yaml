@@ -24,7 +24,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       containers:
         - name: app
-          image: ghcr.io/paperclipai/paperclip:latest@sha256:daf5fa2f8a4d3cd3f0261ab486011372cfa649c7ba120b141cee65cf78c1bd26
+          image: ghcr.io/paperclipai/paperclip:latest@sha256:841069103ca099fbea047acde777950ae86564bb36476f5cfb437dc18907256a
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
