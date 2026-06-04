@@ -5,19 +5,14 @@ kind: Kustomization
 metadata:
   name: langfuse
 spec:
-  components:
-    - ../../../../components/volsync
   dependsOn:
+    - name: postgres
+    - name: valkey
+    - name: minio
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/default/langfuse/app
-  postBuild:
-    substitute:
-      APP: langfuse-postgresql
-      VOLSYNC_CAPACITY: 1Gi
-      VOLSYNC_PUID: "1001"
-      VOLSYNC_PGID: "1001"
   prune: true
   sourceRef:
     kind: GitRepository

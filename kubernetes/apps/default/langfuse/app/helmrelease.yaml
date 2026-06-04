@@ -91,46 +91,26 @@ spec:
           failureThreshold: 6
 
     postgresql:
-      deploy: true
+      deploy: false
+      host: postgres.default.svc.cluster.local
+      port: 5432
       auth:
         username: langfuse
         database: langfuse
-        existingSecret: langfuse-secret
+        existingSecret: postgres-secret
         secretKeys:
-          adminPasswordKey: postgresql-password
-          userPasswordKey: postgresql-password
-      architecture: standalone
-      primary:
-        persistence:
-          existingClaim: langfuse-postgresql
-          storageClass: ceph-block
-          size: 1Gi
-        resources:
-          requests:
-            cpu: 50m
-            memory: 256Mi
-          limits:
-            memory: 1Gi
+          adminPasswordKey: LANGFUSE_POSTGRES_PASSWORD
+          userPasswordKey: LANGFUSE_POSTGRES_PASSWORD
 
     redis:
-      deploy: true
-      architecture: standalone
+      deploy: false
+      host: valkey.default.svc.cluster.local
+      port: 6379
       auth:
-        existingSecret: langfuse-secret
-        existingSecretPasswordKey: redis-password
-      primary:
-        extraFlags:
-          - --maxmemory-policy noeviction
-        persistence:
-          enabled: true
-          storageClass: ceph-block
-          size: 1Gi
-        resources:
-          requests:
-            cpu: 25m
-            memory: 128Mi
-          limits:
-            memory: 512Mi
+        username: default
+        existingSecret: valkey-secret
+        existingSecretPasswordKey: VALKEY_PASSWORD
+        database: 0
 
     clickhouse:
       deploy: true
@@ -154,21 +134,16 @@ spec:
           memory: 4Gi
 
     s3:
-      deploy: true
+      deploy: false
       bucket: langfuse
-      defaultBuckets: langfuse
       region: auto
+      endpoint: http://minio.default.svc.cluster.local:9000
       forcePathStyle: true
-      auth:
-        existingSecret: langfuse-secret
-        rootUserSecretKey: s3-user
-        rootPasswordSecretKey: s3-password
-      persistence:
-        storageClass: ceph-block
-        size: 5Gi
-      resources:
-        requests:
-          cpu: 50m
-          memory: 256Mi
-        limits:
-          memory: 1Gi
+      accessKeyId:
+        secretKeyRef:
+          name: minio-secret
+          key: MINIO_LANGFUSE_ACCESS_KEY
+      secretAccessKey:
+        secretKeyRef:
+          name: minio-secret
+          key: MINIO_LANGFUSE_SECRET_KEY
