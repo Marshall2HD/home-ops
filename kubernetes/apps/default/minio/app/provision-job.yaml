@@ -1,0 +1,64 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-provision
+  labels:
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/component: provisioner
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: minio
+        app.kubernetes.io/component: provisioner
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mc
+          image: docker.io/minio/mc:latest@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: minio-secret
+          command:
+            - /bin/sh
+            - -ec
+            - |-
+              endpoint="http://minio.default.svc.cluster.local:9000"
+              until mc alias set local "$endpoint" "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"; do
+                sleep 5
+              done
+
+              create_bucket_user() {
+                bucket="$1"
+                access_key="$2"
+                secret_key="$3"
+                policy_name="${bucket}-rw"
+                policy_file="/tmp/${policy_name}.json"
+
+                mc mb --ignore-existing "local/${bucket}"
+                cat > "$policy_file" <<EOF
+              {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": ["s3:*"],
+                    "Resource": [
+                      "arn:aws:s3:::${bucket}",
+                      "arn:aws:s3:::${bucket}/*"
+                    ]
+                  }
+                ]
+              }
+              EOF
+                mc admin policy info local "$policy_name" >/dev/null 2>&1 || mc admin policy create local "$policy_name" "$policy_file"
+                mc admin user info local "$access_key" >/dev/null 2>&1 || mc admin user add local "$access_key" "$secret_key"
+                mc admin policy attach local "$policy_name" --user "$access_key"
+              }
+
+              create_bucket_user langfuse "$MINIO_LANGFUSE_ACCESS_KEY" "$MINIO_LANGFUSE_SECRET_KEY"
+              create_bucket_user paperclip "$MINIO_PAPERCLIP_ACCESS_KEY" "$MINIO_PAPERCLIP_SECRET_KEY"
+              create_bucket_user open-webui "$MINIO_OPEN_WEBUI_ACCESS_KEY" "$MINIO_OPEN_WEBUI_SECRET_KEY"

@@ -1,0 +1,143 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperclip
+  labels:
+    app.kubernetes.io/name: paperclip
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: paperclip
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: paperclip
+      annotations:
+        reloader.stakater.com/auto: "true"
+    spec:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: app
+          image: ghcr.io/paperclipai/paperclip:latest@sha256:daf5fa2f8a4d3cd3f0261ab486011372cfa649c7ba120b141cee65cf78c1bd26
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3100
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "3100"
+            - name: HOST
+              value: 0.0.0.0
+            - name: HOME
+              value: /paperclip
+            - name: USER_UID
+              value: "1000"
+            - name: USER_GID
+              value: "1000"
+            - name: PAPERCLIP_HOME
+              value: /paperclip
+            - name: PAPERCLIP_INSTANCE_ID
+              value: default
+            - name: PAPERCLIP_BIND
+              value: custom
+            - name: PAPERCLIP_BIND_HOST
+              value: 0.0.0.0
+            - name: PAPERCLIP_DEPLOYMENT_MODE
+              value: authenticated
+            - name: PAPERCLIP_DEPLOYMENT_EXPOSURE
+              value: private
+            - name: PAPERCLIP_PUBLIC_URL
+              value: https://paperclip.hades.casa
+            - name: PAPERCLIP_API_URL
+              value: https://paperclip.hades.casa
+            - name: PAPERCLIP_AUTH_PUBLIC_BASE_URL
+              value: https://paperclip.hades.casa
+            - name: PAPERCLIP_AUTH_BASE_URL_MODE
+              value: explicit
+            - name: PAPERCLIP_ALLOWED_HOSTNAMES
+              value: paperclip.hades.casa,paperclip,paperclip.default.svc.cluster.local
+            - name: PAPERCLIP_STORAGE_PROVIDER
+              value: s3
+            - name: PAPERCLIP_STORAGE_S3_BUCKET
+              value: paperclip
+            - name: PAPERCLIP_STORAGE_S3_REGION
+              value: us-east-1
+            - name: PAPERCLIP_STORAGE_S3_ENDPOINT
+              value: http://minio.default.svc.cluster.local:9000
+            - name: PAPERCLIP_STORAGE_S3_FORCE_PATH_STYLE
+              value: "true"
+            - name: PAPERCLIP_SECRETS_STRICT_MODE
+              value: "true"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: PAPERCLIP_DATABASE_URL
+            - name: DATABASE_MIGRATION_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: PAPERCLIP_DATABASE_URL
+            - name: BETTER_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: paperclip-secret
+                  key: BETTER_AUTH_SECRET
+            - name: PAPERCLIP_SECRETS_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: paperclip-secret
+                  key: PAPERCLIP_SECRETS_MASTER_KEY
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: MINIO_PAPERCLIP_ACCESS_KEY
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: MINIO_PAPERCLIP_SECRET_KEY
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 2Gi
+          volumeMounts:
+            - name: data
+              mountPath: /paperclip
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: paperclip

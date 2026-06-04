@@ -22,9 +22,13 @@ resources:
   - ./langfuse/ks.yaml
   - ./librechat/ks.yaml
   - ./minecraft/ks.yaml
+  - ./minio/ks.yaml
   - ./mosquitto/ks.yaml
   - ./notifier/ks.yaml
   - ./open-webui/ks.yaml
+  - ./paperclip/ks.yaml
+  - ./postgres/ks.yaml
+  - ./valkey/ks.yaml
   - ./whisper/ks.yaml
   - ./plex/ks.yaml
   - ./prowlarr/ks.yaml

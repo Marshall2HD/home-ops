@@ -1,0 +1,55 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+data:
+  00-shared-databases.sh: |-
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    create_role_db() {
+      local role="$1"
+      local db="$2"
+      local password="$3"
+
+      psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB"         -v role="$role" -v db="$db" -v password="$password" <<'SQL'
+    SELECT format('CREATE ROLE %I LOGIN', :'role')
+    WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'role')\gexec
+    ALTER ROLE :"role" WITH PASSWORD :'password';
+    SELECT format('CREATE DATABASE %I OWNER %I', :'db', :'role')
+    WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = :'db')\gexec
+    GRANT ALL PRIVILEGES ON DATABASE :"db" TO :"role";
+    SQL
+
+      psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$db"         -v role="$role" <<'SQL'
+    GRANT USAGE, CREATE ON SCHEMA public TO :"role";
+    ALTER SCHEMA public OWNER TO :"role";
+    SQL
+    }
+
+    create_role_db hindsight hindsight "$HINDSIGHT_POSTGRES_PASSWORD"
+    create_role_db langfuse langfuse "$LANGFUSE_POSTGRES_PASSWORD"
+    create_role_db paperclip paperclip "$PAPERCLIP_POSTGRES_PASSWORD"
+    create_role_db open_webui open_webui "$OPEN_WEBUI_POSTGRES_PASSWORD"
+
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname hindsight <<'SQL'
+    CREATE EXTENSION IF NOT EXISTS vector;
+    CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
+    CREATE EXTENSION IF NOT EXISTS pg_tokenizer CASCADE;
+    CREATE EXTENSION IF NOT EXISTS vchord_bm25 CASCADE;
+
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1
+        FROM tokenizer_catalog.tokenizer
+        WHERE name = 'llmlingua2'
+      ) THEN
+        PERFORM create_tokenizer('llmlingua2', $tok$
+    model = "llmlingua2"
+    $tok$);
+      END IF;
+    END;
+    $$;
+    SQL
