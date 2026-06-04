@@ -52,8 +52,8 @@ spec:
             - name: HINDSIGHT_POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: HINDSIGHT_POSTGRES_PASSWORD
+                  name: hindsight-secret
+                  key: POSTGRES_PASSWORD
             - name: LANGFUSE_POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
