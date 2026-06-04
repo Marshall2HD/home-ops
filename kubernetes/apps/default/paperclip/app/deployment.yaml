@@ -109,6 +109,9 @@ spec:
             httpGet:
               path: /api/health
               port: http
+              httpHeaders:
+                - name: Host
+                  value: paperclip.hades.casa
             initialDelaySeconds: 20
             periodSeconds: 10
             timeoutSeconds: 5
@@ -117,6 +120,9 @@ spec:
             httpGet:
               path: /api/health
               port: http
+              httpHeaders:
+                - name: Host
+                  value: paperclip.hades.casa
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 6
@@ -124,6 +130,9 @@ spec:
             httpGet:
               path: /api/health
               port: http
+              httpHeaders:
+                - name: Host
+                  value: paperclip.hades.casa
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 5

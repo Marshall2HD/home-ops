@@ -35,10 +35,10 @@ spec:
                 bucket="$1"
                 access_key="$2"
                 secret_key="$3"
-                policy_name="${bucket}-rw"
-                policy_file="/tmp/${policy_name}.json"
+                policy_name="$bucket-rw"
+                policy_file="/tmp/$policy_name.json"
 
-                mc mb --ignore-existing "local/${bucket}"
+                mc mb --ignore-existing "local/$bucket"
                 cat > "$policy_file" <<EOF
               {
                 "Version": "2012-10-17",
@@ -47,8 +47,8 @@ spec:
                     "Effect": "Allow",
                     "Action": ["s3:*"],
                     "Resource": [
-                      "arn:aws:s3:::${bucket}",
-                      "arn:aws:s3:::${bucket}/*"
+                      "arn:aws:s3:::$bucket",
+                      "arn:aws:s3:::$bucket/*"
                     ]
                   }
                 ]
