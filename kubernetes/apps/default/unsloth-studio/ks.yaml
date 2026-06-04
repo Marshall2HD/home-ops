@@ -17,7 +17,7 @@ spec:
   postBuild:
     substitute:
       APP: unsloth-studio
-      VOLSYNC_CAPACITY: 100Gi
+      VOLSYNC_CAPACITY: 300Gi
   prune: true
   sourceRef:
     kind: GitRepository
