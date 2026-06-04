@@ -1,0 +1,89 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app unsloth-studio
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  interval: 1h
+  values:
+    controllers:
+      unsloth-studio:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: docker.io/unsloth/unsloth
+              tag: latest
+            env:
+              TZ: America/New_York
+              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_VISIBLE_DEVICES: all
+            envFrom:
+              - secretRef:
+                  name: unsloth-studio-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api
+                    port: &apiPort 8888
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 6
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api
+                    port: *apiPort
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 10
+                  failureThreshold: 60
+            resources:
+              requests:
+                cpu: 500m
+                memory: 4Gi
+                nvidia.com/gpu: 1
+              limits:
+                memory: 32Gi
+                nvidia.com/gpu: 1
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      runtimeClassName: nvidia
+      nodeSelector:
+        nvidia.feature.node.kubernetes.io/gpu: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+    service:
+      app:
+        ports:
+          http:
+            port: *apiPort
+          studio:
+            port: &studioPort 8000
+    persistence:
+      workspace:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /workspace/work
+          - path: /workspace/studio
+            subPath: studio
+      tmp:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 512Mi
+        globalMounts:
+          - path: /tmp
