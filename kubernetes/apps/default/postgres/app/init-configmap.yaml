@@ -39,7 +39,7 @@ data:
     CREATE EXTENSION IF NOT EXISTS pg_tokenizer CASCADE;
     CREATE EXTENSION IF NOT EXISTS vchord_bm25 CASCADE;
 
-    DO $$
+    DO $$$$
     BEGIN
       IF NOT EXISTS (
         SELECT 1
@@ -51,5 +51,5 @@ data:
     $tok$);
       END IF;
     END;
-    $$;
+    $$$$;
     SQL
