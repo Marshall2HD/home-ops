@@ -8,6 +8,7 @@ spec:
   components:
     - ../../../../components/volsync
   dependsOn:
+    - name: postgres
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h

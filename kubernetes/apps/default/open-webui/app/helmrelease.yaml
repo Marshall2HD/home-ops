@@ -30,6 +30,11 @@ spec:
               WEBUI_URL: "https://chat.hades.casa"
               ENABLE_RESPONSES_API_STATEFUL: "true"
               CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE: "65536"
+              DATABASE_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: postgres-secret
+                    key: OPEN_WEBUI_DATABASE_URL
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
