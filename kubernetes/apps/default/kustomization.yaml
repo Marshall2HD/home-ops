@@ -26,7 +26,6 @@ resources:
   - ./mosquitto/ks.yaml
   - ./notifier/ks.yaml
   - ./open-webui/ks.yaml
-  - ./paperclip/ks.yaml
   - ./postgres/ks.yaml
   - ./valkey/ks.yaml
   - ./whisper/ks.yaml
