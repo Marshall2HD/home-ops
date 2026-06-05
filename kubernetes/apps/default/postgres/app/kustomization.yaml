@@ -7,4 +7,5 @@ resources:
   - ./externalsecret.yaml
   - ./init-configmap.yaml
   - ./service.yaml
+  - ./service-external.yaml
   - ./statefulset.yaml

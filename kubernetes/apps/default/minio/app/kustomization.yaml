@@ -6,5 +6,6 @@ resources:
   - ./password.yaml
   - ./externalsecret.yaml
   - ./service.yaml
+  - ./service-external.yaml
   - ./statefulset.yaml
   - ./provision-job.yaml

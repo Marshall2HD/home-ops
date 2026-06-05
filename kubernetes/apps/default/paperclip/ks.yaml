@@ -5,19 +5,8 @@ kind: Kustomization
 metadata:
   name: paperclip
 spec:
-  components:
-    - ../../../../components/volsync
-  dependsOn:
-    - name: postgres
-    - name: minio
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/default/paperclip/app
-  postBuild:
-    substitute:
-      APP: paperclip
-      VOLSYNC_CAPACITY: 10Gi
   prune: true
   sourceRef:
     kind: GitRepository
