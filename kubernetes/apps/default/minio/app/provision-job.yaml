@@ -60,4 +60,5 @@ spec:
               }
 
               create_bucket_user langfuse "$MINIO_LANGFUSE_ACCESS_KEY" "$MINIO_LANGFUSE_SECRET_KEY"
+              create_bucket_user paperclip "$MINIO_PAPERCLIP_ACCESS_KEY" "$MINIO_PAPERCLIP_SECRET_KEY"
               create_bucket_user open-webui "$MINIO_OPEN_WEBUI_ACCESS_KEY" "$MINIO_OPEN_WEBUI_SECRET_KEY"

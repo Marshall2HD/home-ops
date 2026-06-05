@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-s3-external
+  labels:
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/component: object-storage
+  annotations:
+    lbipam.cilium.io/ips: 10.8.0.132
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+    - name: s3
+      port: 9000
+      targetPort: s3
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: minio
+    app.kubernetes.io/component: object-storage
