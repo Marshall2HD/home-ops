@@ -1,0 +1,121 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: postgres
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: postgres
+  interval: 1h
+  values:
+    controllers:
+      postgres:
+        type: statefulset
+        containers:
+          app:
+            image:
+              repository: docker.io/tensorchord/vchord-suite
+              tag: pg18-20260501@sha256:c6e5e77a1180199f91b040b6e85c6d10b0ded6d49fb614dfd2e7272ffb91af08
+            env:
+              POSTGRES_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: postgres-secret
+                    key: POSTGRES_USER
+              POSTGRES_DB:
+                valueFrom:
+                  secretKeyRef:
+                    name: postgres-secret
+                    key: POSTGRES_DB
+              POSTGRES_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: postgres-secret
+                    key: POSTGRES_PASSWORD
+              HINDSIGHT_POSTGRES_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: postgres-secret
+                    key: HINDSIGHT_POSTGRES_PASSWORD
+              LANGFUSE_POSTGRES_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: postgres-secret
+                    key: LANGFUSE_POSTGRES_PASSWORD
+              PAPERCLIP_POSTGRES_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: postgres-secret
+                    key: PAPERCLIP_POSTGRES_PASSWORD
+              OPEN_WEBUI_POSTGRES_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: postgres-secret
+                    key: OPEN_WEBUI_POSTGRES_PASSWORD
+              PGDATA: /var/lib/postgresql/data/pgdata
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: [pg_isready, -U, postgres, -d, postgres]
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: [pg_isready, -U, postgres, -d, postgres]
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 4Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        primary: true
+        forceRename: postgres
+        ports:
+          postgresql:
+            port: 5432
+      external:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.8.0.131
+        externalTrafficPolicy: Local
+        ports:
+          postgresql:
+            port: 5432
+    persistence:
+      data:
+        existingClaim: postgres
+        globalMounts:
+          - path: /var/lib/postgresql/data
+      initdb:
+        type: configMap
+        name: postgres-init
+        defaultMode: 0755
+        globalMounts:
+          - path: /docker-entrypoint-initdb.d
+            readOnly: true

@@ -12,7 +12,7 @@ spec:
       namespace: rook-ceph
   interval: 1h
   force: true
-  path: ./kubernetes/apps/default/minio/app
+  path: ./kubernetes/apps/database/minio/app
   postBuild:
     substitute:
       APP: minio
@@ -22,5 +22,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: default
+  targetNamespace: database
   wait: false

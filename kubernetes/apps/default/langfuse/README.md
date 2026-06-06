@@ -22,9 +22,8 @@ Create item `langfuse` in the Kubernetes vault with fields:
 - `NEXTAUTH_SECRET`, generate with `openssl rand -base64 32`
 - `POSTGRESQL_PASSWORD`
 - `CLICKHOUSE_PASSWORD`
-- `REDIS_PASSWORD`
-- `S3_USER`
-- `S3_PASSWORD`
+
+Redis/Valkey and S3 credentials are no longer stored here. The `langfuse` `ExternalSecret` re-extracts the owner items — `valkey` for `VALKEY_PASSWORD` and `minio` for `MINIO_LANGFUSE_SECRET_KEY` — mirroring how `recyclarr`/`deduparr` re-extract the `radarr`/`sonarr` items. The S3 access key (`langfuse`) is a literal.
 
 The `ExternalSecret` renders those into `langfuse-secret` using the key names expected by the chart and its Bitnami subcharts.
 

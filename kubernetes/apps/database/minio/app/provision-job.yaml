@@ -26,7 +26,7 @@ spec:
             - /bin/sh
             - -ec
             - |-
-              endpoint="http://minio.default.svc.cluster.local:9000"
+              endpoint="http://minio.database.svc.cluster.local:9000"
               until mc alias set local "$endpoint" "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"; do
                 sleep 5
               done

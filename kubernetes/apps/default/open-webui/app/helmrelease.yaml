@@ -33,7 +33,7 @@ spec:
               DATABASE_URL:
                 valueFrom:
                   secretKeyRef:
-                    name: postgres-secret
+                    name: open-webui-secret
                     key: OPEN_WEBUI_DATABASE_URL
             envFrom:
               - secretRef:

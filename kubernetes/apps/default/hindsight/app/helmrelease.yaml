@@ -214,7 +214,7 @@ spec:
     fullnameOverride: hindsight
     version: 0.7.1
     existingSecret: hindsight-secret
-    databaseUrl: "postgresql://hindsight:$(POSTGRES_PASSWORD_URI)@postgres.default.svc.cluster.local:5432/hindsight"
+    databaseUrl: "postgresql://hindsight:$(POSTGRES_PASSWORD_URI)@postgres.database.svc.cluster.local:5432/hindsight"
 
     postgresql:
       enabled: false
