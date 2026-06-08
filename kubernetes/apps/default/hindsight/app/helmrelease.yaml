@@ -38,6 +38,61 @@ spec:
                   rollingUpdate:
                     maxSurge: 0
                     maxUnavailable: 1
+          # TEMPORARY: mirrors upstream PR #1954 (vectorize-io/hindsight) — drops the
+          # blanket vchordrq.probes session GUC that breaks recall on listless vchord
+          # indexes (VectorChord 1.1: "need 0 probes, but 1 probes provided").
+          # Remove once a hindsight release > 0.7.2 includes #1954.
+          # initContainer image tag MUST stay in sync with the api/worker image tag.
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: hindsight-api
+            patch: |-
+              - op: add
+                path: /spec/template/spec/initContainers
+                value:
+                  - name: patch-vchord-probes
+                    image: ghcr.io/vectorize-io/hindsight-api:0.7.2
+                    command: ["/bin/sh", "-c", "cp -a /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
+                    volumeMounts:
+                      - name: api-code
+                        mountPath: /tmp/api-code
+              - op: add
+                path: /spec/template/spec/volumes/-
+                value:
+                  name: api-code
+                  emptyDir: {}
+              - op: add
+                path: /spec/template/spec/containers/0/volumeMounts/-
+                value:
+                  name: api-code
+                  mountPath: /app/api
+          - target:
+              group: apps
+              version: v1
+              kind: StatefulSet
+              name: hindsight-worker
+            patch: |-
+              - op: add
+                path: /spec/template/spec/initContainers
+                value:
+                  - name: patch-vchord-probes
+                    image: ghcr.io/vectorize-io/hindsight-api:0.7.2
+                    command: ["/bin/sh", "-c", "cp -a /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
+                    volumeMounts:
+                      - name: api-code
+                        mountPath: /tmp/api-code
+              - op: add
+                path: /spec/template/spec/volumes
+                value:
+                  - name: api-code
+                    emptyDir: {}
+              - op: add
+                path: /spec/template/spec/containers/0/volumeMounts
+                value:
+                  - name: api-code
+                    mountPath: /app/api
   values:
     fullnameOverride: hindsight
     version: 0.7.2
