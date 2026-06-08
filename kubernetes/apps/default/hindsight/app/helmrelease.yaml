@@ -38,181 +38,9 @@ spec:
                   rollingUpdate:
                     maxSurge: 0
                     maxUnavailable: 1
-          - target:
-              group: apps
-              version: v1
-              kind: Deployment
-              name: hindsight-api
-            patch: |-
-              - op: add
-                path: /spec/template/spec/initContainers
-                value:
-                  - name: patch-migrations
-                    image: ghcr.io/vectorize-io/hindsight-api:0.7.1
-                    command: ["/bin/sh", "-c"]
-                    args:
-                      - |
-                        set -e
-                        cp -r /app/api/. /tmp/api-code/
-                        python - <<'PY'
-                        from pathlib import Path
-
-                        migrations = Path('/tmp/api-code/hindsight_api/migrations.py')
-                        migrations.write_text(
-                            migrations.read_text().replace(
-                                'SELECT data_type',
-                                "SELECT CASE WHEN data_type = 'USER-DEFINED' THEN udt_name ELSE data_type END AS data_type",
-                            )
-                        )
-
-                        db_utils = Path('/tmp/api-code/hindsight_api/engine/db_utils.py')
-                        text = db_utils.read_text()
-                        start = text.index('    if isinstance(backend_or_pool, DatabaseBackend) or getattr(backend_or_pool, "_wraps_backend", False):')
-                        end = text.index('    else:\n        # Legacy path: raw asyncpg.Pool', start)
-                        replacement = '''\
-                            if isinstance(backend_or_pool, DatabaseBackend) or getattr(backend_or_pool, "_wraps_backend", False):
-                                # Use the backend's acquire context manager with retry. Only retry connection
-                                # acquisition, never exceptions raised by the caller inside the yielded block.
-                                start = time.time()
-                                last_exception = None
-                                acquire_cm = None
-                                conn = None
-                                for attempt in range(max_retries + 1):
-                                    try:
-                                        acquire_cm = backend_or_pool.acquire()
-                                        conn = await acquire_cm.__aenter__()
-                                        acquire_time = time.time() - start
-                                        if acquire_time > 0.05:
-                                            logger.warning(f"[DB POOL] Slow acquire: {acquire_time:.3f}s")
-                                        break
-                                    except Exception as e:
-                                        if not _is_retryable(e):
-                                            raise
-                                        last_exception = e
-                                        if attempt < max_retries:
-                                            delay = min(DEFAULT_BASE_DELAY * (2**attempt), DEFAULT_MAX_DELAY)
-                                            logger.warning(
-                                                f"Database acquire failed (attempt {attempt + 1}/{max_retries + 1}): {e}. "
-                                                f"Retrying in {delay:.1f}s..."
-                                            )
-                                            await asyncio.sleep(delay)
-                                        else:
-                                            logger.error(f"Database acquire failed after {max_retries + 1} attempts: {e}")
-                                if conn is None:
-                                    raise last_exception
-
-                                exc_info = (None, None, None)
-                                try:
-                                    try:
-                                        yield conn
-                                    except BaseException as e:
-                                        exc_info = (type(e), e, e.__traceback__)
-                                        raise
-                                finally:
-                                    await acquire_cm.__aexit__(*exc_info)
-                                return
-                        '''
-                        db_utils.write_text(text[:start] + replacement + text[end:])
-                        PY
-                        echo "Patched migrations.py and db_utils.py"
-                    volumeMounts:
-                      - name: api-code
-                        mountPath: /tmp/api-code
-              - op: add
-                path: /spec/template/spec/volumes
-                value:
-                  - name: api-code
-                    emptyDir: {}
-              - op: add
-                path: /spec/template/spec/containers/0/volumeMounts
-                value:
-                  - name: api-code
-                    mountPath: /app/api
-          - target:
-              group: apps
-              version: v1
-              kind: StatefulSet
-              name: hindsight-worker
-            patch: |-
-              - op: add
-                path: /spec/template/spec/initContainers
-                value:
-                  - name: patch-db-utils
-                    image: ghcr.io/vectorize-io/hindsight-api:0.7.1
-                    command: ["/bin/sh", "-c"]
-                    args:
-                      - |
-                        set -e
-                        cp -r /app/api/. /tmp/api-code/
-                        python - <<'PY'
-                        from pathlib import Path
-
-                        db_utils = Path('/tmp/api-code/hindsight_api/engine/db_utils.py')
-                        text = db_utils.read_text()
-                        start = text.index('    if isinstance(backend_or_pool, DatabaseBackend) or getattr(backend_or_pool, "_wraps_backend", False):')
-                        end = text.index('    else:\n        # Legacy path: raw asyncpg.Pool', start)
-                        replacement = '''\
-                            if isinstance(backend_or_pool, DatabaseBackend) or getattr(backend_or_pool, "_wraps_backend", False):
-                                # Use the backend's acquire context manager with retry. Only retry connection
-                                # acquisition, never exceptions raised by the caller inside the yielded block.
-                                start = time.time()
-                                last_exception = None
-                                acquire_cm = None
-                                conn = None
-                                for attempt in range(max_retries + 1):
-                                    try:
-                                        acquire_cm = backend_or_pool.acquire()
-                                        conn = await acquire_cm.__aenter__()
-                                        acquire_time = time.time() - start
-                                        if acquire_time > 0.05:
-                                            logger.warning(f"[DB POOL] Slow acquire: {acquire_time:.3f}s")
-                                        break
-                                    except Exception as e:
-                                        if not _is_retryable(e):
-                                            raise
-                                        last_exception = e
-                                        if attempt < max_retries:
-                                            delay = min(DEFAULT_BASE_DELAY * (2**attempt), DEFAULT_MAX_DELAY)
-                                            logger.warning(
-                                                f"Database acquire failed (attempt {attempt + 1}/{max_retries + 1}): {e}. "
-                                                f"Retrying in {delay:.1f}s..."
-                                            )
-                                            await asyncio.sleep(delay)
-                                        else:
-                                            logger.error(f"Database acquire failed after {max_retries + 1} attempts: {e}")
-                                if conn is None:
-                                    raise last_exception
-
-                                exc_info = (None, None, None)
-                                try:
-                                    try:
-                                        yield conn
-                                    except BaseException as e:
-                                        exc_info = (type(e), e, e.__traceback__)
-                                        raise
-                                finally:
-                                    await acquire_cm.__aexit__(*exc_info)
-                                return
-                        '''
-                        db_utils.write_text(text[:start] + replacement + text[end:])
-                        PY
-                        echo "Patched db_utils.py"
-                    volumeMounts:
-                      - name: api-code
-                        mountPath: /tmp/api-code
-              - op: add
-                path: /spec/template/spec/volumes
-                value:
-                  - name: api-code
-                    emptyDir: {}
-              - op: add
-                path: /spec/template/spec/containers/0/volumeMounts
-                value:
-                  - name: api-code
-                    mountPath: /app/api
   values:
     fullnameOverride: hindsight
-    version: 0.7.1
+    version: 0.7.2
     existingSecret: hindsight-secret
     databaseUrl: "postgresql://hindsight:$(POSTGRES_PASSWORD_URI)@postgres.database.svc.cluster.local:5432/hindsight"
 
@@ -224,7 +52,7 @@ spec:
       replicaCount: 1
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.7.1
+        tag: 0.7.2
       resources:
         requests:
           cpu: 100m
@@ -240,7 +68,7 @@ spec:
     api:
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.7.1
+        tag: 0.7.2
       resources:
         requests:
           cpu: 100m
@@ -305,7 +133,7 @@ spec:
     controlPlane:
       image:
         repository: ghcr.io/vectorize-io/hindsight-control-plane
-        tag: 0.7.1
+        tag: 0.7.2
       resources:
         requests:
           cpu: 50m
