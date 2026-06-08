@@ -54,7 +54,7 @@ spec:
                 value:
                   - name: patch-vchord-probes
                     image: ghcr.io/vectorize-io/hindsight-api:0.7.2
-                    command: ["/bin/sh", "-c", "cp -a /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
+                    command: ["/bin/sh", "-c", "cp -r /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
                     volumeMounts:
                       - name: api-code
                         mountPath: /tmp/api-code
@@ -79,7 +79,7 @@ spec:
                 value:
                   - name: patch-vchord-probes
                     image: ghcr.io/vectorize-io/hindsight-api:0.7.2
-                    command: ["/bin/sh", "-c", "cp -a /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
+                    command: ["/bin/sh", "-c", "cp -r /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
                     volumeMounts:
                       - name: api-code
                         mountPath: /tmp/api-code
