@@ -92,23 +92,23 @@ spec:
 
     postgresql:
       deploy: false
-      host: postgres.database.svc.cluster.local
+      host: postgres.default.svc.cluster.local
       port: 5432
       auth:
         username: langfuse
         database: langfuse
-        existingSecret: langfuse-secret
+        existingSecret: postgres-secret
         secretKeys:
           adminPasswordKey: LANGFUSE_POSTGRES_PASSWORD
           userPasswordKey: LANGFUSE_POSTGRES_PASSWORD
 
     redis:
       deploy: false
-      host: valkey.database.svc.cluster.local
+      host: valkey.default.svc.cluster.local
       port: 6379
       auth:
         username: default
-        existingSecret: langfuse-secret
+        existingSecret: valkey-secret
         existingSecretPasswordKey: VALKEY_PASSWORD
         database: 0
 
@@ -125,7 +125,7 @@ spec:
         enabled: false
       persistence:
         storageClass: ceph-block
-        size: 10Gi
+        size: 30Gi
       resources:
         requests:
           cpu: 100m
@@ -137,13 +137,13 @@ spec:
       deploy: false
       bucket: langfuse
       region: auto
-      endpoint: http://minio.database.svc.cluster.local:9000
+      endpoint: http://minio.default.svc.cluster.local:9000
       forcePathStyle: true
       accessKeyId:
         secretKeyRef:
-          name: langfuse-secret
+          name: minio-secret
           key: MINIO_LANGFUSE_ACCESS_KEY
       secretAccessKey:
         secretKeyRef:
-          name: langfuse-secret
+          name: minio-secret
           key: MINIO_LANGFUSE_SECRET_KEY
