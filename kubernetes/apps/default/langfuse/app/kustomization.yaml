@@ -5,5 +5,6 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrepository.yaml
+  - ./pvc-clickhouse.yaml
   - ./helmrelease.yaml
   - ./httproute.yaml

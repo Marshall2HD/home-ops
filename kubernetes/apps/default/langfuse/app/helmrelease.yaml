@@ -123,9 +123,11 @@ spec:
         existingSecretKey: clickhouse-password
       zookeeper:
         enabled: false
+      # StatefulSet volumeClaimTemplates are immutable after install.
+      # The existing ClickHouse PVC expansion is declared in pvc-clickhouse.yaml.
       persistence:
         storageClass: ceph-block
-        size: 30Gi
+        size: 10Gi
       resources:
         requests:
           cpu: 100m
