@@ -53,7 +53,7 @@ spec:
                 path: /spec/template/spec/initContainers
                 value:
                   - name: patch-vchord-probes
-                    image: ghcr.io/vectorize-io/hindsight-api:0.7.2
+                    image: ghcr.io/vectorize-io/hindsight-api:0.8.1
                     command: ["/bin/sh", "-c", "cp -r /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
                     volumeMounts:
                       - name: api-code
@@ -78,7 +78,7 @@ spec:
                 path: /spec/template/spec/initContainers
                 value:
                   - name: patch-vchord-probes
-                    image: ghcr.io/vectorize-io/hindsight-api:0.7.2
+                    image: ghcr.io/vectorize-io/hindsight-api:0.8.1
                     command: ["/bin/sh", "-c", "cp -r /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
                     volumeMounts:
                       - name: api-code
@@ -107,7 +107,7 @@ spec:
       replicaCount: 1
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.7.2
+        tag: 0.8.1
       resources:
         requests:
           cpu: 100m
@@ -123,7 +123,7 @@ spec:
     api:
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.7.2
+        tag: 0.8.1
       resources:
         requests:
           cpu: 100m
