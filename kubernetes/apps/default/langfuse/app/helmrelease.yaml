@@ -139,7 +139,7 @@ spec:
       deploy: false
       bucket: langfuse
       region: auto
-      endpoint: http://minio.default.svc.cluster.local:9000
+      endpoint: http://minio.database.svc.cluster.local:9000
       forcePathStyle: true
       accessKeyId:
         secretKeyRef:
