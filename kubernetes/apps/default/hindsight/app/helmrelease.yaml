@@ -53,7 +53,7 @@ spec:
                 path: /spec/template/spec/initContainers
                 value:
                   - name: patch-vchord-probes
-                    image: ghcr.io/vectorize-io/hindsight-api:0.8.1
+                    image: ghcr.io/vectorize-io/hindsight-api:0.7.2
                     command: ["/bin/sh", "-c", "cp -r /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
                     volumeMounts:
                       - name: api-code
@@ -78,7 +78,7 @@ spec:
                 path: /spec/template/spec/initContainers
                 value:
                   - name: patch-vchord-probes
-                    image: ghcr.io/vectorize-io/hindsight-api:0.8.1
+                    image: ghcr.io/vectorize-io/hindsight-api:0.7.2
                     command: ["/bin/sh", "-c", "cp -r /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
                     volumeMounts:
                       - name: api-code
@@ -107,7 +107,7 @@ spec:
       replicaCount: 1
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.8.1
+        tag: 0.7.2
       resources:
         requests:
           cpu: 100m
@@ -123,7 +123,7 @@ spec:
     api:
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.8.1
+        tag: 0.7.2
       resources:
         requests:
           cpu: 100m
@@ -143,12 +143,10 @@ spec:
         HINDSIGHT_API_VECTOR_EXTENSION: vchord
         HINDSIGHT_API_TEXT_SEARCH_EXTENSION: vchord
 
-        HINDSIGHT_API_LLM_PROVIDER: openrouter
-        HINDSIGHT_API_LLM_MODEL: openai/gpt-oss-20b
-        HINDSIGHT_API_LLM_BASE_URL: https://openrouter.ai/api/v1
-        HINDSIGHT_API_LLM_DEFAULT_HEADERS: '{"X-Whois":"hindsight-api-home-ops","X-Application":"hindsight-api-home-ops"}'
-        HINDSIGHT_API_LLM_EXTRA_BODY: '{"provider":{"only":["Groq"]}}'
-        HINDSIGHT_API_LLM_MAX_CONCURRENT: "3"
+        HINDSIGHT_API_LLM_PROVIDER: openai
+        HINDSIGHT_API_LLM_MODEL: gemma4-aeon-uncensored
+        HINDSIGHT_API_LLM_BASE_URL: https://api.spark.nix.casa/v1
+        HINDSIGHT_API_LLM_MAX_CONCURRENT: "1"
 
         HINDSIGHT_API_EMBEDDINGS_PROVIDER: litellm-sdk
         HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_MODEL: voyage/voyage-4-large
