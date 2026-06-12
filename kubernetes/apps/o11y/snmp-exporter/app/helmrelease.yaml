@@ -13,13 +13,9 @@ spec:
     fullnameOverride: *app
     serviceMonitor:
       enabled: true
-      params:
-        - name: apcups
-          module:
-            - apcups
-          target: 10.1.0.80
-          auth:
-            - public_v2
+      # No local SNMP targets are currently scraped; keep this explicit so upstream
+      # example UPS targets do not get reintroduced during syncs.
+      params: []
       path: /snmp
       scrapeTimeout: 10s
       relabelings:
