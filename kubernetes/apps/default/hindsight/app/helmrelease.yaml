@@ -42,7 +42,7 @@ spec:
           # TEMPORARY: mirrors upstream PR #1954 (vectorize-io/hindsight) — drops the
           # blanket vchordrq.probes session GUC that breaks recall on listless vchord
           # indexes (VectorChord 1.1: "need 0 probes, but 1 probes provided").
-          # Remove once a hindsight release > 0.7.2 includes #1954.
+          # Remove once a hindsight release > 0.8.1 includes #1954.
           # initContainer image tag MUST stay in sync with the api/worker image tag.
           - target:
               group: apps
@@ -54,7 +54,7 @@ spec:
                 path: /spec/template/spec/initContainers
                 value:
                   - name: patch-vchord-probes
-                    image: ghcr.io/vectorize-io/hindsight-api:0.7.2
+                    image: ghcr.io/vectorize-io/hindsight-api:0.8.1
                     command: ["/bin/sh", "-c", "cp -r /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
                     volumeMounts:
                       - name: api-code
@@ -79,7 +79,7 @@ spec:
                 path: /spec/template/spec/initContainers
                 value:
                   - name: patch-vchord-probes
-                    image: ghcr.io/vectorize-io/hindsight-api:0.7.2
+                    image: ghcr.io/vectorize-io/hindsight-api:0.8.1
                     command: ["/bin/sh", "-c", "cp -r /app/api/. /tmp/api-code/ && sed -i '/\"vchord\": ((\"vchordrq.probes\"/d' /tmp/api-code/hindsight_api/_vector_index.py"]
                     volumeMounts:
                       - name: api-code
@@ -96,7 +96,7 @@ spec:
                     mountPath: /app/api
   values:
     fullnameOverride: hindsight
-    version: 0.7.2
+    version: 0.8.1
     existingSecret: hindsight-secret
     databaseUrl: "postgresql://hindsight:$(POSTGRES_PASSWORD_URI)@postgres.database.svc.cluster.local:5432/hindsight"
 
@@ -108,7 +108,7 @@ spec:
       replicaCount: 1
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.7.2
+        tag: 0.8.1
       resources:
         requests:
           cpu: 100m
@@ -124,7 +124,7 @@ spec:
     api:
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.7.2
+        tag: 0.8.1
       resources:
         requests:
           cpu: 100m
@@ -191,7 +191,7 @@ spec:
     controlPlane:
       image:
         repository: ghcr.io/vectorize-io/hindsight-control-plane
-        tag: 0.7.2
+        tag: 0.8.1
       resources:
         requests:
           cpu: 50m
