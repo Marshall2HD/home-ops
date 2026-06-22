@@ -23,20 +23,24 @@ spec:
               TZ: America/New_York
               SILLYTAVERN_LISTEN: "true"
               SILLYTAVERN_WHITELIST: '["::/0", "0.0.0.0/0"]'
-              SILLYTAVERN_PORT: &port 8000
+              SILLYTAVERN_PORT: &port 80
+              SILLYTAVERN_HEARTBEATINTERVAL: "30"
               SILLYTAVERN_ENABLESERVERPLUGINS: "true"
               SILLYTAVERN_EXTENSIONS_MODELS_CLASSIFICATION: "SamLowe/roberta-base-go_emotions-onnx"
               SILLYTAVERN_EXTENSIONS_MODELS_EMBEDDING: "mixedbread-ai/mxbai-embed-large-v1"
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
+                custom: true
                 spec:
-                  periodSeconds: 1
-                  failureThreshold: 600
+                  exec:
+                    command: [node, src/healthcheck.js]
+                  initialDelaySeconds: 20
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+              readiness: *probes
+              startup: *probes
             resources:
               requests:
                 cpu: 100m
@@ -67,7 +71,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-            sectionName: https
     persistence:
       data:
         existingClaim: "{{ .Release.Name }}"

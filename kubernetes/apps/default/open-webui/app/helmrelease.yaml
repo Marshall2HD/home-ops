@@ -39,15 +39,26 @@ spec:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
-              readiness:
-                enabled: true
-              startup:
-                enabled: true
+                custom: true
                 spec:
-                  periodSeconds: 1
-                  failureThreshold: 600
+                  httpGet:
+                    path: /health
+                    port: &port 8080
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness: *probes
+              startup:
+                <<: *probes
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 120
             resources:
               requests:
                 cpu: 100m
@@ -60,7 +71,7 @@ spec:
       app:
         ports:
           http:
-            port: 8080
+            port: *port
     route:
       app:
         hostnames:
@@ -69,7 +80,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-            sectionName: https
     persistence:
       data:
         existingClaim: "{{ .Release.Name }}"

@@ -30,7 +30,6 @@ data:
 
     create_role_db hindsight hindsight "$HINDSIGHT_POSTGRES_PASSWORD"
     create_role_db langfuse langfuse "$LANGFUSE_POSTGRES_PASSWORD"
-    create_role_db paperclip paperclip "$PAPERCLIP_POSTGRES_PASSWORD"
     create_role_db open_webui open_webui "$OPEN_WEBUI_POSTGRES_PASSWORD"
 
     psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname hindsight <<'SQL'

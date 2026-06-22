@@ -1,11 +1,10 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/refs/tags/v8.0.0/schemas/config-schema.json
+# yaml-language-server: $schema=https://schemas.recyclarr.dev/latest/config-schema.json
 sonarr:
   series:
     base_url: http://sonarr.default.svc.cluster.local
     api_key: !env_var SONARR_API_KEY
-    # Keep local Sonarr-only source-boost CFs like [Falke] BluRay Source / REMUX Source.
-    delete_old_custom_formats: false
+    delete_old_custom_formats: true
     media_management:
       propers_and_repacks: do_not_prefer
     media_naming:
@@ -18,20 +17,6 @@ sonarr:
       series: plex-imdb
     quality_definition:
       type: series
-      # Animation-safe minimums: TRaSH defaults reject legit efficient 1080p animation.
-      qualities:
-        - name: WEBRip-720p
-          min: 4
-        - name: WEBDL-720p
-          min: 4
-        - name: Bluray-720p
-          min: 5
-        - name: WEBRip-1080p
-          min: 8
-        - name: WEBDL-1080p
-          min: 8
-        - name: Bluray-1080p
-          min: 10
     quality_profiles:
       - trash_id: c4cadd6b35b95f62c3d47a408e53e2f7 # WEB-2160p (Combined)
         reset_unmatched_scores:

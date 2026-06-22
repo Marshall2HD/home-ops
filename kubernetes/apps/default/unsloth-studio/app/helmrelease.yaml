@@ -27,7 +27,7 @@ spec:
               - secretRef:
                   name: unsloth-studio-secret
             probes:
-              liveness:
+              liveness: &probes
                 enabled: true
                 custom: true
                 spec:
@@ -37,6 +37,7 @@ spec:
                   periodSeconds: 30
                   timeoutSeconds: 10
                   failureThreshold: 6
+              readiness: *probes
               startup:
                 enabled: true
                 custom: true
