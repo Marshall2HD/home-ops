@@ -10,7 +10,7 @@ spec:
   hostnames:
     - langfuse.hades.casa
   parentRefs:
-    - name: envoy-internal
+    - name: envoy-external
       namespace: network
   rules:
     - backendRefs:

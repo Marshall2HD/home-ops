@@ -41,7 +41,7 @@ spec:
                     maxUnavailable: 1
   values:
     fullnameOverride: hindsight
-    version: 0.8.2
+    version: 0.8.3
     existingSecret: hindsight-secret
     databaseUrl: "postgresql://hindsight:$(POSTGRES_PASSWORD_URI)@postgres.database.svc.cluster.local:5432/hindsight"
 
@@ -53,7 +53,7 @@ spec:
       replicaCount: 1
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.8.2
+        tag: 0.8.3
       resources:
         requests:
           cpu: 100m
@@ -69,7 +69,7 @@ spec:
     api:
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
-        tag: 0.8.2
+        tag: 0.8.3
       resources:
         requests:
           cpu: 100m
@@ -93,10 +93,9 @@ spec:
         HINDSIGHT_API_VECTOR_EXTENSION: vchord
         HINDSIGHT_API_TEXT_SEARCH_EXTENSION: vchord
 
-        HINDSIGHT_API_LLM_PROVIDER: openai
-        HINDSIGHT_API_LLM_MODEL: gemma4-aeon-uncensored
-        HINDSIGHT_API_LLM_BASE_URL: http://athena:8001/v1
-        HINDSIGHT_API_LLM_API_KEY: spark-local
+        HINDSIGHT_API_LLM_PROVIDER: openrouter
+        HINDSIGHT_API_LLM_MODEL: openai/gpt-oss-120b
+        HINDSIGHT_API_LLM_EXTRA_BODY: '{"provider":{"only":["Cerebras","Groq"]}}'
         HINDSIGHT_API_LLM_MAX_CONCURRENT: "1"
         HINDSIGHT_API_RETAIN_LLM_MAX_CONCURRENT: "1"
         HINDSIGHT_API_REFLECT_LLM_MAX_CONCURRENT: "1"
@@ -108,8 +107,8 @@ spec:
         HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_OUTPUT_DIMENSIONS: "2048"
         HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_ENCODING_FORMAT: ""
 
-        HINDSIGHT_API_RERANKER_PROVIDER: litellm
-        HINDSIGHT_API_RERANKER_LITELLM_API_BASE: http://athena:8766/v1
+        # HINDSIGHT_API_RERANKER_PROVIDER: litellm
+        # HINDSIGHT_API_RERANKER_LITELLM_API_BASE: http://athena:8766/v1
         HINDSIGHT_API_RERANKER_LITELLM_MODEL: zerank-2
         HINDSIGHT_API_RERANKER_LITELLM_TIMEOUT: "120"
         HINDSIGHT_API_LAZY_RERANKER: "true"
@@ -143,7 +142,7 @@ spec:
     controlPlane:
       image:
         repository: ghcr.io/vectorize-io/hindsight-control-plane
-        tag: 0.8.2
+        tag: 0.8.3
       resources:
         requests:
           cpu: 50m
@@ -155,4 +154,3 @@ spec:
         NEXT_TELEMETRY_DISABLED: "1"
         HINDSIGHT_CP_HOSTNAME: "0.0.0.0"
         HINDSIGHT_CP_PORT: "3000"
-        HINDSIGHT_CP_DATAPLANE_API_URL: "http://hindsight-api.default.svc.cluster.local:8888"
