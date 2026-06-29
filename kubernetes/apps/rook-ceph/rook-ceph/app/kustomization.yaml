@@ -6,4 +6,5 @@ resources:
   - ./externalsecret.yaml
   - ./grafanadashboard.yaml
   - ./helmrelease.yaml
+  - ./ceph-csi-drivers.yaml
   - ./ocirepository.yaml
