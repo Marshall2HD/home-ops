@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/csi.ceph.io/cephconnection_v1.json
+apiVersion: csi.ceph.io/v1
+kind: CephConnection
+metadata:
+  name: rook-ceph
+spec:
+  monitors:
+    - 10.43.136.137:3300
+  rbdMirrorDaemonCount: 1
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/csi.ceph.io/clientprofile_v1.json
+apiVersion: csi.ceph.io/v1
+kind: ClientProfile
+metadata:
+  name: rook-ceph
+spec:
+  cephConnectionRef:
+    name: rook-ceph
+  cephFs:
+    cephCsiSecrets:
+      controllerPublishSecret:
+        name: rook-csi-cephfs-provisioner
+        namespace: rook-ceph
+  rbd:
+    cephCsiSecrets:
+      controllerPublishSecret:
+        name: rook-csi-rbd-provisioner
+        namespace: rook-ceph
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/csi.ceph.io/clientprofile_v1.json
+apiVersion: csi.ceph.io/v1
+kind: ClientProfile
+metadata:
+  name: 6ce7824f6ae653f41176f58ec8768ad6
+spec:
+  cephConnectionRef:
+    name: rook-ceph
+  cephFs:
+    cephCsiSecrets:
+      controllerPublishSecret:
+        name: rook-csi-cephfs-provisioner
+        namespace: rook-ceph
+    subVolumeGroup: csi

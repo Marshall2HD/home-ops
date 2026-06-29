@@ -7,4 +7,5 @@ resources:
   - ./grafanadashboard.yaml
   - ./helmrelease.yaml
   - ./ceph-csi-drivers.yaml
+  - ./ceph-csi-profiles.yaml
   - ./ocirepository.yaml
