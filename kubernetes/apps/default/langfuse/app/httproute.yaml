@@ -12,8 +12,6 @@ spec:
   parentRefs:
     - name: envoy-external
       namespace: network
-    - name: envoy-internal
-      namespace: network
   rules:
     - backendRefs:
         - name: langfuse-web
