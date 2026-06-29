@@ -160,23 +160,9 @@ cluster:
     disabled: true
     image: registry.k8s.io/kube-proxy:v1.36.2
   scheduler:
-    config:
-      apiVersion: kubescheduler.config.k8s.io/v1
-      kind: KubeSchedulerConfiguration
-      profiles:
-        - schedulerName: default-scheduler
-          plugins:
-            score:
-              disabled:
-                - name: ImageLocality
-          pluginConfig:
-            - name: PodTopologySpread
-              args:
-                defaultingType: List
-                defaultConstraints:
-                  - maxSkew: 1
-                    topologyKey: kubernetes.io/hostname
-                    whenUnsatisfiable: ScheduleAnyway
+    # Talos v1.13.x panics while rendering static pods if this carries
+    # raw integer values inside scheduler.config (DeepCopyJSONValue: cannot deep copy int).
+    # Keep the scheduler on defaults unless/until Talos fixes the renderer.
     extraArgs:
       bind-address: 0.0.0.0
     image: registry.k8s.io/kube-scheduler:v1.36.2
