@@ -142,7 +142,7 @@ spec:
     controlPlane:
       image:
         repository: ghcr.io/vectorize-io/hindsight-control-plane
-        tag: 0.8.3
+        tag: 0.8.4
       resources:
         requests:
           cpu: 50m
