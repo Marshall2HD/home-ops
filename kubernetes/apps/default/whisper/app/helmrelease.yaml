@@ -18,19 +18,34 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/marshall2hd/parakeet-api
-              tag: latest
+              repository: ghcr.io/mudler/parakeet.cpp-server
+              tag: latest-cuda
+            command:
+              - /usr/local/bin/parakeet-server
+            args:
+              - --model
+              - /models/parakeet.cpp/tdt-0.6b-v3-q4_k.gguf
+              - --host
+              - 0.0.0.0
+              - --port
+              - "8000"
+              - --threads
+              - "4"
+              - --cache-dir
+              - /models/parakeet.cpp-cache
             env:
               TZ: America/New_York
               NVIDIA_DRIVER_CAPABILITIES: all
               NVIDIA_VISIBLE_DEVICES: all
+              PARAKEET_DEVICE: CUDA0
+              PARAKEET_ATT_CONTEXT: "88"
             probes:
               liveness: &probes
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /healthz
+                    path: /health
                     port: &port 8000
                   periodSeconds: 30
                   timeoutSeconds: 5
@@ -41,7 +56,7 @@ spec:
                 custom: true
                 spec:
                   httpGet:
-                    path: /healthz
+                    path: /health
                     port: *port
                   initialDelaySeconds: 10
                   periodSeconds: 10
