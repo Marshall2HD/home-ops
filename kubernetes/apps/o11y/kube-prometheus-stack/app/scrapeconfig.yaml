@@ -8,6 +8,7 @@ spec:
   staticConfigs:
     - targets:
         - hypnos.internal:9100
+        - daedalus.internal:9100
   metricsPath: /metrics
   relabelings:
     - action: replace
