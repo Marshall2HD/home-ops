@@ -60,7 +60,7 @@ spec:
             },
             "overrides": [
               { "matcher": { "id": "byRegexp", "options": ".*22bcf8.*" }, "properties": [ { "id": "displayName", "value": "bottom external / intake" } ] },
-              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "mid chassis / free air" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "mid chassis / ambient" } ] },
               { "matcher": { "id": "byRegexp", "options": ".*cca8fe.*" }, "properties": [ { "id": "displayName", "value": "top internal / exhaust" } ] }
             ]
           },
@@ -97,7 +97,7 @@ spec:
             },
             "overrides": [
               { "matcher": { "id": "byRegexp", "options": ".*22bcf8.*" }, "properties": [ { "id": "displayName", "value": "bottom external / intake" } ] },
-              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "mid chassis / free air" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "mid chassis / ambient" } ] },
               { "matcher": { "id": "byRegexp", "options": ".*cca8fe.*" }, "properties": [ { "id": "displayName", "value": "top internal / exhaust" } ] }
             ]
           },
