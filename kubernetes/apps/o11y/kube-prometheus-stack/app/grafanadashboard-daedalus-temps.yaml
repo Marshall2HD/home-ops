@@ -33,7 +33,7 @@ spec:
         {
           "id": 1,
           "type": "stat",
-          "title": "Current Probe Temps",
+          "title": "Current Temperature Sensors",
           "gridPos": { "h": 5, "w": 24, "x": 0, "y": 0 },
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
           "targets": [
@@ -59,9 +59,9 @@ spec:
               }
             },
             "overrides": [
-              { "matcher": { "id": "byRegexp", "options": ".*22bcf8.*" }, "properties": [ { "id": "displayName", "value": "bottom external / intake (22bcf8)" } ] },
-              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "mid chassis / free ambient (22fe38)" } ] },
-              { "matcher": { "id": "byRegexp", "options": ".*cca8fe.*" }, "properties": [ { "id": "displayName", "value": "internal exhaust / switch (cca8fe)" } ] }
+              { "matcher": { "id": "byRegexp", "options": ".*22bcf8.*" }, "properties": [ { "id": "displayName", "value": "bottom external / intake" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "mid chassis / free air" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*cca8fe.*" }, "properties": [ { "id": "displayName", "value": "top internal / exhaust" } ] }
             ]
           },
           "options": {
@@ -73,7 +73,7 @@ spec:
         {
           "id": 2,
           "type": "timeseries",
-          "title": "1-Wire Probe Trends",
+          "title": "DS18B20 Temperature Trends",
           "gridPos": { "h": 12, "w": 24, "x": 0, "y": 5 },
           "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
           "targets": [
@@ -96,9 +96,9 @@ spec:
               }
             },
             "overrides": [
-              { "matcher": { "id": "byRegexp", "options": ".*22bcf8.*" }, "properties": [ { "id": "displayName", "value": "bottom external / intake (22bcf8)" } ] },
-              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "mid chassis / free ambient (22fe38)" } ] },
-              { "matcher": { "id": "byRegexp", "options": ".*cca8fe.*" }, "properties": [ { "id": "displayName", "value": "internal exhaust / switch (cca8fe)" } ] }
+              { "matcher": { "id": "byRegexp", "options": ".*22bcf8.*" }, "properties": [ { "id": "displayName", "value": "bottom external / intake" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "mid chassis / free air" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*cca8fe.*" }, "properties": [ { "id": "displayName", "value": "top internal / exhaust" } ] }
             ]
           },
           "options": {
