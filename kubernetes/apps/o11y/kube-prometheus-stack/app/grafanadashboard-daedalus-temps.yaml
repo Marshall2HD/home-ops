@@ -1,0 +1,141 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: daedalus-temperatures
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  datasources:
+    - datasourceName: prometheus
+      inputName: DS_PROMETHEUS
+  json: |
+    {
+      "__inputs": [
+        {
+          "name": "DS_PROMETHEUS",
+          "label": "Prometheus",
+          "type": "datasource",
+          "pluginId": "prometheus"
+        }
+      ],
+      "title": "Daedalus Temperatures",
+      "uid": "daedalus-temps",
+      "tags": ["daedalus", "temperature", "homelab"],
+      "timezone": "browser",
+      "editable": true,
+      "refresh": "1m",
+      "time": { "from": "now-24h", "to": "now" },
+      "panels": [
+        {
+          "id": 1,
+          "type": "stat",
+          "title": "Current Probe Temps",
+          "gridPos": { "h": 5, "w": 24, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "targets": [
+            {
+              "expr": "node_hwmon_temp_celsius{job=\"node-exporter\", instance=~\"daedalus.*\", chip=~\"w1_bus_master.*\"}",
+              "legendFormat": "{{chip}}",
+              "instant": true,
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "celsius",
+              "decimals": 1,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "blue", "value": null },
+                  { "color": "green", "value": 15 },
+                  { "color": "yellow", "value": 30 },
+                  { "color": "red", "value": 40 }
+                ]
+              }
+            },
+            "overrides": [
+              { "matcher": { "id": "byRegexp", "options": ".*22bcf8.*" }, "properties": [ { "id": "displayName", "value": "Probe 1 (22bcf8)" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "Probe 2 (22fe38)" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*cca8fe.*" }, "properties": [ { "id": "displayName", "value": "Probe 3 (cca8fe)" } ] }
+            ]
+          },
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "reduceOptions": { "calcs": ["lastNotNull"] }
+          }
+        },
+        {
+          "id": 2,
+          "type": "timeseries",
+          "title": "1-Wire Probe Trends",
+          "gridPos": { "h": 12, "w": 24, "x": 0, "y": 5 },
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "targets": [
+            {
+              "expr": "node_hwmon_temp_celsius{job=\"node-exporter\", instance=~\"daedalus.*\", chip=~\"w1_bus_master.*\"}",
+              "legendFormat": "{{chip}}",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "celsius",
+              "decimals": 1,
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "spanNulls": true,
+                "showPoints": "never"
+              }
+            },
+            "overrides": [
+              { "matcher": { "id": "byRegexp", "options": ".*22bcf8.*" }, "properties": [ { "id": "displayName", "value": "Probe 1 (22bcf8)" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*22fe38.*" }, "properties": [ { "id": "displayName", "value": "Probe 2 (22fe38)" } ] },
+              { "matcher": { "id": "byRegexp", "options": ".*cca8fe.*" }, "properties": [ { "id": "displayName", "value": "Probe 3 (cca8fe)" } ] }
+            ]
+          },
+          "options": {
+            "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "min", "max", "mean"] },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          }
+        },
+        {
+          "id": 3,
+          "type": "timeseries",
+          "title": "Pi CPU / PCIe ADC (context)",
+          "gridPos": { "h": 9, "w": 24, "x": 0, "y": 17 },
+          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "targets": [
+            {
+              "expr": "node_thermal_zone_temp{job=\"node-exporter\", instance=~\"daedalus.*\"}",
+              "legendFormat": "CPU ({{type}})",
+              "refId": "A"
+            },
+            {
+              "expr": "node_hwmon_temp_celsius{job=\"node-exporter\", instance=~\"daedalus.*\", chip=~\".*pcie.*\"}",
+              "legendFormat": "PCIe ADC",
+              "refId": "B"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "celsius",
+              "decimals": 1,
+              "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 5, "spanNulls": true, "showPoints": "never" }
+            }
+          },
+          "options": {
+            "legend": { "displayMode": "list", "placement": "bottom" },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          }
+        }
+      ],
+      "schemaVersion": 39
+    }
