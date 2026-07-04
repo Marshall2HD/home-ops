@@ -50,7 +50,7 @@ spec:
 
     worker:
       enabled: true
-      replicaCount: 1
+      replicaCount: 0
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
         tag: 0.8.4
@@ -67,7 +67,7 @@ spec:
       reloader.stakater.com/auto: "true"
 
     api:
-      replicaCount: 1
+      replicaCount: 0
       image:
         repository: ghcr.io/vectorize-io/hindsight-api
         tag: 0.8.4
@@ -101,17 +101,11 @@ spec:
         HINDSIGHT_API_LLM_EXTRA_BODY: '{}'
         HINDSIGHT_API_RETAIN_LLM_MODEL: gpt-5.4-mini
         HINDSIGHT_API_REFLECT_LLM_MODEL: gpt-5.4-mini
-        HINDSIGHT_API_CONSOLIDATION_LLM_PROVIDER: litellmrouter
-        HINDSIGHT_API_CONSOLIDATION_LLM_MODEL: openrouter/openai/gpt-oss-120b
-        HINDSIGHT_API_CONSOLIDATION_LLM_BASE_URL: https://openrouter.ai/api/v1
-        HINDSIGHT_API_CONSOLIDATION_LLM_API_KEY: "$(HINDSIGHT_API_OPENROUTER_API_KEY)"
-        HINDSIGHT_API_CONSOLIDATION_LLM_EXTRA_BODY: '{"provider":{"order":["groq","cerebras"],"allow_fallbacks":true}}'
-        HINDSIGHT_API_CONSOLIDATION_LLM_LITELLMROUTER_CONFIG: '{"model_list":[{"model_name":"default","litellm_params":{"model":"openrouter/openai/gpt-oss-120b","api_base":"https://openrouter.ai/api/v1","api_key":"os.environ/HINDSIGHT_API_OPENROUTER_API_KEY","extra_body":{"provider":{"order":["groq","cerebras"],"allow_fallbacks":true}}}}],"num_retries":0}'
-        HINDSIGHT_API_CONSOLIDATION_DEDUP_THRESHOLD: "0.97"
+        HINDSIGHT_API_CONSOLIDATION_LLM_MODEL: gpt-5.4-mini
         HINDSIGHT_API_LLM_MAX_CONCURRENT: "1"
         HINDSIGHT_API_RETAIN_LLM_MAX_CONCURRENT: "1"
         HINDSIGHT_API_REFLECT_LLM_MAX_CONCURRENT: "1"
-        HINDSIGHT_API_CONSOLIDATION_LLM_MAX_CONCURRENT: "4"
+        HINDSIGHT_API_CONSOLIDATION_LLM_MAX_CONCURRENT: "1"
         HINDSIGHT_API_WORKER_MAX_SLOTS: "3"
 
         HINDSIGHT_API_EMBEDDINGS_PROVIDER: litellm-sdk
