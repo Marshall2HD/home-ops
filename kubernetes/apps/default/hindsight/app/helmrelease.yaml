@@ -146,7 +146,7 @@ spec:
         failureThreshold: 12
 
     controlPlane:
-      replicaCount: 0
+      replicaCount: 1
       image:
         repository: ghcr.io/vectorize-io/hindsight-control-plane
         tag: 0.8.4
