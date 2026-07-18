@@ -6,8 +6,10 @@ metadata:
   name: minio
 spec:
   components:
-    - ../../../../components/volsync
+    - ../../../../components/kopiur/backup
   dependsOn:
+    - name: kopiur-repository
+      namespace: kopiur-system
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
@@ -16,7 +18,7 @@ spec:
   postBuild:
     substitute:
       APP: minio
-      VOLSYNC_CAPACITY: 25Gi
+      KOPIUR_CAPACITY: 25Gi
   prune: true
   sourceRef:
     kind: GitRepository
