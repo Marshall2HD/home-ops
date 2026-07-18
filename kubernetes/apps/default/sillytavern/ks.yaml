@@ -5,9 +5,11 @@ metadata:
   name: sillytavern
 spec:
   components:
-    - ../../../../components/volsync
+    - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
   dependsOn:
+    - name: kopiur-repository
+      namespace: kopiur-system
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
@@ -15,7 +17,7 @@ spec:
   postBuild:
     substitute:
       APP: sillytavern
-      VOLSYNC_CAPACITY: 25Gi
+      KOPIUR_CAPACITY: 25Gi
   prune: true
   sourceRef:
     kind: GitRepository

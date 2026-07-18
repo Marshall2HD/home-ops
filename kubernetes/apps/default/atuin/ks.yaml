@@ -6,8 +6,10 @@ metadata:
   name: atuin
 spec:
   components:
-    - ../../../../components/volsync
+    - ../../../../components/kopiur/backup
   dependsOn:
+    - name: kopiur-repository
+      namespace: kopiur-system
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h

@@ -22,8 +22,10 @@ metadata:
   name: paper
 spec:
   components:
-    - ../../../../components/volsync
+    - ../../../../components/kopiur/backup
   dependsOn:
+    - name: kopiur-repository
+      namespace: kopiur-system
     - name: mc-router
       namespace: default
     - name: rook-ceph-cluster
@@ -33,7 +35,7 @@ spec:
   postBuild:
     substitute:
       APP: paper
-      VOLSYNC_CAPACITY: 100Gi
+      KOPIUR_CAPACITY: 100Gi
   prune: true
   sourceRef:
     kind: GitRepository
