@@ -18,6 +18,7 @@ resources:
   - ./chaski/ks.yaml
   - ./cobalt/ks.yaml
   - ./deduparr/ks.yaml
+  - ./flaresolverr/ks.yaml
   - ./go2rtc/ks.yaml
   - ./hindsight/ks.yaml
   - ./home-assistant/ks.yaml
