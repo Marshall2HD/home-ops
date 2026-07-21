@@ -18,7 +18,7 @@ spec:
   postBuild:
     substitute:
       APP: minio
-      KOPIUR_CAPACITY: 25Gi
+      KOPIUR_CAPACITY: 100Gi
   prune: true
   sourceRef:
     kind: GitRepository
