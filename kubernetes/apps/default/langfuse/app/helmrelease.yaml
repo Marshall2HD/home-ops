@@ -115,6 +115,10 @@ spec:
     clickhouse:
       deploy: true
       logLevel: warning
+      extraOverrides: |
+        <clickhouse>
+          <text_log remove="1"/>
+        </clickhouse>
       usersExtraOverrides: |
         <clickhouse>
           <profiles>
