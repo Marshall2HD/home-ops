@@ -55,7 +55,8 @@ spec:
               requests:
                 cpu: 100m
               limits:
-                memory: 16Gi
+                # Intentionally sized from 30-day usage; do not reset to onedr0p defaults.
+                memory: 4Gi
     defaultPodOptions:
       runtimeClassName: nvidia
       securityContext:

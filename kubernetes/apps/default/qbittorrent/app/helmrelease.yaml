@@ -51,7 +51,8 @@ spec:
               requests:
                 cpu: 100m
               limits:
-                memory: 32Gi
+                # Intentionally sized from 30-day usage; do not reset to onedr0p defaults.
+                memory: 6Gi
     defaultPodOptions:
       terminationGracePeriodSeconds: 300
       securityContext:

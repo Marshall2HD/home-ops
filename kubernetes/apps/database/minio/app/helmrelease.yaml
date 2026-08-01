@@ -65,7 +65,8 @@ spec:
                 cpu: 50m
                 memory: 256Mi
               limits:
-                memory: 1Gi
+                # Intentionally sized from 30-day usage; do not reset to onedr0p defaults.
+                memory: 2Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
