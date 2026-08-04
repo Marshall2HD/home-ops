@@ -18,7 +18,7 @@ spec:
           paper:
             image:
               repository: ghcr.io/itzg/minecraft-server
-              tag: 2026.6.1@sha256:2a3ed0997720d79b7ed783a79e43143358b2e60d27daf15c2b1d27b59d04a6d8
+              tag: 2026.8.0@sha256:e3335993929a1565f73c30b2041bcbc1473fc9c406fdd5a0d0ea24c08ef73320
             env:
               BROADCAST_RCON_TO_OPS: false
               DIFFICULTY: hard
