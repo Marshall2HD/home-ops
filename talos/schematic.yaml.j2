@@ -3,6 +3,10 @@ customization:
   extraKernelArgs:
     - amd_iommu=on # PCI Passthrough
     - amd_pstate=active # Better CPU frequency scaling for Zen 5
+    # Existing Ceph RBD and monitor filesystems mounted as unlabeled_t under Talos' experimental
+    # permissive SELinux policy, producing enough AVC events to destabilize this single node.
+    - -selinux # Remove Talos' default selinux=1 argument
+    - selinux=0 # Disable SELinux until Talos and Rook/Ceph CSI support this upgrade path
     - sysctl.kernel.kexec_load_disabled=1 # Security hardening
   systemExtensions:
     officialExtensions:
