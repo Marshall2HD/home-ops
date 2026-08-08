@@ -15,7 +15,7 @@ spec:
       enabled: true
       bbr: true
     bpf:
-      datapathMode: veth
+      datapathMode: netkit # Existing workloads were created with netkit; changing modes requires recreating every pod
       masquerade: true
       preallocateMaps: true
     bpfClockProbe: true
