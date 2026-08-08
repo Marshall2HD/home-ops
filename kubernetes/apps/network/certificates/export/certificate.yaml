@@ -3,11 +3,11 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: turbo-ac
+  name: hades-casa
 spec:
   dnsNames:
-    - turbo.ac
-    - "*.turbo.ac"
+    - hades.casa
+    - "*.hades.casa"
   duration: 160h
   issuerRef:
     kind: ClusterIssuer
@@ -16,6 +16,6 @@ spec:
     algorithm: ECDSA
     size: 256
     rotationPolicy: Always
-  secretName: turbo-ac-tls
+  secretName: hades-casa-tls
   usages:
     - digital signature

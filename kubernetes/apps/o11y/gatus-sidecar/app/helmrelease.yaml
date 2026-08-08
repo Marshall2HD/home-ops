@@ -31,8 +31,8 @@ spec:
       annotations:
         gatus.home-operations.com/enabled: "false"
       hostnames:
-        - "{{ .Release.Name }}.turbo.ac"
-        - status.turbo.ac
+        - "{{ .Release.Name }}.hades.casa"
+        - status.hades.casa
       parentRefs:
         - name: envoy-external
           namespace: network

@@ -26,4 +26,4 @@ spec:
         enabled: true
       prometheusRule:
         enabled: true
-    replicaCount: 2
+    replicaCount: 1

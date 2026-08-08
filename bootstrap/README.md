@@ -15,10 +15,10 @@ directory is not used again until the next rebuild.
 - Tools pinned in `.mise/config.toml` installed via `mise install` (talosctl,
   just, minijinja-cli, op, yq, jq), plus kubectl, helmfile, kustomize and gum
   on the PATH (not pinned here).
-- A signed-in 1Password CLI (`op`), with access to both accounts (personal
-  and home-operations). Machine secrets never live in this repo; every
-  `op://` reference in the Talos configs and bootstrap manifests is resolved
-  at apply time with `op inject`.
+- A signed-in 1Password CLI (`op`) with access to the personal account.
+  Machine secrets never live in this repo; every `op://` reference in the
+  Talos configs and bootstrap manifests is resolved at apply time with
+  `op inject`.
 - A valid `talosconfig` at the repo root (mise points `TALOSCONFIG` there).
   The justfile derives the controller endpoint and node list from
   `talosctl config info`, so nothing is hardcoded here.
@@ -30,38 +30,36 @@ directory is not used again until the next rebuild.
 ## UDM configuration
 
 The Kubernetes API is fronted by a Cilium LoadBalancer Service (`kube-api`,
-`192.168.69.120`, `externalTrafficPolicy: Local` so only nodes with a
-healthy apiserver attract traffic). Cilium announces it to the UDM over BGP
-along with every other LoadBalancer IP. See
+`10.8.0.120`, `externalTrafficPolicy: Local` so only the node with a healthy
+apiserver attracts traffic). Cilium announces it to the UDM over BGP along
+with every other LoadBalancer IP. See
 [networking.yaml](../kubernetes/apps/kube-system/cilium/app/networking.yaml).
 
 ```mermaid
 graph LR
-    client[LAN client] -->|hashed flow| udm["UDM (ASN 64513)"]
-    udm -->|ECMP| k0["k8s-0 (192.168.42.10)"]
-    udm -->|ECMP| k1["k8s-1 (192.168.42.11)"]
-    udm -->|ECMP| k2["k8s-2 (192.168.42.12)"]
-    k0 & k1 & k2 -. "BGP (ASN 64514): VIPs from 192.168.69.0/24" .-> udm
+    client[LAN client] --> udm["UDM (ASN 64513)"]
+    udm --> nyx["nyx (10.4.0.10)"]
+    nyx -. "BGP (ASN 64514): VIPs from 10.8.0.0/24" .-> udm
 ```
 
 The VIPs the UDM learns this way:
 
-| VIP              | Hostname            | Backs                          |
-| ---------------- | ------------------- | ------------------------------ |
-| `192.168.69.120` | `k8s.internal`      | `kube-api` Service (apiserver) |
-| `192.168.69.121` | `internal.turbo.ac` | `envoy-internal` Gateway       |
-| `192.168.69.126` | `external.turbo.ac` | `envoy-external` Gateway       |
+| VIP          | Hostname              | Backs                          |
+| ------------ | --------------------- | ------------------------------ |
+| `10.8.0.120` | `k8s.internal`        | `kube-api` Service (apiserver) |
+| `10.8.0.121` | `internal.hades.casa` | `envoy-internal` Gateway       |
+| `10.8.0.126` | `external.hades.casa` | `envoy-external` Gateway       |
 
 A static A record in UniFi (under the policy settings; the UI location
 varies by Network release) points the API hostname at the VIP:
 
 ```text
-k8s.internal → 192.168.69.120
+k8s.internal → 10.8.0.120
 ```
 
-Cilium (ASN 64514) peers from the node IPs on the SERVERS subnet
-(`192.168.42.10-12`) and announces LoadBalancer Service IPs from the
-`192.168.69.0/24` pool. UniFi accepts a single FRR config upload per device
+Cilium (ASN 64514) peers from Nyx on the SERVERS subnet (`10.4.0.10`) and
+announces LoadBalancer Service IPs from the `10.8.0.0/24` pool. UniFi accepts
+a single FRR config upload per device
 (Settings → Routing → BGP):
 
 <details>
@@ -69,18 +67,15 @@ Cilium (ASN 64514) peers from the node IPs on the SERVERS subnet
 
 ```text
 router bgp 64513
-  bgp router-id 192.168.1.1
+  bgp router-id 10.1.0.1
   no bgp ebgp-requires-policy
 
   neighbor k8s peer-group
   neighbor k8s remote-as 64514
 
-  neighbor 192.168.42.10 peer-group k8s
-  neighbor 192.168.42.11 peer-group k8s
-  neighbor 192.168.42.12 peer-group k8s
+  neighbor 10.4.0.10 peer-group k8s
 
   address-family ipv4 unicast
-    maximum-paths 3
     neighbor k8s next-hop-self
     neighbor k8s soft-reconfiguration inbound
   exit-address-family
@@ -89,25 +84,19 @@ exit
 
 </details>
 
-`maximum-paths 3` gives true ECMP across the control plane nodes for the
-`kube-api` VIP (FRR's eBGP default is a single best path).
-
 > [!WARNING]
 > Re-uploading the FRR config briefly bounces established BGP sessions.
 
-To verify: `vtysh -c "show bgp summary"` on the UDM, `192.168.69.120/32`
-showing an ECMP path per healthy apiserver in `vtysh -c "show ip route"`,
-and `curl -k https://k8s.internal:6443/livez`. In
-`vtysh -c "show ip bgp 192.168.69.120"` every path should carry the
-`multipath` tag; `ip route show 192.168.69.120` should list one `nexthop`
-line per node (a single flat line means multipath is not installed in the
-kernel).
+To verify, run `vtysh -c "show bgp summary"` on the UDM and confirm that
+`10.4.0.10` is established. `vtysh -c "show ip route 10.8.0.120"` should show
+Nyx as the next hop, and `curl -k https://k8s.internal:6443/livez` should
+succeed.
 
 > [!NOTE]
 > `k8s.internal` rides the Cilium `kube-api` LoadBalancer, so the named API
 > endpoint depends on Cilium being healthy. If the CNI is ever down, reach
-> the API directly at `https://192.168.42.10-12:6443` and the Talos API at
-> the same node addresses; neither depends on the CNI.
+> the API directly at `https://10.4.0.10:6443` and the Talos API at
+> `10.4.0.10`; neither depends on the CNI.
 
 ## UDM boot scripts
 
@@ -129,33 +118,6 @@ curl -fsL "https://raw.githubusercontent.com/unifi-utilities/unifi-common/HEAD/r
 > upgrade, check `systemctl is-enabled udm-boot` and rerun the installer if
 > needed.
 
-## ECMP flow hashing
-
-The kernel default (`fib_multipath_hash_policy=0`) hashes on source and
-destination IP only, so a given client always lands on the same node.
-Policy `1` adds ports to the hash and spreads individual connections
-across the ECMP next-hops.
-
-`/data/on_boot.d/30-ecmp-l4-hash.sh`:
-
-```sh
-#!/bin/sh
-echo "net.ipv4.fib_multipath_hash_policy = 1" > /etc/sysctl.d/30-ecmp-l4-hash.conf
-sysctl -w net.ipv4.fib_multipath_hash_policy=1
-```
-
-The `sysctl.d` drop-in covers reboots on its own; the boot script recreates
-it after firmware upgrades.
-
-> [!TIP]
-> To verify spreading, run this a few times from one machine and expect the
-> node in the SAN to vary:
->
-> ```sh
-> openssl s_client -connect k8s.internal:6443 </dev/null 2>/dev/null \
->   | openssl x509 -noout -ext subjectAltName
-> ```
-
 ## HTTP/3 discovery
 
 Envoy Gateway serves HTTP/3 (`http3: {}` in the `ClientTrafficPolicy`, UDP
@@ -168,7 +130,7 @@ records of their own.
 
 > [!IMPORTANT]
 > Externally published apps (`plex`, anything else behind the Cloudflare
-> tunnel) are CNAMEs to `external.turbo.ac` in public DNS, and the UDM has
+> tunnel) are CNAMEs to `external.hades.casa` in public DNS, and the UDM has
 > no HTTPS record for those names. The browser's HTTPS query is forwarded
 > upstream, where Cloudflare answers with its own HTTPS record, and
 > browsers then use that record and connect through Cloudflare, even
@@ -188,8 +150,8 @@ CONF_DIR=/run/dnsmasq.dhcp.conf.d
 for i in $(seq 1 30); do [ -d "$CONF_DIR" ] && break; sleep 2; done
 [ -d "$CONF_DIR" ] || exit 0
 cat > "$CONF_DIR/custom.conf" <<RR
-dns-rr=external.turbo.ac,65,00010000010006026833026832
-dns-rr=internal.turbo.ac,65,00010000010006026833026832
+dns-rr=external.hades.casa,65,00010000010006026833026832
+dns-rr=internal.hades.casa,65,00010000010006026833026832
 RR
 [ -f /run/dnsmasq-main.pid ] && kill "$(cat /run/dnsmasq-main.pid)" 2>/dev/null
 exit 0
@@ -208,8 +170,8 @@ it with the new config.
 To verify:
 
 ```sh
-dig +short @192.168.1.1 internal.turbo.ac HTTPS   # expect: 1 . alpn="h3,h2"
-curl --http3-only -sk -o /dev/null -w '%{http_version}\n' https://internal.turbo.ac/
+dig +short @10.1.0.1 internal.hades.casa HTTPS   # expect: 1 . alpn="h3,h2"
+curl --http3-only -sk -o /dev/null -w '%{http_version}\n' https://internal.hades.casa/
 ```
 
 ## Stages
@@ -236,10 +198,9 @@ graph LR
    installed), then applies:
     - `kustomize/` - bootstrap Secrets rendered through `op inject`, plus
       their namespaces: 1Password Connect credentials and token plus the
-      Cloudflare tunnel ID from the personal account (`personal/`), and the
-      1Password service-account token from the home-operations account
-      (`home-operations/`, injected with its own `OP_ACCOUNT`). These exist
-      before their controllers so nothing deadlocks on a missing Secret.
+      Cloudflare tunnel ID from the personal account (`personal/`). These
+      exist before their controllers so nothing deadlocks on a missing
+      Secret.
     - `helmfile/crds.yaml` - CRDs extracted from upstream charts
       (envoy-gateway, grafana-operator, kube-prometheus-stack) and applied
       directly. Installing CRDs out-of-band means Flux Kustomizations that
@@ -262,8 +223,8 @@ graph LR
 Bootstrap itself restores no application data; that happens declaratively
 once Flux takes over, via [Kopiur](https://github.com/home-operations/kopiur)
 (deployed from [kubernetes/apps/kopiur-system/](../kubernetes/apps/kopiur-system/),
-backed by the `expanse`
-ClusterRepository: kopia in S3 on `expanse.internal`).
+backed by the `hypnos`
+ClusterRepository: kopia in S3 on `hypnos.internal`).
 
 Apps that opt into the `kopiur/backup` component get a PVC whose
 `spec.dataSourceRef` points at a Kopiur `Restore` with `target.populator: {}`

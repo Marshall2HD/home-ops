@@ -84,7 +84,7 @@ spec:
     route:
       app:
         hostnames:
-          - "{{ .Release.Name }}.turbo.ac"
+          - "{{ .Release.Name }}.hades.casa"
         parentRefs:
           - name: envoy-internal
             namespace: network
@@ -97,7 +97,7 @@ spec:
         existingClaim: "{{ .Release.Name }}"
       media:
         type: nfs
-        server: expanse.internal
-        path: /mnt/eros/Media
+        server: hypnos.internal
+        path: /mnt/Elysium/Media
         globalMounts:
           - path: /media

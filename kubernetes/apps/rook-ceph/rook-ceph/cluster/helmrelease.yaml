@@ -9,12 +9,17 @@ spec:
     kind: OCIRepository
     name: rook-ceph-cluster
   interval: 1h
-  timeout: 10m
+  timeout: 15m
   values:
     cephClusterSpec:
       cephConfig:
-        mon:
-          mon_cluster_log_level: info
+        global:
+          mon_data_avail_warn: "15"
+          osd_pool_default_size: "2"
+          osd_pool_default_min_size: "1"
+      mon:
+        count: 1 # Single Node
+        allowMultiplePerNode: false
       cleanupPolicy:
         wipeDevicesFromOtherClusters: true
       crashCollector:
@@ -28,6 +33,7 @@ spec:
         ssl: false
         prometheusEndpoint: http://prometheus-operated.o11y.svc.cluster.local:9090
       mgr:
+        count: 1 # Single Node
         modules:
           - name: pg_autoscaler
             enabled: true
@@ -39,8 +45,10 @@ spec:
           limits:
             memory: 8Gi # Required for bootstrap
       storage:
-        devicePathFilter: /dev/disk/by-id/nvme-Micron_7450_MTFDKBA800TFS_.*
         useAllDevices: false
+        devicePathFilter: "^/dev/disk/by-id/nvme-Micron_7450_MTFDKBA800TFS_(25124FA456CD|25124FA45676)$"
+        config:
+          osdsPerDevice: "1"
         useAllNodes: true
     monitoring:
       enabled: true
@@ -50,7 +58,7 @@ spec:
     route:
       dashboard:
         host:
-          name: rook.turbo.ac
+          name: rook.hades.casa
           path: /
           pathType: PathPrefix
         parentRefs:
@@ -59,9 +67,9 @@ spec:
     cephBlockPools:
       - name: ceph-blockpool
         spec:
-          failureDomain: host
+          failureDomain: osd # Changed from 'host' for single node
           replicated:
-            size: 3
+            size: 2 # Mirror across 2 drives
         storageClass:
           enabled: true
           name: ceph-block
@@ -93,13 +101,14 @@ spec:
       - name: ceph-filesystem
         spec:
           metadataPool:
+            failureDomain: osd
             replicated:
-              size: 3
+              size: 2
           dataPools:
             - name: data0
-              failureDomain: host
+              failureDomain: osd
               replicated:
-                size: 3
+                size: 2
           metadataServer:
             activeCount: 1
             activeStandby: true

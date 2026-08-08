@@ -18,15 +18,16 @@ cluster:
 ---
 apiVersion: v1alpha1
 kind: LinkAliasConfig
-name: net0
+name: net%d
 selector:
-  match: link.driver == "atlantic" && mac(link.permanent_addr).startsWith("00:30:93:12:")
+  match: link.driver == "i40e" && mac(link.permanent_addr).startsWith("38:05:25:33:8c:")
 ---
 apiVersion: v1alpha1
 kind: BondConfig
 name: bond0
 links:
   - net0
+  - net1
 bondMode: active-backup
 mtu: 9000
 ---
@@ -37,15 +38,15 @@ clientIdentifier: mac
 ---
 apiVersion: v1alpha1
 kind: VLANConfig
-name: bond0.70
-vlanID: 70
+name: bond0.7
+vlanID: 7
 parent: bond0
 mtu: 9000
 ---
 apiVersion: v1alpha1
 kind: VLANConfig
-name: bond0.90
-vlanID: 90
+name: bond0.9
+vlanID: 9
 parent: bond0
 mtu: 9000
 ---
@@ -72,7 +73,7 @@ installer:
   image: factory.talos.dev/metal-installer/{{ schematic }}:v1.14.0-beta.1
 provisioning:
   diskSelector:
-    match: disk.model == "MK000480GWCEV"
+    match: disk.serial == "253036800050"
   wipe: false
 ---
 apiVersion: v1alpha1
@@ -80,8 +81,8 @@ kind: RawVolumeConfig
 name: miroir-slow
 provisioning:
   diskSelector:
-    match: disk.model == "Corsair MP600 MICRO" && !system_disk
-  minSize: 1TB
+    match: disk.serial == "25124FAE9A64" && !system_disk
+  minSize: 750GB
 ---
 apiVersion: v1alpha1
 kind: FilesystemTrimConfig
@@ -116,13 +117,26 @@ name: nbd
 ---
 apiVersion: v1alpha1
 kind: KernelModuleConfig
-name: thunderbolt
+name: nvidia
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: nvidia_uvm
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: nvidia_drm
+---
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: nvidia_modeset
 ---
 apiVersion: v1alpha1
 kind: SysctlConfig
 params:
   fs.inotify.max_user_instances: "8192"
   fs.inotify.max_user_watches: "1048576"
+  net.core.bpf_jit_harden: "1" # Required for NVIDIA GPU support
   net.core.default_qdisc: fq
   net.core.rmem_max: "67108864"
   net.core.wmem_max: "67108864"
@@ -138,7 +152,7 @@ params:
   net.ipv4.tcp_slow_start_after_idle: "0"
   net.ipv4.tcp_window_scaling: "1"
   net.ipv4.tcp_wmem: 4096 65536 33554432
-  net/ipv6/conf/bond0.70/disable_ipv6: "1" # keep the host off IPv6 on the IoT segmen
+  net/ipv6/conf/bond0.7/disable_ipv6: "1" # Keep the host off IPv6 on the IoT segment
   sunrpc.tcp_max_slot_table_entries: "128"
   sunrpc.tcp_slot_table_entries: "128"
   user.max_user_namespaces: "11255"
@@ -170,7 +184,7 @@ apiVersion: v1alpha1
 kind: KubeNodeConfig
 nodeIP:
   validSubnets:
-    - 192.168.42.0/24
+    - 10.4.0.0/24
 labels:
   node.kubernetes.io/gpu: "true"
   topology.kubernetes.io/region: main
@@ -181,6 +195,7 @@ config:
   crashLoopBackOff:
     maxContainerRestartPeriod: 60s
   imageMaximumGCAge: 168h
+  maxPods: 250
   maxParallelImagePulls: 3
   serializeImagePulls: false
   shutdownGracePeriod: 90s

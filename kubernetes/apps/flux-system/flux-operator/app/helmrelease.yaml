@@ -23,7 +23,7 @@ spec:
       httpRoute:
         enabled: true
         hostnames:
-          - flux-operator.turbo.ac
+          - flux-operator.hades.casa
         parentRefs:
           - name: envoy-internal
             namespace: network

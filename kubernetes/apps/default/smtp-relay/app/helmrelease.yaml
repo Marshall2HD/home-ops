@@ -54,8 +54,8 @@ spec:
       app:
         type: LoadBalancer
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: smtp-relay.turbo.ac
-          lbipam.cilium.io/ips: 192.168.69.122
+          external-dns.alpha.kubernetes.io/hostname: smtp-relay.hades.casa
+          lbipam.cilium.io/ips: 10.8.0.122
         externalTrafficPolicy: Local
         ports:
           smtp:

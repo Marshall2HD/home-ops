@@ -9,7 +9,7 @@ spec:
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
   dependsOn:
-    - name: intel-gpu-resource-driver
+    - name: nvidia-device-plugin
       namespace: kube-system
     - name: rook-ceph-cluster
       namespace: rook-ceph

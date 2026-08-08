@@ -11,4 +11,4 @@ spec:
     operation: copy
   ref:
     tag: 1.21.1
-  url: oci://ocharted.turbo.ac/kubernetes-sigs.github.io/external-dns/external-dns
+  url: oci://ocharted.hades.casa/kubernetes-sigs.github.io/external-dns/external-dns

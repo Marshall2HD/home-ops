@@ -21,7 +21,7 @@ spec:
         gatus.home-operations.com/endpoint: |-
           conditions: ["[STATUS] == 200"]
       hostnames:
-        - "{{ .Release.Name }}.turbo.ac"
+        - "{{ .Release.Name }}.hades.casa"
       parentRefs:
         - name: envoy-external
           namespace: network

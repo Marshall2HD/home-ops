@@ -15,7 +15,7 @@
   hostRules: [
     {
       description: "Authenticate against the ocharted OCI registry",
-      matchHost: "ocharted.turbo.ac",
+      matchHost: "ocharted.hades.casa",
       hostType: "docker",
       username: "{{ secrets.OCHARTED_USERNAME }}",
       password: "{{ secrets.OCHARTED_PASSWORD }}",

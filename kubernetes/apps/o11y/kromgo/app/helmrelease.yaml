@@ -106,7 +106,7 @@ spec:
         - name: envoy-external
           namespace: network
       hostnames:
-        - "{{ .Release.Name }}.turbo.ac"
+        - "{{ .Release.Name }}.hades.casa"
     resources:
       requests:
         cpu: 10m

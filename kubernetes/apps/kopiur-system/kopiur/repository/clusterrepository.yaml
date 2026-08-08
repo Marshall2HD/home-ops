@@ -3,7 +3,7 @@
 apiVersion: kopiur.home-operations.com/v1alpha1
 kind: ClusterRepository
 metadata:
-  name: expanse
+  name: hypnos
 spec:
   allowedNamespaces:
     all: true
@@ -14,10 +14,13 @@ spec:
           name: kopiur-repository-secret
           namespace: kopiur-system
       bucket: kopiur
-      endpoint: expanse.internal:9000
+      endpoint: hypnos.internal:3900
       region: us-east-1
       tls:
         disableTls: true
+  catalog:
+    periodicRefresh: true
+    refreshInterval: 1h
   encryption:
     passwordSecretRef:
       name: kopiur-repository-secret

@@ -7,7 +7,7 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - expanse.internal:9002
+        - hypnos.internal:3903
   metricsPath: /metrics
   relabelings:
     - action: replace
@@ -22,7 +22,8 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - expanse.internal:9100
+        - hypnos.internal:9100
+        - daedalus.internal:9100
   metricsPath: /metrics
   relabelings:
     - action: replace
@@ -37,7 +38,7 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - expanse.internal:9633
+        - hypnos.internal:9633
   metricsPath: /metrics
   relabelings:
     - action: replace
@@ -52,9 +53,7 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - jetkvm-0.internal
-        - jetkvm-1.internal
-        - jetkvm-2.internal
+        - jetkvm.internal
   metricsPath: /metrics
   relabelings:
     - action: replace

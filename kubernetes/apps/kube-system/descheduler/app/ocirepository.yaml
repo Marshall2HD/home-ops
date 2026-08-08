@@ -11,4 +11,4 @@ spec:
     operation: copy
   ref:
     tag: 0.36.0
-  url: oci://ocharted.turbo.ac/kubernetes-sigs.github.io/descheduler/descheduler
+  url: oci://ocharted.hades.casa/kubernetes-sigs.github.io/descheduler/descheduler

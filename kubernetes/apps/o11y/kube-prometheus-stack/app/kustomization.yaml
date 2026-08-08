@@ -6,6 +6,7 @@ resources:
   - ./alertmanagerconfig.yaml
   - ./externalsecret.yaml
   - ./grafanadashboard.yaml
+  - ./grafanadashboard-daedalus-temps.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
   - ./scrapeconfig.yaml

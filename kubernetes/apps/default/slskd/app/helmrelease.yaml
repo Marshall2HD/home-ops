@@ -80,7 +80,7 @@ spec:
       soulseek:
         type: LoadBalancer
         annotations:
-          lbipam.cilium.io/ips: 192.168.69.127
+          lbipam.cilium.io/ips: 10.8.0.127
         externalTrafficPolicy: Local
         ports:
           soulseek-tcp:
@@ -89,7 +89,7 @@ spec:
     route:
       app:
         hostnames:
-          - "{{ .Release.Name }}.turbo.ac"
+          - "{{ .Release.Name }}.hades.casa"
         parentRefs:
           - name: envoy-internal
             namespace: network
@@ -132,8 +132,8 @@ spec:
             subPath: slskd.yml
       media:
         type: nfs
-        server: expanse.internal
-        path: /mnt/eros/Media
+        server: hypnos.internal
+        path: /mnt/Elysium/Media
         globalMounts:
           - path: /media
       tmp:
