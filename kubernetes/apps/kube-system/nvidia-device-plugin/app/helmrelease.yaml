@@ -21,6 +21,8 @@ spec:
     runtimeClassName: nvidia
     nodeSelector:
       node.kubernetes.io/gpu: "true"
+    # Nyx is explicitly labeled as the GPU node and does not run Node Feature Discovery.
+    affinity: null
     config:
       map:
         default: |-
