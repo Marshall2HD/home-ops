@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: cert-manager
+  interval: 1h
+  values:
+    crds:
+      enabled: true
+    # cert-manager expects host:port here, not DoH URLs. DoH strings make DNS-01
+    # self-checks flake on nested names like ui.hindsight.hades.casa.
+    dns01RecursiveNameservers: 1.1.1.1:53,1.0.0.1:53
+    dns01RecursiveNameserversOnly: true
+    prometheus:
+      enabled: true
+      servicemonitor:
+        enabled: true
+    webhook:
+      replicaCount: 2
+      podDisruptionBudget:
+        enabled: true

@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./externalsecret.yaml
+  - ./postgres-init-configmap.yaml
+  - ./postgres-service.yaml
+  - ./postgres-statefulset.yaml
+  - ./helmrelease.yaml
+  - ./httproute-api.yaml
+  - ./httproute-ui.yaml
+  - ./ocirepository.yaml

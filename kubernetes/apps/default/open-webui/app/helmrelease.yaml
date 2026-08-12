@@ -1,0 +1,77 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: open-webui
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: open-webui
+  interval: 1h
+  values:
+    controllers:
+      open-webui:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/open-webui/open-webui
+              tag: dev@sha256:635ecd0c44385d41492b94cfc2d029e9094b111362b49a002a1655d0fa79b911
+            env:
+              DATA_DIR: /app/backend/data
+              HOME: /app/backend/data
+              ENABLE_OPENAI_API: "true"
+              OPENAI_API_BASE_URLS: "http://llama.default.svc.cluster.local:8080/v1"
+              OPENAI_API_KEYS: "not-needed"
+              ENABLE_OLLAMA_API: "false"
+              ENABLE_SIGNUP: "false"
+              WEBUI_URL: "https://chat.hades.casa"
+              ENABLE_RESPONSES_API_STATEFUL: "true"
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  periodSeconds: 1
+                  failureThreshold: 600
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 2Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+    service:
+      app:
+        ports:
+          http:
+            port: 8080
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+          - chat.hades.casa
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /app/backend/data
+      tmp:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 64Mi
+        globalMounts:
+          - path: /tmp

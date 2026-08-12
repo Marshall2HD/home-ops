@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+
+components:
+  - ../../components/alerts
+
+resources:
+  - ./namespace.yaml
+  - ./agregarr/ks.yaml
+  - ./atuin/ks.yaml
+  - ./autobrr/ks.yaml
+  - ./bazarr/ks.yaml
+  - ./brrpolice/ks.yaml
+  - ./cobalt/ks.yaml
+  - ./deduparr/ks.yaml
+  - ./go2rtc/ks.yaml
+  - ./home-assistant/ks.yaml
+  - ./hindsight/ks.yaml
+  - ./librechat/ks.yaml
+  - ./minecraft/ks.yaml
+  - ./mosquitto/ks.yaml
+  - ./notifier/ks.yaml
+  - ./open-webui/ks.yaml
+  - ./whisper/ks.yaml
+  - ./plex/ks.yaml
+  - ./prowlarr/ks.yaml
+  - ./qbittorrent/ks.yaml
+  - ./qui/ks.yaml
+  - ./radarr/ks.yaml
+  - ./recyclarr/ks.yaml
+  - ./sillytavern/ks.yaml
+  - ./sabnzbd/ks.yaml
+  - ./seasonpackerr/ks.yaml
+  - ./seerr/ks.yaml
+  - ./slskd/ks.yaml
+  - ./smtp-relay/ks.yaml
+  - ./sonarr/ks.yaml
+  - ./tautulli/ks.yaml
+  - ./thelounge/ks.yaml
+  - ./zigbee/ks.yaml

@@ -1,0 +1,111 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: paper
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: paper
+  values:
+    controllers:
+      paper:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          paper:
+            image:
+              repository: ghcr.io/itzg/minecraft-server
+              tag: 2026.4.1@sha256:1544b0bd94b2734a5b12cb38e73751cc5dee4d7f6ab5b751afcb6ecc4b8f1460
+            env:
+              BROADCAST_RCON_TO_OPS: false
+              DIFFICULTY: hard
+              ENABLE_COMMAND_BLOCK: true
+              ENABLE_WHITELIST: true
+              EULA: true
+              FORCE_GAMEMODE: true
+              ICON: https://i.imgur.com/1Pzv8xx.png
+              MAX_MEMORY: 10G
+              MODE: survival
+              MOTD: "Powered by 100% §kVOID §r energy.§r\n                     (っ◕‿◕)っ"
+              OVERRIDE_ICON: true
+              PAPER_CHANNEL: experimental
+              PAUSE_WHEN_EMPTY_SECONDS: "600"
+              SEED: 1691256543523180978
+              SERVER_NAME: Gaia
+              SPAWN_PROTECTION: 0
+              TZ: America/New_York
+              TYPE: PAPER
+              USE_MEOWICE_FLAGS: true
+              USE_MEOWICE_GRAALVM_FLAGS: true
+              VERSION: 1.21.10
+              VIEW_DISTANCE: 32
+            envFrom:
+              - secretRef:
+                  name: paper-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  exec: &probeExec
+                    command:
+                      - mc-health
+                  periodSeconds: 60
+              readiness: *probes
+              startup:
+                enabled: true
+                spec:
+                  exec: *probeExec
+                  failureThreshold: 300
+                  initialDelaySeconds: 30
+                  periodSeconds: 1
+            securityContext:
+              allowPrivilegeEscalation: true
+              readOnlyRootFilesystem: true
+              capabilities:
+                add:
+                  - NET_RAW
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 10Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        controller: paper
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: mc.hades.casa
+          external-dns.alpha.kubernetes.io/target: mc-router.hades.casa
+          mc-router.itzg.me/externalServerName: mc.hades.casa
+        ports:
+          minecraft:
+            port: 25565
+      rcon:
+        controller: paper
+        ports:
+          rcon:
+            port: 25575
+            targetPort: 25575
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /data
+      tmpfs:
+        type: emptyDir
+        medium: Memory
+        globalMounts:
+          - path: /tmp

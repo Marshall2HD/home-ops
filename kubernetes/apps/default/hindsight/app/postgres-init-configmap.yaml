@@ -1,0 +1,25 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hindsight-postgres-init
+data:
+  00-extensions.sql: |-
+    CREATE EXTENSION IF NOT EXISTS vector;
+    CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
+    CREATE EXTENSION IF NOT EXISTS pg_tokenizer CASCADE;
+    CREATE EXTENSION IF NOT EXISTS vchord_bm25 CASCADE;
+
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1
+        FROM tokenizer_catalog.tokenizer
+        WHERE name = 'llmlingua2'
+      ) THEN
+        PERFORM create_tokenizer('llmlingua2', $tok$
+    model = "llmlingua2"
+    $tok$);
+      END IF;
+    END;
+    $$;

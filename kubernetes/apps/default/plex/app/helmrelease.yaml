@@ -1,0 +1,114 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: plex
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: plex
+  interval: 1h
+  values:
+    controllers:
+      plex:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-operations/plex
+              tag: 1.43.1.10611@sha256:a9c3723cb31cc9621df27cf5801184c290293adf1df2bfaea4b8b6fc01dbfd96
+            env:
+              TZ: America/New_York
+              PLEX_ADVERTISE_URL: https://plex.hades.casa:443,http://10.8.0.128:32400,http://plex.default.svc.cluster.local:32400
+              PLEX_NO_AUTH_NETWORKS: 10.5.0.0/24
+              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_VISIBLE_DEVICES: all
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /identity
+                    port: &port 32400
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 16Gi
+    defaultPodOptions:
+      runtimeClassName: nvidia
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.8.0.128
+        externalTrafficPolicy: Local
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            conditions: ["[STATUS] == 401"]
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+        parentRefs:
+          - name: envoy-external
+            namespace: network
+        rules:
+          - # Ref: https://forums.plex.tv/t/external-srt-subtitles-are-not-working-w-reverse-proxy/886540
+            backendRefs:
+              - identifier: app
+                port: *port
+            filters:
+              - type: RequestHeaderModifier
+                requestHeaderModifier:
+                  remove:
+                    - Range
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /library/streams
+          - backendRefs:
+              - identifier: app
+                port: *port
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+      media:
+        type: nfs
+        server: hypnos.internal
+        path: /mnt/Elysium/Media
+        globalMounts:
+          - path: /media
+            readOnly: true
+      tmp:
+        type: emptyDir

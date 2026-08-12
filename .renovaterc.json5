@@ -1,0 +1,38 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:recommended",
+    "docker:enableMajor",
+    "helpers:pinGitHubActionDigests",
+    "github>Marshall2HD/home-ops//.renovate/autoMerge.json5",
+    "github>Marshall2HD/home-ops//.renovate/changelogs.json5",
+    "github>Marshall2HD/home-ops//.renovate/customManagers.json5",
+    "github>Marshall2HD/home-ops//.renovate/grafanaDashboards.json5",
+    "github>Marshall2HD/home-ops//.renovate/groups.json5",
+    "github>Marshall2HD/home-ops//.renovate/labels.json5",
+    "github>Marshall2HD/home-ops//.renovate/overrides.json5",
+    "github>Marshall2HD/home-ops//.renovate/semanticCommits.json5",
+    "github>Marshall2HD/home-ops//.renovate/talosFactory.json5",
+    ":automergeBranch",
+    ":disableRateLimiting",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":timezone(America/New_York)",
+  ],
+  registryAliases: {
+    "mirror.gcr.io": "docker.io",
+  },
+  dependencyDashboardTitle: "Renovate Dashboard 🤖",
+  ignorePaths: [
+    "**/resources/**",
+  ],
+  flux: {
+    managerFilePatterns: ["/\\.yaml(?:\\.j2)?$/"],
+  },
+  "helm-values": {
+    managerFilePatterns: ["/\\.yaml(?:\\.j2)?$/"],
+  },
+  kubernetes: {
+    managerFilePatterns: ["/\\.yaml(?:\\.j2)?$/"],
+  },
+}

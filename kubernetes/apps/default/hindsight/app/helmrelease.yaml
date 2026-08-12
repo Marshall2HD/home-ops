@@ -1,0 +1,197 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hindsight
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: hindsight
+  interval: 1h
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: hindsight-api
+            patch: |-
+              - op: add
+                path: /spec/strategy
+                value:
+                  type: RollingUpdate
+                  rollingUpdate:
+                    maxSurge: 0
+                    maxUnavailable: 1
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: hindsight-control-plane
+            patch: |-
+              - op: add
+                path: /spec/strategy
+                value:
+                  type: RollingUpdate
+                  rollingUpdate:
+                    maxSurge: 0
+                    maxUnavailable: 1
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: hindsight-api
+            patch: |-
+              - op: add
+                path: /spec/template/spec/initContainers
+                value:
+                  - name: patch-migrations
+                    image: ghcr.io/vectorize-io/hindsight-api:0.6.2
+                    command: ["/bin/sh", "-c"]
+                    args:
+                      - cp -r /app/api/. /tmp/api-code/ && sed -i "s/SELECT data_type/SELECT CASE WHEN data_type = 'USER-DEFINED' THEN udt_name ELSE data_type END AS data_type/g" /tmp/api-code/hindsight_api/migrations.py && echo "Patched migrations.py"
+                    volumeMounts:
+                      - name: api-code
+                        mountPath: /tmp/api-code
+              - op: add
+                path: /spec/template/spec/volumes
+                value:
+                  - name: api-code
+                    emptyDir: {}
+              - op: add
+                path: /spec/template/spec/containers/0/volumeMounts
+                value:
+                  - name: api-code
+                    mountPath: /app/api
+  values:
+    fullnameOverride: hindsight
+    version: 0.6.2
+    existingSecret: hindsight-secret
+    databaseUrl: "postgresql://hindsight:$(POSTGRES_PASSWORD_URI)@hindsight-postgres.default.svc.cluster.local:5432/hindsight"
+
+    postgresql:
+      enabled: false
+
+    worker:
+      enabled: true
+      replicaCount: 1
+      image:
+        repository: ghcr.io/vectorize-io/hindsight-api
+        tag: 0.6.2
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 4Gi
+      env:
+        HINDSIGHT_API_PORT: "8889"
+
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
+
+    api:
+      image:
+        repository: ghcr.io/vectorize-io/hindsight-api
+        tag: 0.6.2
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 12Gi
+      persistence:
+        modelCache:
+          enabled: true
+          storageClass: ceph-block
+          size: 5Gi
+      env:
+        HINDSIGHT_API_RUN_MIGRATIONS_ON_STARTUP: "true"
+        HINDSIGHT_API_DATABASE_SCHEMA: public
+        HINDSIGHT_API_VECTOR_EXTENSION: vchord
+        HINDSIGHT_API_TEXT_SEARCH_EXTENSION: vchord
+
+        HINDSIGHT_API_LLM_PROVIDER: anthropic
+        HINDSIGHT_API_LLM_MODEL: claude-opus-4-6
+        HINDSIGHT_API_LLM_BASE_URL: http://10.4.0.178:8788
+        HINDSIGHT_API_LLM_API_KEY: oauth
+        HINDSIGHT_API_LLM_DEFAULT_HEADERS: '{"X-Whois":"hindsight-api-home-ops","X-Application":"hindsight-api-home-ops"}'
+        HINDSIGHT_API_LLM_MAX_CONCURRENT: "3"
+
+        HINDSIGHT_API_RETAIN_LLM_PROVIDER: anthropic
+        HINDSIGHT_API_RETAIN_LLM_MODEL: claude-opus-4-6
+        HINDSIGHT_API_RETAIN_LLM_BASE_URL: http://10.4.0.178:8788
+        HINDSIGHT_API_RETAIN_LLM_API_KEY: oauth
+        HINDSIGHT_API_RETAIN_LLM_MAX_CONCURRENT: "3"
+        HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES: "5"
+        HINDSIGHT_API_RETAIN_LLM_INITIAL_BACKOFF: "1"
+        HINDSIGHT_API_RETAIN_LLM_MAX_BACKOFF: "18000"
+
+        HINDSIGHT_API_REFLECT_LLM_PROVIDER: anthropic
+        HINDSIGHT_API_REFLECT_LLM_MODEL: claude-opus-4-6
+        HINDSIGHT_API_REFLECT_LLM_BASE_URL: http://10.4.0.178:8788
+        HINDSIGHT_API_REFLECT_LLM_API_KEY: oauth
+        HINDSIGHT_API_REFLECT_LLM_MAX_CONCURRENT: "3"
+        HINDSIGHT_API_REFLECT_LLM_MAX_RETRIES: "5"
+
+        HINDSIGHT_API_CONSOLIDATION_LLM_PROVIDER: anthropic
+        HINDSIGHT_API_CONSOLIDATION_LLM_MODEL: claude-opus-4-6
+        HINDSIGHT_API_CONSOLIDATION_LLM_BASE_URL: http://10.4.0.178:8788
+        HINDSIGHT_API_CONSOLIDATION_LLM_API_KEY: oauth
+        HINDSIGHT_API_CONSOLIDATION_LLM_MAX_CONCURRENT: "3"
+        HINDSIGHT_API_CONSOLIDATION_LLM_MAX_RETRIES: "5"
+        HINDSIGHT_API_CONSOLIDATION_LLM_INITIAL_BACKOFF: "1"
+        HINDSIGHT_API_CONSOLIDATION_LLM_MAX_BACKOFF: "18000"
+
+        HINDSIGHT_API_EMBEDDINGS_PROVIDER: litellm-sdk
+        HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_MODEL: voyage/voyage-4-large
+        HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_OUTPUT_DIMENSIONS: "2048"
+        HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_ENCODING_FORMAT: ""
+        HINDSIGHT_API_RERANKER_PROVIDER: local
+        HINDSIGHT_API_LAZY_RERANKER: "true"
+
+        HINDSIGHT_API_DISPOSITION_SKEPTICISM: "4"
+        HINDSIGHT_API_DISPOSITION_LITERALISM: "2"
+        HINDSIGHT_API_DISPOSITION_EMPATHY: "4"
+
+        HINDSIGHT_API_AUDIT_LOG_ENABLED: "true"
+        HINDSIGHT_API_METRICS_INCLUDE_BANK_ID: "true"
+        HINDSIGHT_API_OTEL_TRACES_ENABLED: "true"
+        HINDSIGHT_API_OTEL_EXPORTER_OTLP_ENDPOINT: "http://langfuse.nix.casa/api/public/otel"
+        HINDSIGHT_API_OTEL_SERVICE_NAME: "hindsight-api"
+
+        HINDSIGHT_CP_DATAPLANE_API_URL: "https://ui.hindsight.hades.casa"
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 8888
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 6
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 8888
+        initialDelaySeconds: 20
+        periodSeconds: 5
+        timeoutSeconds: 3
+        failureThreshold: 12
+
+    controlPlane:
+      image:
+        repository: ghcr.io/vectorize-io/hindsight-control-plane
+        tag: 0.6.2
+      resources:
+        requests:
+          cpu: 50m
+          memory: 512Mi
+        limits:
+          memory: 4Gi
+      env:
+        NODE_ENV: production
+        NEXT_TELEMETRY_DISABLED: "1"
+        HINDSIGHT_CP_HOSTNAME: "0.0.0.0"
+        HINDSIGHT_CP_PORT: "3000"
