@@ -8,6 +8,8 @@
   ],
   fetchChangeLogs: "off",
   prFooter: "",
+  gitIgnoredAuthors: ["15093189+Marshall2HD@users.noreply.github.com"],
+  platformCommit: "disabled",
   lockFileMaintenance: {
     enabled: true,
     schedule: ["before 3am on the first day of the month"],
