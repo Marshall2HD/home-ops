@@ -65,7 +65,6 @@ spec:
                 cpu: 50m
                 memory: 256Mi
               limits:
-                # Intentionally sized from 30-day usage; do not reduce without fresh usage data.
                 memory: 2Gi
     defaultPodOptions:
       securityContext:
