@@ -6,6 +6,8 @@
     "github>home-operations/renovate-presets//apps/talosFactory.json5#7.0.0",
     ":timezone(America/New_York)",
   ],
+  fetchChangeLogs: "off",
+  prFooter: "",
   lockFileMaintenance: {
     enabled: true,
     schedule: ["before 3am on the first day of the month"],
