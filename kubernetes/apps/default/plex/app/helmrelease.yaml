@@ -14,6 +14,18 @@ spec:
       plex:
         annotations:
           reloader.stakater.com/auto: "true"
+        initContainers:
+          cleanup-plex-next-cache:
+            image:
+              repository: ghcr.io/home-operations/plex
+              tag: 1.43.2.10687@sha256:be00a2ad851ea3193cd870636f908eb6425ad89390f23cdb08daa35ab5cceacc
+            command: ["/bin/sh", "-c"]
+            args:
+              - |-
+                path='/config/Library/Application Support/Plex Media Server/Cache/va-dri-linux-x86_64'
+                if [ "$(readlink "$path")" = /usr/lib/dri ]; then
+                  rm "$path"
+                fi
         containers:
           app:
             image:
