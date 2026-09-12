@@ -18,27 +18,22 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/mudler/parakeet.cpp-server
-              tag: latest-cuda
+              repository: ghcr.io/marshall2hd/l4-parakeet-rs
+              tag: sha-43f398044258ef5128dfa5e15a5a4013822d4bcf@sha256:084aa72aca01d4cb3db0ae0c3eccb68f8fcff42d6a3d9f08c3527ef51fdf0f1d
             command:
-              - /usr/local/bin/parakeet-server
+              - /usr/local/bin/parakeet-l4
             args:
-              - --model
-              - /models/parakeet.cpp/tdt-0.6b-v3-q4_k.gguf
+              - serve
+              - --artifact
+              - /models/l4-parakeet/v2-fp16-sm89.pkl4
               - --host
               - 0.0.0.0
               - --port
               - "8000"
-              - --threads
-              - "4"
-              - --cache-dir
-              - /models/parakeet.cpp-cache
             env:
               TZ: America/New_York
               NVIDIA_DRIVER_CAPABILITIES: all
               NVIDIA_VISIBLE_DEVICES: all
-              PARAKEET_DEVICE: CUDA0
-              PARAKEET_ATT_CONTEXT: "88"
             probes:
               liveness: &probes
                 enabled: true
@@ -65,7 +60,7 @@ spec:
             resources:
               requests:
                 cpu: 1
-                memory: 2Gi
+                memory: 4Gi
                 nvidia.com/gpu: 1
               limits:
                 memory: 8Gi
