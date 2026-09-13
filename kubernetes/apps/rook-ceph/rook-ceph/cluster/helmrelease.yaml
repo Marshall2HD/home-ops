@@ -12,9 +12,9 @@ spec:
   timeout: 15m
   values:
     cephImage:
-      # Keep the live engine version through CSI adoption; upgrade separately afterward.
+      # Includes the ceph-volume fix for nonexistent devices during raw discovery.
       repository: quay.io/ceph/ceph
-      tag: v20.2.1
+      tag: v20.2.2
     cephClusterSpec:
       cephConfig:
         global:
