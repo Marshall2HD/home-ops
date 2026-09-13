@@ -1,8 +1,35 @@
 # Nyx upstream adoption
 
 Prepared against [onedr0p's reviewed revision](https://github.com/onedr0p/home-ops/commit/912b5f8709db724eefb8c7431c5d9f710549a534).
-This is a portable-change adoption, not a cluster mirror. Nothing in this branch has
-been deployed as part of preparation.
+This is a portable-change adoption, not a cluster mirror.
+
+## Live checkpoint: 2026-09-13
+
+PR #809 is merged. CSI adoption completed with all 23 object UIDs and all 70 original
+PVC bindings preserved. Block and CephFS snapshot/restore tests passed. Both DNS
+controllers use GA annotations; all 99 UniFi records were unchanged by that switch.
+All Helm releases were Ready before node maintenance.
+
+Talos 1.14.0 with Kata installed successfully using `--no-reboot`. The subsequent
+graceful reboot stalled after volume unmount phases and entry into service shutdown.
+The node answers ping, but Talos and Kubernetes APIs are unavailable. Console access
+through JetKVM is required before choosing a reset. No forced reset was issued.
+
+The Cilium and tuppr-upgrades Kustomizations have durable `suspend: true` holds.
+Live Cilium still uses temporary netkit values. Kubernetes remains 1.36.3; the new
+Talos machine configuration and Kata readiness label have not been applied.
+Kata is not activated or live-validated. The cluster-apps and paper Kustomizations,
+plus the paper HelmRelease, are temporarily suspended; restore paper to one replica
+and resume those temporary holds after recovery, retaining the two durable holds.
+
+Recovery evidence and two verified encrypted etcd snapshots are outside Git at
+`/Volumes/Mimi/Artifacts/home-ops-review/recovery/`. Consult `host-maintenance.json`
+there before continuing. Do not combine the remaining runtime/datapath cutover with
+unrelated engine upgrades.
+
+ExternalDNS v0.22.0 does not enforce `--dry-run` for its webhook provider. Do not use
+that flag to preview UniFi writes. The initial probe submitted a plan; normal DNS
+reconciliation restored the records, which were checked directly before switching.
 
 ## Preserved local configuration
 

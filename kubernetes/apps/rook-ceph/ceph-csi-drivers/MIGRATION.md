@@ -1,9 +1,14 @@
 # Ceph CSI Helm migration
 
-This branch implements **stage one**, not immediate removal of the generated resources.
-Read-only inspection found the CSI resources in both the `rook-ceph` Flux Kustomization
-inventory and Helm release `ceph-csi-drivers` revision 4. Helm ownership alone does not
-protect them from Flux pruning.
+Both stages completed on Nyx on 2026-09-13. All 23 CSI object UIDs survived adoption
+and removal from the old Flux inventory. All 70 original PVCs retained their UIDs and
+PV bindings. Disposable block and CephFS claims passed write, snapshot, restore and
+content-verification tests. Temporary prune protection was removed only after the old
+inventory no longer contained those objects. Nyx's monitor and client profiles remain
+in `rook-ceph/app/ceph-csi-profiles.yaml`.
+
+The procedure below records the sequencing used. Helm ownership alone does not protect
+resources from Flux pruning.
 
 The Ceph engine image is explicitly held at the live `quay.io/ceph/ceph:v20.2.1`.
 Rook chart 1.20.7 otherwise advances it to 20.2.4. Upgrade the engine separately after
