@@ -16,8 +16,8 @@ resources:
   - ./bazarr/ks.yaml
   - ./brrpolice/ks.yaml
   - ./chaski/ks.yaml
+  - ./cleanrr/ks.yaml
   - ./cobalt/ks.yaml
-  - ./deduparr/ks.yaml
   - ./flaresolverr/ks.yaml
   - ./home-assistant/ks.yaml
   - ./langfuse/ks.yaml

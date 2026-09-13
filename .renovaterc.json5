@@ -1,9 +1,9 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: [
-    "github>home-operations/renovate-presets#7.0.0",
-    "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#7.0.0",
-    "github>home-operations/renovate-presets//apps/talosFactory.json5#7.0.0",
+    "github>home-operations/renovate-presets#8.1.0",
+    "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#8.1.0",
+    "github>home-operations/renovate-presets//apps/talosFactory.json5#8.1.0",
     ":timezone(America/New_York)",
   ],
   fetchChangeLogs: "off",
@@ -146,9 +146,9 @@
       minimumGroupSize: 2,
     },
     {
-      description: "Hold Rook-Ceph at v1.19.x",
+      description: "Hold Rook-Ceph at the supported v1.20 patch series",
       matchPackageNames: ["/rook-ceph/", "/rook-ceph-cluster/"],
-      allowedVersions: "<1.20.0",
+      allowedVersions: ">=1.20.0 <1.21.0",
     },
     {
       description: "1Password CLI is not resolvable on GitHub, bump manually",

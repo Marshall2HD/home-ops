@@ -18,13 +18,26 @@ spec:
       region: us-east-1
       tls:
         disableTls: true
-  catalog:
-    periodicRefresh: true
-    refreshInterval: 1h
   encryption:
     passwordSecretRef:
       name: kopiur-repository-secret
       namespace: kopiur-system
       key: KOPIA_PASSWORD
+  maintenance:
+    schedule:
+      quick:
+        cron: 0 * * * *
+        jitter: 10m
+      full:
+        cron: 0 3 * * *
+        jitter: 1h
+  moverDefaults:
+    cache:
+      # Fit the shared 5Gi cache PVCs; index-blobs also uses the metadata budget.
+      contentCacheSizeMb: 512
+      metadataCacheSizeMb: 1024
+  parameters:
+    epoch:
+      minDuration: 1h
   scheduleDefaults:
     timezone: America/New_York

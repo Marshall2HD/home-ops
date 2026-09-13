@@ -1,0 +1,46 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ceph-csi-drivers
+spec:
+  releaseName: ceph-csi-drivers
+  chartRef:
+    kind: OCIRepository
+    name: ceph-csi-drivers
+  interval: 1h
+  values:
+    # Explicitly preserve the live, single-node Driver and OperatorConfig specs.
+    operatorConfig:
+      namespace: rook-ceph
+      driverSpecDefaults:
+        imageSet:
+          name: rook-csi-operator-image-set-configmap
+        controllerPlugin:
+          priorityClassName: system-cluster-critical
+          replicas: 1
+        nodePlugin:
+          priorityClassName: system-node-critical
+    drivers:
+      rbd:
+        enabled: true
+        name: rook-ceph.rbd.csi.ceph.com
+        grpcTimeout: 30
+        snapshotPolicy: volumeSnapshot
+        controllerPlugin:
+          replicas: 1
+      cephfs:
+        enabled: true
+        name: rook-ceph.cephfs.csi.ceph.com
+        fsGroupPolicy: None
+        grpcTimeout: 30
+        snapshotPolicy: volumeSnapshot
+        controllerPlugin:
+          replicas: 1
+      nfs:
+        enabled: false
+        name: rook-ceph.nfs.csi.ceph.com
+      nvmeof:
+        enabled: false
+        name: rook-ceph.nvmeof.csi.ceph.com

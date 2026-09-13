@@ -29,8 +29,16 @@ spec:
             probes:
               liveness:
                 enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               readiness:
                 enabled: true
+                spec:
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               startup:
                 enabled: true
                 spec:
@@ -54,6 +62,7 @@ spec:
       app:
         type: LoadBalancer
         annotations:
+          external-dns.kubernetes.io/hostname: smtp-relay.hades.casa
           external-dns.alpha.kubernetes.io/hostname: smtp-relay.hades.casa
           lbipam.cilium.io/ips: 10.8.0.122
         externalTrafficPolicy: Local

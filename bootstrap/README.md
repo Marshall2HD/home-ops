@@ -202,9 +202,10 @@ graph LR
       exist before their controllers so nothing deadlocks on a missing
       Secret.
     - `helmfile/crds.yaml` - CRDs extracted from upstream charts
-      (envoy-gateway, grafana-operator, kube-prometheus-stack) and applied
-      directly. Installing CRDs out-of-band means Flux Kustomizations that
-      consume CRD-backed resources don't need `dependsOn` chains.
+      (envoy-gateway, grafana-operator, kopiur, kube-prometheus-stack,
+      snapshot-controller) and applied directly. Installing CRDs out-of-band
+      means Flux Kustomizations that consume CRD-backed resources don't need
+      `dependsOn` chains.
 5. **apps** - `helmfile sync` of `helmfile/apps.yaml`, the minimal release
    chain Flux needs before it can take over:
 

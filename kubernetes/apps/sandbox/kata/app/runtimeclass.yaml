@@ -1,0 +1,15 @@
+---
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: kata
+handler: kata
+# Siderolabs' Cloud Hypervisor runtime, not the nested-virtualization QEMU variant.
+overhead:
+  podFixed:
+    memory: 130Mi
+    cpu: 250m
+scheduling:
+  nodeSelector:
+    # Set only after installing the extension and verifying veth on the node.
+    runtime.hades.casa/kata-ready: "true"
