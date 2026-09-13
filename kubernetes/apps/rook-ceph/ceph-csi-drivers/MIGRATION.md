@@ -5,6 +5,10 @@ Read-only inspection found the CSI resources in both the `rook-ceph` Flux Kustom
 inventory and Helm release `ceph-csi-drivers` revision 4. Helm ownership alone does not
 protect them from Flux pruning.
 
+The Ceph engine image is explicitly held at the live `quay.io/ceph/ceph:v20.2.1`.
+Rook chart 1.20.7 otherwise advances it to 20.2.4. Upgrade the engine separately after
+CSI adoption, storage validation and fresh backups; do not combine those transitions.
+
 ## Required staged rollout
 
 1. Confirm the live Helm release is deployed and the two Drivers still match
