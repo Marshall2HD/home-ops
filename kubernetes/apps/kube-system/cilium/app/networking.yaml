@@ -66,6 +66,7 @@ kind: Service
 metadata:
   name: kube-api
   annotations:
+    external-dns.kubernetes.io/hostname: k8s.hades.casa
     external-dns.alpha.kubernetes.io/hostname: k8s.hades.casa
     lbipam.cilium.io/ips: 10.8.0.120
 spec:

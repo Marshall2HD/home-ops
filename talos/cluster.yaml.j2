@@ -52,6 +52,8 @@ mtu: 9000
 ---
 apiVersion: v1alpha1
 kind: ResolverConfig
+searchDomains:
+  domains: []
 hostDNS:
   enabled: true
   forwardKubeDNSToHost: true # Requires Cilium socketLB features
@@ -70,7 +72,7 @@ clusterSecret: op://kubernetes/talos/CLUSTER_SECRET
 apiVersion: v1alpha1
 kind: UnattendedInstallConfig
 installer:
-  image: factory.talos.dev/metal-installer/{{ schematic }}:v1.14.0-beta.1
+  image: factory.talos.dev/metal-installer/{{ schematic }}:v1.14.0
 provisioning:
   diskSelector:
     match: disk.serial == "253036800050"
@@ -140,6 +142,7 @@ params:
   net.core.default_qdisc: fq
   net.core.rmem_max: "67108864"
   net.core.wmem_max: "67108864"
+  net.ipv4.ip_local_port_range: 1024 65535
   net.ipv4.neigh.default.gc_thresh1: "4096"
   net.ipv4.neigh.default.gc_thresh2: "8192"
   net.ipv4.neigh.default.gc_thresh3: "16384"
@@ -148,10 +151,10 @@ params:
   net.ipv4.tcp_fastopen: "3"
   net.ipv4.tcp_mtu_probing: "1"
   net.ipv4.tcp_notsent_lowat: "131072"
-  net.ipv4.tcp_rmem: 4096 87380 33554432
+  net.ipv4.tcp_rmem: 4096 131072 67108864
   net.ipv4.tcp_slow_start_after_idle: "0"
   net.ipv4.tcp_window_scaling: "1"
-  net.ipv4.tcp_wmem: 4096 65536 33554432
+  net.ipv4.tcp_wmem: 4096 65536 67108864
   net/ipv6/conf/bond0.7/disable_ipv6: "1" # Keep the host off IPv6 on the IoT segment
   sunrpc.tcp_max_slot_table_entries: "128"
   sunrpc.tcp_slot_table_entries: "128"
@@ -166,7 +169,7 @@ contents: |
   [ NFSMount_Global_Options ]
   nfsvers=4.2
   hard=True
-  nconnect=8
+  nconnect=16
   noatime=True
   rsize=1048576
   wsize=1048576
@@ -201,7 +204,7 @@ config:
   shutdownGracePeriod: 90s
   shutdownGracePeriodCriticalPods: 60s
 defaultRuntimeSeccompProfileEnabled: true
-image: ghcr.io/siderolabs/kubelet:v1.36.3
+image: ghcr.io/siderolabs/kubelet:v1.37.0
 ---
 apiVersion: v1alpha1
 kind: KubeNetworkConfig
