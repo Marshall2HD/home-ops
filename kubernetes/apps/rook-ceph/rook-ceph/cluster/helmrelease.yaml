@@ -11,10 +11,11 @@ spec:
   interval: 1h
   timeout: 15m
   values:
+    cephImage:
+      # Keep the live engine version through CSI adoption; upgrade separately afterward.
+      repository: quay.io/ceph/ceph
+      tag: v20.2.1
     cephClusterSpec:
-      cephVersion:
-        # Keep the live engine version through CSI adoption; upgrade separately afterward.
-        image: quay.io/ceph/ceph:v20.2.1
       cephConfig:
         global:
           mon_data_avail_warn: "15"
