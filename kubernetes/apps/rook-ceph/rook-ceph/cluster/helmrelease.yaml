@@ -14,7 +14,7 @@ spec:
     cephImage:
       # Keep the live engine version through CSI adoption; upgrade separately afterward.
       repository: quay.io/ceph/ceph
-      tag: v20.2.1
+      tag: v20.2.4
     cephClusterSpec:
       cephConfig:
         global:
