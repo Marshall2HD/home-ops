@@ -12,18 +12,23 @@ been deployed as part of preparation.
   single-node monitor/controller counts, OSD-level replication, maxPods and hugepages.
 - NVIDIA Plex initialization, existing applications and persistent data, and local
   dependency guards for certificates, registry storage, snapshots and backups.
-- No go2rtc, Z-Wave, Spegel, Intel GPU stack, or Kata runtime.
+- No go2rtc, Z-Wave, Spegel, or Intel GPU stack.
 - Langfuse remains on chart 1.5.41. Its separate 2.0 PR requires a ClickHouse data
   migration and is not part of upstream parity.
 
-## Keep Cilium netkit
+## Kata changes the Cilium decision
 
-Nyx already uses native routing, BPF host routing, BIG TCP and BBR with netkit.
-The final read-only check found 644/644 controllers healthy on Cilium 1.20.1.
-Upstream's veth choice accommodates Kata, which Nyx does not use. Switching would
-require recreating every pod, without an established benefit for this hardware.
-Keep netkit and the single operator replica. Reassess only if a runtime requiring
-veth is introduced. See [Cilium's netkit guidance](https://docs.cilium.io/en/stable/operations/performance/tuning/#netkit).
+Kata was subsequently requested for untrusted workloads. Nyx exposes AMD-V (`svm`),
+`/dev/kvm`, `/dev/vhost-net` and `/dev/vhost-vsock`. The schematic now includes the
+official Kata extension while retaining all AMD/NVIDIA extensions and kernel arguments.
+The `kata` RuntimeClass uses Cloud Hypervisor, not QEMU's nested-virtualization runtime.
+
+Cilium now targets veth because released Kata does not support netkit. Preserve BPF
+host routing, BBR, native routing, BIG TCP and the single operator replica. Existing
+netkit pods must be recreated in a coordinated maintenance window, not silently left
+on a mixed datapath. Follow the [Kata rollout and isolation checks](apps/sandbox/README.md)
+before admitting workloads. This is not a default runtime change for infrastructure,
+GPU applications, or the credentialed CI runner.
 
 ## Roll out in stages
 
@@ -43,8 +48,10 @@ veth is introduced. See [Cilium's netkit guidance](https://docs.cilium.io/en/sta
    removing alpha keys later. Both controllers use sync policy, so ordering matters.
 4. Talos template changes are not applied by Flux. Separately render and dry-run the
    Nyx configuration, then apply it in a maintenance window. Preserve the existing
-   schematic and disk selection. Verify networking, NVIDIA workloads and NFS mounts
-   after reboot. Do not run a manual upgrade concurrently with Tuppr.
+   AMD/NVIDIA extensions and disk selection while adding Kata. A version-only Tuppr
+   upgrade does not install the new schematic. Follow the Kata procedure for the
+   Image Factory upgrade and veth migration. Verify networking, NVIDIA workloads and
+   NFS mounts after reboot. Do not run a manual upgrade concurrently with Tuppr.
 5. Verify Cleanrr health and its Radarr/Sonarr connections. Download-client removal
    remains disabled. Check Kopiur maintenance and cache usage, Arr authentication,
    Home Assistant MCP authentication, monitoring, DNS and tunnel readiness.
@@ -72,3 +79,8 @@ intentional stage-one CSI objects, whose behavior was compared. The Cloudflare t
 ID secret is unavailable to offline rendering and produces the expected substitution
 warning. Rendering is not proof of live upgrade, storage, DNS, or webhook behavior;
 those checks remain mandatory during rollout.
+
+The Kata follow-up separately passed flate checks for the sandbox Kustomization and
+Cilium HelmRelease, server-side dry-run schema validation for the RuntimeClass and
+isolation resources, and 13 positive/negative controls against the admission CEL
+expressions. No live admission policy, VM, or network-isolation test has been run.

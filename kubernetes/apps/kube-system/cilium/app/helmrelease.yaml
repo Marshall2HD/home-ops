@@ -15,7 +15,7 @@ spec:
       enabled: true
       bbr: true
     bpf:
-      datapathMode: netkit # Existing workloads were created with netkit; changing modes requires recreating every pod
+      datapathMode: veth # Kata requires veth; migrate existing netkit pods during the coordinated rollout
       masquerade: true
       preallocateMaps: true
     bpfClockProbe: true
