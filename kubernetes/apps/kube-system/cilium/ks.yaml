@@ -5,6 +5,7 @@ kind: Kustomization
 metadata:
   name: cilium
 spec:
+  suspend: true # Hold until coordinated netkit-to-veth maintenance is ready.
   interval: 1h
   path: ./kubernetes/apps/kube-system/cilium/app
   prune: true

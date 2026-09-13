@@ -21,6 +21,7 @@ kind: Kustomization
 metadata:
   name: tuppr-upgrades
 spec:
+  suspend: true # Prevent automatic upgrades during staged storage and Kata rollout.
   dependsOn:
     - name: tuppr
   interval: 1h
