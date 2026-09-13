@@ -84,6 +84,8 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/hostname: mc.hades.casa
           external-dns.alpha.kubernetes.io/target: mc-router.hades.casa
+          external-dns.kubernetes.io/hostname: mc.hades.casa
+          external-dns.kubernetes.io/target: mc-router.hades.casa
           mc-router.itzg.me/externalServerName: mc.hades.casa
         ports:
           minecraft:
