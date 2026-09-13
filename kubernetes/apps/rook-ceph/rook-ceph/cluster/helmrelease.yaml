@@ -10,6 +10,10 @@ spec:
     name: rook-ceph-cluster
   interval: 1h
   timeout: 15m
+  upgrade:
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 5m
   values:
     cephImage:
       # Includes the ceph-volume fix for nonexistent devices during raw discovery.
