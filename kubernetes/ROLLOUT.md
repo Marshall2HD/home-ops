@@ -12,15 +12,18 @@ All Helm releases were Ready before node maintenance.
 
 Talos 1.14.0 with Kata installed successfully using `--no-reboot`. The subsequent
 graceful reboot stalled after volume unmount phases and entry into service shutdown.
-The node answers ping, but Talos and Kubernetes APIs are unavailable. Console access
-through JetKVM is required before choosing a reset. No forced reset was issued.
+The user force-restarted Nyx. Both APIs recovered, the node is Ready on Talos 1.14.0,
+and the Kata, AMD, NVIDIA and DRBD extensions are loaded. Ceph returned to HEALTH_OK
+and all 70 original PVC identities and bindings were checked again after restart.
+Minecraft is running again. MinIO's old Docker Hub image became inaccessible; Quay
+serves the exact same pinned digest, so only its registry address was changed.
 
 The Cilium and tuppr-upgrades Kustomizations have durable `suspend: true` holds.
 Live Cilium still uses temporary netkit values. Kubernetes remains 1.36.3; the new
 Talos machine configuration and Kata readiness label have not been applied.
-Kata is not activated or live-validated. The cluster-apps and paper Kustomizations,
-plus the paper HelmRelease, are temporarily suspended; restore paper to one replica
-and resume those temporary holds after recovery, retaining the two durable holds.
+Kata is not activated or live-validated. The temporary cluster-apps and paper
+Kustomization holds and paper HelmRelease hold have been resumed; paper is restored
+to one replica. Retain the two durable holds until their remaining stages are ready.
 
 Recovery evidence and two verified encrypted etcd snapshots are outside Git at
 `/Volumes/Mimi/Artifacts/home-ops-review/recovery/`. Consult `host-maintenance.json`
