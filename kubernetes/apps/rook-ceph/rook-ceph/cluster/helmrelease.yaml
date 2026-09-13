@@ -25,7 +25,8 @@ spec:
         count: 1 # Single Node
         allowMultiplePerNode: false
       cleanupPolicy:
-        wipeDevicesFromOtherClusters: true
+        # Nyx only uses the two explicitly selected disks; never sanitize other disks.
+        wipeDevicesFromOtherClusters: false
       crashCollector:
         disable: false
       csi:

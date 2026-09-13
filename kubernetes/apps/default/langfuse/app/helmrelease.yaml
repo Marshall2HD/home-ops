@@ -117,6 +117,15 @@ spec:
       logLevel: warning
       extraOverrides: |
         <clickhouse>
+          <!-- Bound concurrent merges and row-block memory on Nyx. -->
+          <background_pool_size>2</background_pool_size>
+          <background_merges_mutations_concurrency_ratio>2</background_merges_mutations_concurrency_ratio>
+          <merge_tree>
+            <merge_max_block_size>1024</merge_max_block_size>
+            <number_of_free_entries_in_pool_to_lower_max_size_of_merge>1</number_of_free_entries_in_pool_to_lower_max_size_of_merge>
+            <number_of_free_entries_in_pool_to_execute_mutation>2</number_of_free_entries_in_pool_to_execute_mutation>
+            <number_of_free_entries_in_pool_to_execute_optimize_entire_partition>3</number_of_free_entries_in_pool_to_execute_optimize_entire_partition>
+          </merge_tree>
           <!-- Keep low-value system logs from competing with Langfuse data for
                memory and Ceph I/O. These logs are not used by Langfuse. -->
           <text_log remove="1"/>
@@ -161,11 +170,10 @@ spec:
         size: 10Gi
       resources:
         requests:
-          cpu: 100m
-          memory: 512Mi
+          cpu: "1"
+          memory: 2Gi
         limits:
-          cpu: "2"
-          memory: 4Gi
+          memory: 8Gi
 
     s3:
       deploy: false
