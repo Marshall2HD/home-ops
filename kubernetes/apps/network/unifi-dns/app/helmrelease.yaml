@@ -37,9 +37,6 @@ spec:
             port: http-webhook
           initialDelaySeconds: 10
           timeoutSeconds: 5
-    extraArgs:
-      # Remove after the dual-written Gateway/Service annotations are present on Nyx.
-      - --annotation-prefix=external-dns.alpha.kubernetes.io/
     triggerLoopOnEvent: true
     policy: sync
     sources:
