@@ -1,7 +1,9 @@
 # Kata workload isolation on Nyx
 
-This namespace is for untrusted code, not host infrastructure. Nothing has been
-deployed during preparation. No existing workload has been moved into it.
+This namespace is for untrusted code, not host infrastructure. Nyx was live-validated
+on 2026-09-14 with Kata 3.32.0, Cloud Hypervisor and Cilium veth. No existing workload
+has been moved into it. Admission, separate guest-kernel/VMM, token/device absence,
+and network deny/allow/deny controls passed; see [rollout evidence](../../ROLLOUT.md).
 
 ## Boundary
 
@@ -18,7 +20,7 @@ deployed during preparation. No existing workload has been moved into it.
   Limits include Kubernetes-accounted runtime overhead; these are scheduling and
   resource controls, not a guarantee against all denial-of-service attacks.
 - RuntimeClass scheduling requires `runtime.hades.casa/kata-ready=true`. The label is
-  intentionally absent until the node is prepared. Missing runtime support fails
+  persisted only on the prepared and validated Nyx node. Missing runtime support fails
   closed rather than falling back to runc. Do not grant untrusted actors permission
   to modify namespace policies, RuntimeClasses, node labels or RBAC.
 
@@ -34,15 +36,19 @@ runner migration, not something a runtimeClass switch solves.
 1. Confirm fresh backups, Ceph HEALTH_OK and out-of-band console access. Nyx is the
    only node, so reboot and pod recreation cause an outage. Coordinate with Tuppr;
    do not allow manual and automated upgrades to race.
-2. Reconcile the veth Cilium configuration and verify the Cilium DaemonSet rollout.
-   Do not admit sandbox workloads yet. Prepare the Talos image from the updated
-   schematic, preserving all existing AMD/NVIDIA extensions, kernel arguments and
-   exact disk selection. A version-only upgrade using the old schematic omits Kata.
-3. Upgrade Nyx using that new Image Factory image. Recreate old netkit pods as required
-   by Cilium's datapath migration procedure; a reboot alone must not be assumed to
-   migrate every sandbox. Verify veth endpoints, DNS, service routing, BGP, Ceph CSI,
-   NFS and NVIDIA workloads before proceeding. Never delete all infrastructure pods
-   indiscriminately on a single-node control plane.
+2. Prepare and install the Talos image from the updated schematic, preserving all
+   AMD/NVIDIA extensions, kernel arguments and exact disk selection. A version-only
+   upgrade using the old schematic omits Kata. Keep the existing Cilium datapath
+   until its coordinated cutover; do not admit sandbox workloads yet.
+3. Before switching netkit to veth, pause GitOps, operators, DNS reconciliation,
+   autoscalers and backup schedules, and let running jobs finish. Stop applications
+   gracefully and verify volume unmounts before stopping Ceph and DNS in order. Keep
+   host-network control-plane/Cilium/CSI-node services running and use the direct API
+   address. Require zero Cilium pod endpoints before changing the datapath and
+   restarting Cilium; never bypass its restore guard or erase its state. Restore DNS,
+   gateways, Ceph, applications and reconcilers, including original replica counts
+   and schedule/autoscaler settings. Verify veth, DNS, service routing, BGP, Ceph CSI,
+   NFS and NVIDIA. A reboot alone does not establish a safe datapath migration.
 4. Verify `talosctl get extensions`, `/dev/kvm`, and the extension's containerd
    fragments `/etc/cri/conf.d/10-kata-containers.part` and `11-kata-qemu.part`.
    The extension registers the runtimes; do not add a duplicate containerd patch.
@@ -57,7 +63,10 @@ runner migration, not something a runtimeClass switch solves.
 7. Negative controls must be rejected: omit/change runtimeClassName, enable token
    automount, project a token explicitly, add a Multus annotation, request privileged
    mode, hostNetwork or a hostPath. Also verify a second ordinary pod cannot reach
-   the sandbox. Do not call the namespace validated until these live checks pass.
+   the sandbox. Temporarily allow only HTTP between two disposable test pods and
+   verify both directions, then remove the exception and verify denial again. This
+   prevents broken networking from passing as isolation. Do not call the namespace
+   validated until these live checks pass.
 
 For rollback, stop sandbox jobs and remove the readiness label first. Restore the
 previous schematic only after no Kata pods remain. Reversing veth back to netkit is

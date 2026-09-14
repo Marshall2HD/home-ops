@@ -4,6 +4,9 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: rook-ceph-cluster
+  labels:
+    # Keep the cluster-wide remediation patch from re-enabling engine rollback.
+    helm.hades.casa/upgrade-strategy: retry
 spec:
   chartRef:
     kind: OCIRepository

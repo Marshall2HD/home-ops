@@ -3,7 +3,7 @@
 Prepared against [onedr0p's reviewed revision](https://github.com/onedr0p/home-ops/commit/912b5f8709db724eefb8c7431c5d9f710549a534).
 This is a portable-change adoption, not a cluster mirror.
 
-## Live checkpoint: 2026-09-13
+## Live checkpoint: 2026-09-14
 
 PR #809 is merged. CSI adoption completed with all 23 object UIDs and all 70 original
 PVC bindings preserved. Block and CephFS snapshot/restore tests passed. Both DNS
@@ -18,16 +18,35 @@ and all 70 original PVC identities and bindings were checked again after restart
 Minecraft is running again. MinIO's old Docker Hub image became inaccessible; Quay
 serves the exact same pinned digest, so only its registry address was changed.
 
-The Cilium and tuppr-upgrades Kustomizations have durable `suspend: true` holds.
-Live Cilium still uses temporary netkit values. Kubernetes remains 1.36.3; the new
-Talos machine configuration and Kata readiness label have not been applied.
-Kata is not activated or live-validated. The temporary cluster-apps and paper
-Kustomization holds and paper HelmRelease hold have been resumed; paper is restored
-to one replica. Retain the two durable holds until their remaining stages are ready.
+Kubernetes is now 1.37.0 and the full Talos configuration is applied. The Kubernetes
+upgrade required one kubelet service restart to recover a stalled API-server static
+pod, not another host reboot. Cilium migrated to veth only after graceful application
+shutdown, volume unmounts, ordered Ceph shutdown and zero remaining pod endpoints.
+DNS, BGP, Ceph, NFS, NVIDIA Plex and all original controller replica counts recovered.
+All 70 original PVC identities and bindings were verified again. Backup/CronJob
+suspensions and autoscaler behavior were restored.
 
-Recovery evidence and two verified encrypted etcd snapshots are outside Git at
+Kata passed live admission, separate guest-kernel/VMM, token/device-absence and network
+isolation tests. The readiness label is persisted in the Nyx Talos template. Cilium
+and tuppr-upgrades holds are removed; Tuppr targets match the installed versions.
+No existing application or credentialed CI runner was moved to Kata.
+
+ClickHouse's retained 1,190-column `system.metric_log` caused repeated memory-heavy
+merge failures. Bounded merge blocks/concurrency and an 8Gi memory limit compacted
+79 parts into six without changing the 560,520 rows. No active merges or new errors
+remained at the final check, and Langfuse ingestion resumed. Its image/schema/PVC
+were not changed. Ceph 20.2.2 fixed raw-device discovery; foreign-disk wiping remains
+disabled. The storage release explicitly opts out of global Helm rollback defaults
+so a failed future engine upgrade retries rather than automatically downgrading.
+
+Two stale restore attachment/PV records were removed only after confirming their
+backing images were absent. Three retained database rollback images remain intact.
+There are also 31 historical finalizing VolumeAttachments whose PVs no longer exist;
+these were left alone and distinguished from real mounts during the cutover.
+
+Recovery evidence and three verified encrypted etcd snapshots are outside Git at
 `/Volumes/Mimi/Artifacts/home-ops-review/recovery/`. Consult `host-maintenance.json`
-there before continuing. Do not combine the remaining runtime/datapath cutover with
+there before further maintenance. Keep future runtime/datapath changes separate from
 unrelated engine upgrades.
 
 ExternalDNS v0.22.0 does not enforce `--dry-run` for its webhook provider. Do not use
@@ -110,7 +129,12 @@ ID secret is unavailable to offline rendering and produces the expected substitu
 warning. Rendering is not proof of live upgrade, storage, DNS, or webhook behavior;
 those checks remain mandatory during rollout.
 
-The Kata follow-up separately passed flate checks for the sandbox Kustomization and
-Cilium HelmRelease, server-side dry-run schema validation for the RuntimeClass and
-isolation resources, and 13 positive/negative controls against the admission CEL
-expressions. No live admission policy, VM, or network-isolation test has been run.
+The Kata follow-up passed live admission controls, including rejecting omitted runtime
+and token settings, explicit token projection, Kata/Multus overrides, privileged mode,
+host networking, hostPath and extra capabilities. The guest kernel was `6.18.35`, versus
+the host's `6.18.48-talos`, with a separate Cloud Hypervisor process. Internet, LAN,
+cluster/node API, DNS and peer ingress were denied. A temporary peer-only HTTP rule
+allowed both directions; deleting it restored denial, proving that a broken guest
+network was not being mistaken for isolation. No API token or tested host devices
+were exposed. These checks verify the configured boundary, not absence of all escape
+vulnerabilities.
