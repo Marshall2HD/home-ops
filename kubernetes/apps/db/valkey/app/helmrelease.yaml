@@ -21,7 +21,7 @@ spec:
             command:
               - /bin/sh
               - -ec
-              - exec valkey-server --appendonly yes --dir /data --requirepass "$VALKEY_PASSWORD" --maxmemory-policy noeviction
+              - exec valkey-server --appendonly yes --dir /data --requirepass "$VALKEY_PASSWORD" --maxmemory-policy noeviction --save ""
             env:
               VALKEY_PASSWORD:
                 valueFrom:
@@ -55,15 +55,32 @@ spec:
                   periodSeconds: 5
                   timeoutSeconds: 3
                   failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /bin/sh
+                      - -ec
+                      - valkey-cli -a "$VALKEY_PASSWORD" ping | grep -q PONG
+                  initialDelaySeconds: 10
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
             securityContext:
               allowPrivilegeEscalation: false
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 25m
-                memory: 64Mi
-              limits:
                 memory: 512Mi
+              # An AOF rewrite forks a copy-on-write child, and the cgroup is
+              # charged for its dirtied pages, so peak usage is roughly double
+              # the dataset. 512Mi only fit the job until the queue outgrew it
+              # and valkey started getting OOM-killed mid-rewrite.
+              limits:
+                memory: 3Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
