@@ -83,6 +83,13 @@ spec:
             subPath: plugins
           - path: /home/node/app/public/scripts/extensions/third-party
             subPath: extensions
+      # Adds Claude models newer than the app's static picker list, e.g. claude-opus-5-5.
+      claude-model-extras:
+        type: configMap
+        name: "{{ .Release.Name }}-claude-model-extras"
+        globalMounts:
+          - path: /home/node/app/public/scripts/extensions/third-party/claude-model-extras
+            readOnly: true
       tmp:
         type: emptyDir
         medium: Memory

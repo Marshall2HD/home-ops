@@ -1,0 +1,9 @@
+{
+  "display_name": "Claude Model Extras",
+  "loading_order": 50,
+  "requires": [],
+  "optional": [],
+  "js": "index.js",
+  "author": "Marshall2HD",
+  "version": "1.0.0"
+}

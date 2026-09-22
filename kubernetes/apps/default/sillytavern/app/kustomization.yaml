@@ -5,3 +5,10 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
+configMapGenerator:
+  - name: sillytavern-claude-model-extras
+    files:
+      - manifest.json=./resources/claude-model-extras/manifest.json
+      - index.js=./resources/claude-model-extras/index.js
+generatorOptions:
+  disableNameSuffixHash: true
