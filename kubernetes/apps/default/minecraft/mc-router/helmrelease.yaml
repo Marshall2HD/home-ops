@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -9,6 +10,26 @@ spec:
     kind: OCIRepository
     name: mc-router
   values:
+    image:
+      repository: itzg/mc-router
+      tag: 1.46.4@sha256:92766cd72262e4e13569463708af2bb87457ee5b3ba914b72ccbc8b09f8eb384
+      pullPolicy: IfNotPresent
+    podSecurityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop: ["ALL"]
+    resources:
+      requests:
+        cpu: 100m
+        memory: 50Mi
+      limits:
+        cpu: 250m
+        memory: 100Mi
     services:
       minecraft:
         type: LoadBalancer
@@ -18,3 +39,6 @@ spec:
           lbipam.cilium.io/ips: 10.8.0.130
       extraServiceSpec:
         externalTrafficPolicy: Local
+    minecraftRouter:
+      metrics:
+        backend: prometheus

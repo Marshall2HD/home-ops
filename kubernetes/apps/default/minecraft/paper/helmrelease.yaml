@@ -12,13 +12,14 @@ spec:
   values:
     controllers:
       paper:
+        strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
           paper:
             image:
               repository: ghcr.io/itzg/minecraft-server
-              tag: 2026.8.0@sha256:e3335993929a1565f73c30b2041bcbc1473fc9c406fdd5a0d0ea24c08ef73320
+              tag: 2026.8.2@sha256:efa878ddb49cf5251b2e5f2ad71b08fd2f7236c1f7907433f6697258b31d2ce4
             env:
               BROADCAST_RCON_TO_OPS: false
               DIFFICULTY: hard
@@ -31,6 +32,7 @@ spec:
               MODE: survival
               MOTD: "Powered by 100% §kVOID §r energy.§r\n                     (っ◕‿◕)っ"
               OVERRIDE_ICON: true
+              PAPER_BUILD: "121"
               PAUSE_WHEN_EMPTY_SECONDS: "600"
               SEED: 1691256543523180978
               SERVER_NAME: Gaia
@@ -44,22 +46,33 @@ spec:
               - secretRef:
                   name: paper-secret
             probes:
-              liveness: &probes
+              liveness:
                 enabled: true
                 custom: true
                 spec:
                   exec: &probeExec
                     command:
                       - mc-health
-                  periodSeconds: 60
-              readiness: *probes
-              startup:
+                  failureThreshold: 6
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness:
                 enabled: true
+                custom: true
                 spec:
                   exec: *probeExec
-                  failureThreshold: 300
-                  initialDelaySeconds: 30
-                  periodSeconds: 1
+                  failureThreshold: 6
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec: *probeExec
+                  failureThreshold: 36
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 5
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -78,6 +91,8 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
     service:
       app:
         controller: paper

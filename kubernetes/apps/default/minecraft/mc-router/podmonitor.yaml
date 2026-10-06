@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/podmonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: mc-router
+spec:
+  namespaceSelector:
+    matchNames:
+      - default
+  podMetricsEndpoints:
+    - port: api
+      path: /metrics
+      interval: 30s
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: mc-router
+      app.kubernetes.io/name: mc-router
