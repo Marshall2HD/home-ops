@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: csm-data
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: ceph-block
+  resources:
+    requests:
+      storage: 40Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: csm
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: csm
+  template:
+    metadata:
+      labels:
+        app: csm
+    spec:
+      automountServiceAccountToken: false
+      runtimeClassName: nvidia
+      nodeSelector:
+        kubernetes.io/hostname: nyx
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: csm
+          image: pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime@sha256:417bd75df6365104c283ea4c1651fb3530d9eb5a4c2fafa51943cff2a94e6385
+          command: [bash, /app/bootstrap.sh]
+          env:
+            - name: CSM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: csm-api-key
+                  key: CSM_API_KEY
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: csm-hf-token
+                  key: HF_TOKEN
+                  optional: true
+          ports:
+            - containerPort: 8000
+              name: http
+          resources:
+            requests:
+              cpu: "2"
+              memory: 4Gi
+              nvidia.com/gpu: "1"
+            limits:
+              memory: 20Gi
+              nvidia.com/gpu: "1"
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 10
+            failureThreshold: 240
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 30
+            failureThreshold: 5
+          volumeMounts:
+            - { name: data, mountPath: /data }
+            - { name: source, mountPath: /app, readOnly: true }
+            - { name: shm, mountPath: /dev/shm }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: csm-data
+        - name: source
+          configMap:
+            name: csm-server
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: csm
+spec:
+  type: NodePort
+  selector:
+    app: csm
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      nodePort: 30824
