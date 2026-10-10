@@ -12,61 +12,41 @@ spec:
   values:
     controllers:
       proto:
-        # One gateway session per token: a second replica would answer every message twice.
-        replicas: 1
-        strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
-              # Built by Marshall2HD/Proto CI from rewrite/cleanroom; Renovate bumps the digest.
               repository: ghcr.io/marshall2hd/proto
               tag: rewrite-cleanroom@sha256:7c5405ac093e392f8866e3ca4035a48f7380c669eb2ef091790234c4dc2161bf
             env:
-              TZ: America/New_York
-              RUST_LOG: info
               ELEVENLABS_VOICE_ID: 21m00Tcm4TlvDq8ikWAM
               # yt-dlp writes its cache under HOME; the root filesystem is read-only.
               HOME: /tmp
-              XDG_CACHE_HOME: /tmp/cache
+              TZ: America/New_York
             envFrom:
               - secretRef:
-                  name: proto-secret
+                  name: "{{ .Release.Name }}-secret"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
-            # Measured: 19 MiB RSS idle; yt-dlp adds about 70 MiB while
-            # resolving a /play link and needs a few CPU-seconds.
             resources:
               requests:
-                cpu: 20m
-                memory: 64Mi
-                ephemeral-storage: 64Mi
+                cpu: 10m
               limits:
-                cpu: "1"
                 memory: 256Mi
-                ephemeral-storage: 128Mi
     defaultPodOptions:
-      # Separate guest kernel: Proto parses untrusted messages and decodes untrusted media.
-      runtimeClassName: kata
-      automountServiceAccountToken: false
-      enableServiceLinks: false
       securityContext:
         runAsNonRoot: true
-        runAsUser: 65532
-        runAsGroup: 65532
-        fsGroup: 65532
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
-        seccompProfile: { type: RuntimeDefault }
     persistence:
       data:
-        existingClaim: proto
+        existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /app/data
       tmp:
         type: emptyDir
-        sizeLimit: 64Mi
-        globalMounts:
-          - path: /tmp
