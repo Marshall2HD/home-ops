@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: proto
+
+# Only the Alertmanager alert: the shared alerts component would also copy the Flux
+# GitHub token into this namespace, and Proto gets no secrets but its own.
+resources:
+  - ./namespace.yaml
+  - ../../components/alerts/alertmanager
+  - ./proto/ks.yaml
