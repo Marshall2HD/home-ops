@@ -22,7 +22,7 @@ spec:
             image:
               # Built by Marshall2HD/Proto CI from rewrite/cleanroom; Renovate bumps the digest.
               repository: ghcr.io/marshall2hd/proto
-              tag: rewrite-cleanroom@sha256:791122b94872dbb8ed1e905889fe2ed505958804d04e9907887e315db8e3e835
+              tag: rewrite-cleanroom@sha256:7c5405ac093e392f8866e3ca4035a48f7380c669eb2ef091790234c4dc2161bf
             env:
               TZ: America/New_York
               RUST_LOG: info
@@ -37,7 +37,7 @@ spec:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
-            # Measured on Thanatos: 19 MiB RSS idle; yt-dlp adds about 70 MiB while
+            # Measured: 19 MiB RSS idle; yt-dlp adds about 70 MiB while
             # resolving a /play link and needs a few CPU-seconds.
             resources:
               requests:
