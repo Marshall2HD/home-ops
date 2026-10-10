@@ -37,13 +37,13 @@
       ignoreTests: false,
     },
     {
-      description: "Auto-merge Proto digests published by its own CI",
+      description: "Commit Proto digests published by its own CI straight to main",
       matchDatasources: ["docker"],
       matchUpdateTypes: ["digest"],
       matchPackageNames: ["ghcr.io/marshall2hd/proto"],
       automerge: true,
-      automergeType: "pr",
-      ignoreTests: false,
+      automergeType: "branch",
+      ignoreTests: true,
     },
     {
       description: "Auto-merge high-cadence OCI packages weekly",
