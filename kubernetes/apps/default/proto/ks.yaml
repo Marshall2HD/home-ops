@@ -12,6 +12,8 @@ spec:
   postBuild:
     substitute:
       APP: proto
+      # Holds only settings.json (the TTS channel per server).
+      KOPIUR_CAPACITY: 1Gi
   prune: true
   sourceRef:
     kind: GitRepository
