@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/externaldns.k8s.io/dnsendpoint_v1alpha1.json
+# The Metaxu admin UI. Tailnet devices send falkerie.com lookups to the UniFi
+# gateway, so this internal record resolves metaxu.falkerie.com to Thanatos's
+# tailnet address, where Caddy serves the admin UI at /console and proxies the
+# inference API to Metaxu's listeners. The public Cloudflare record and the
+# tunnel's /v1-only ingress are unchanged.
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: metaxu
+spec:
+  endpoints:
+    - dnsName: metaxu.falkerie.com
+      recordType: A
+      targets:
+        - 100.88.88.15
