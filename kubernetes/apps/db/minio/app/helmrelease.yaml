@@ -16,8 +16,8 @@ spec:
         containers:
           app:
             image:
-              repository: quay.io/minio/minio
-              tag: latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+              repository: cgr.dev/chainguard/minio
+              tag: latest@sha256:dc455cdd4db6e390b1b26514f15ff37681a777bf8dab41aac445a0259f751e56
             args:
               - server
               - /data
