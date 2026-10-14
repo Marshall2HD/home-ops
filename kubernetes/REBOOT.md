@@ -25,11 +25,11 @@ person at Nyx (or one who can reach it within minutes) for its whole duration.
 
 ## Known failure modes
 
-| when | what happened | mitigation |
-| --- | --- | --- |
-| Aug 2026, manual `talosctl upgrade` | Talos drained the node and waited forever on single-node PDBs (Ceph OSD/MDS, cert-manager and external-secrets webhooks). | Rook `managePodBudgets: false`; webhook PDBs removed. Tuppr already passes `--drain=false` on one node. `talosctl upgrade` defaults to a 5 minute drain timeout, after which it exits *without rebooting*. |
-| Aug 2026, `talosctl reboot -m powercycle` | Shutdown stalled stopping containers and removing cgroups; the reboot lock then timed out. | Don't stack reboot requests. Wait, look at the console, then reset. |
-| Sep 2026, `talosctl reboot --mode=powercycle` after a `--no-reboot` upgrade | RBD volumes unmounted cleanly, then Talos went silent after `stopAllServices`. Ping answered; ports 50000 and 6443 refused. A physical reset was needed. | Unknown root cause. Capture the JetKVM screen before resetting next time. |
+| when                                                                        | what happened                                                                                                                                            | mitigation                                                                                                                                                                                                 |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aug 2026, manual `talosctl upgrade`                                         | Talos drained the node and waited forever on single-node PDBs (Ceph OSD/MDS, cert-manager and external-secrets webhooks).                                | Rook `managePodBudgets: false`; webhook PDBs removed. Tuppr already passes `--drain=false` on one node. `talosctl upgrade` defaults to a 5 minute drain timeout, after which it exits _without rebooting_. |
+| Aug 2026, `talosctl reboot -m powercycle`                                   | Shutdown stalled stopping containers and removing cgroups; the reboot lock then timed out.                                                               | Don't stack reboot requests. Wait, look at the console, then reset.                                                                                                                                        |
+| Sep 2026, `talosctl reboot --mode=powercycle` after a `--no-reboot` upgrade | RBD volumes unmounted cleanly, then Talos went silent after `stopAllServices`. Ping answered; ports 50000 and 6443 refused. A physical reset was needed. | Unknown root cause. Capture the JetKVM screen before resetting next time.                                                                                                                                  |
 
 Kexec is disabled (`sysctl.kernel.kexec_load_disabled=1`), so both reboot modes go
 through firmware. Use `powercycle` anyway: it is what Tuppr is configured for, and
@@ -63,39 +63,33 @@ flux get ks -A --status-selector ready=false
 
 ### 3. Backups
 
-- Every Kopiur policy must have a successful snapshot from the last two hours.
-  Trigger one per policy, wait for all to show `Succeeded`, and don't continue if
-  any fails:
+Every Kopiur policy must have a successful snapshot from the last two hours.
+Trigger one per policy, wait for all to show `Succeeded`, and don't continue if
+any fails. ClickHouse (Langfuse) has no Kopiur policy.
 
-  ```sh
-  for p in $(kubectl get snapshotpolicies -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" "}{end}'); do
-    kubectl create -f - <<EOF
-  apiVersion: kopiur.home-operations.com/v1alpha1
-  kind: Snapshot
-  metadata: {generateName: ${p#*/}-reboot-, namespace: ${p%/*}}
-  spec: {policyRef: {name: ${p#*/}}}
-  EOF
-  done
-  kubectl get snapshots -A --sort-by=.metadata.creationTimestamp | tail -30
-  ```
+```sh
+for p in $(kubectl get snapshotpolicies -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" "}{end}'); do
+  kubectl create -f - <<EOF
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: Snapshot
+metadata: {generateName: ${p#*/}-reboot-, namespace: ${p%/*}}
+spec: {policyRef: {name: ${p#*/}}}
+EOF
+done
+kubectl get snapshots -A --sort-by=.metadata.creationTimestamp | tail -30
+```
 
-  ClickHouse (Langfuse) has no Kopiur policy.
+Take an etcd snapshot and encrypt it to the recovery recipient. Never leave a
+plaintext copy: it contains every cluster secret. Then record PVC identities for
+the post-reboot check.
 
-- Take an etcd snapshot and encrypt it to the recovery recipient. Never leave a
-  plaintext copy: it contains every cluster secret.
-
-  ```sh
-  R=/Volumes/Mimi/Developer/artifacts/home-ops-review/recovery
-  talosctl -n 10.4.0.10 etcd snapshot /tmp/etcd.db
-  openssl cms -encrypt -binary -aes256 -outform DER -in /tmp/etcd.db \
-    -out "$R/etcd-before-$(date -u +%F).cms" "$R/recipient.crt" && trash /tmp/etcd.db
-  ```
-
-- Record PVC identities for the post-reboot check:
-
-  ```sh
-  kubectl get pvc -A -o json | jq '[.items[] | {ns:.metadata.namespace,name:.metadata.name,uid:.metadata.uid,pv:.spec.volumeName,phase:.status.phase}]' > "$R/pvcs-$(date -u +%F).json"
-  ```
+```sh
+R=/Volumes/Mimi/Developer/artifacts/home-ops-review/recovery
+talosctl -n 10.4.0.10 etcd snapshot /tmp/etcd.db
+openssl cms -encrypt -binary -aes256 -outform DER -in /tmp/etcd.db \
+  -out "$R/etcd-before-$(date -u +%F).cms" "$R/recipient.crt" && trash /tmp/etcd.db
+kubectl get pvc -A -o json | jq '[.items[] | {ns:.metadata.namespace,name:.metadata.name,uid:.metadata.uid,pv:.spec.volumeName,phase:.status.phase}]' > "$R/pvcs-$(date -u +%F).json"
+```
 
 ### 4. Ceph flags
 
