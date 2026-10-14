@@ -21,7 +21,7 @@ spec:
     cephImage:
       # Includes the ceph-volume fix for nonexistent devices during raw discovery.
       repository: quay.io/ceph/ceph
-      tag: v20.2.2
+      tag: v20.2.4
     cephClusterSpec:
       cephConfig:
         global:
