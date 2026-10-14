@@ -38,6 +38,11 @@ spec:
         wipeDevicesFromOtherClusters: false
       crashCollector:
         disable: false
+      # Two OSDs: Rook skips ok-to-stop below three OSDs and restarts them back to back.
+      # Restarting the second before the first has caught up leaves PGs down, and the
+      # raw-mode OSD activate then hangs in lvs on an RBD device (2026-10-14). Wait for
+      # active+clean before each OSD update.
+      upgradeOSDRequiresHealthyPGs: true
       disruptionManagement:
         # Single node: Rook's OSD/MDS/mon PDBs cannot be satisfied during a node drain
         # and made Talos wait forever (Aug 2026). See kubernetes/REBOOT.md.
