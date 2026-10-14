@@ -55,7 +55,7 @@ reconciliation restored the records, which were checked directly before switchin
 
 ## Preserved local configuration
 
-- Marshall2HD/home-ops, hades.casa, ocharted.hades.casa, local VLANs, BGP peer,
+- Marshall2HD/home-ops, hades.casa, local VLANs, BGP peer,
   load-balancer addresses, and Hypnos backup repository.
 - Nyx's AMD/NVIDIA schematic, install disk serial, exact two Ceph device IDs,
   single-node monitor/controller counts, OSD-level replication, maxPods and hugepages.
@@ -107,15 +107,14 @@ GPU applications, or the credentialed CI runner.
 
 ## Konflate activation
 
-Konflate targets this repository and uses the existing GitHub bot App
-and read-only mounted ocharted credentials. Required 1Password
-field/attachment names were checked without persisting secret values. The webhook
+Konflate targets this repository and uses the existing GitHub bot App.
+Required 1Password field/attachment names were checked without persisting secret values. The webhook
 secret is derived by External Secrets from the existing Flux token with a separate
 `konflate:` domain prefix; SHA-256 is the available Sprig template function.
 
 The chart polls every 30 minutes, so a GitHub webhook is not required for initial
 operation. After deployment, verify ExternalSecret synchronization, App repository
-access, private-chart rendering, checks/comments, and endpoint readiness. Configure
+access, chart rendering, checks/comments, and endpoint readiness. Configure
 an optional GitHub webhook only after confirming the deployed Konflate endpoint and
 event requirements, using the derived secret without logging it. No webhook or App
 permission changes were made during preparation.
