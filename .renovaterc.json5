@@ -10,15 +10,6 @@
   prFooter: "",
   gitIgnoredAuthors: ["15093189+Marshall2HD@users.noreply.github.com"],
   platformCommit: "disabled",
-  hostRules: [
-    {
-      description: "Authenticate against the ocharted OCI registry",
-      matchHost: "ocharted.hades.casa",
-      hostType: "docker",
-      username: "{{ secrets.OCHARTED_USERNAME }}",
-      password: "{{ secrets.OCHARTED_PASSWORD }}",
-    },
-  ],
   packageRules: [
     // Auto-merge rules
     {

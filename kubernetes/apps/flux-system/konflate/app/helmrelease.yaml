@@ -20,26 +20,10 @@ spec:
       # This instance renders for Nyx, not the Kubernetes version bundled in Helm.
       kubeVersion: "{{ .Capabilities.KubeVersion.Version }}"
       helmApiVersions: '{{ join "," .Capabilities.APIVersions }}'
-      extraEnv:
-        - name: DOCKER_CONFIG
-          value: /var/run/registry
-        - name: FLATE_REGISTRY_CONFIG
-          value: /var/run/registry/config.json
     secret:
       existingSecret: konflate-webhook-token-secret
     deploymentAnnotations:
       reloader.stakater.com/auto: "true"
-    volumes:
-      - name: registry-auth
-        secret:
-          secretName: konflate-registry-secret
-          items:
-            - key: .dockerconfigjson
-              path: config.json
-    volumeMounts:
-      - name: registry-auth
-        mountPath: /var/run/registry
-        readOnly: true
     httpRoute:
       enabled: true
       annotations:
