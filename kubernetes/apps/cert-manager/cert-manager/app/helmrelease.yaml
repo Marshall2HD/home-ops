@@ -20,5 +20,6 @@ spec:
         enabled: true
     webhook:
       replicaCount: 2
+      # Single node: a minAvailable PDB blocks a node drain on the second eviction.
       podDisruptionBudget:
-        enabled: true
+        enabled: false
