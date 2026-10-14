@@ -52,6 +52,11 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
     defaultPodOptions:
+      # metaxu.falkerie.com resolves to Thanatos's tailnet address on the LAN (unifi-dns), which pods
+      # can't reach; Caddy on Thanatos also answers for it on the LAN.
+      hostAliases:
+        - ip: 10.4.0.178
+          hostnames: [metaxu.falkerie.com]
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
