@@ -45,8 +45,8 @@ There are also 31 historical finalizing VolumeAttachments whose PVs no longer ex
 these were left alone and distinguished from real mounts during the cutover.
 
 Recovery evidence and three verified encrypted etcd snapshots are outside Git at
-`/Volumes/Mimi/Artifacts/home-ops-review/recovery/`. Consult `host-maintenance.json`
-there before further maintenance. Keep future runtime/datapath changes separate from
+`/Volumes/Mimi/Developer/artifacts/home-ops-review/recovery/`. Consult `host-maintenance.json`
+there before further maintenance. Follow [REBOOT.md](REBOOT.md) for any reboot. Keep future runtime/datapath changes separate from
 unrelated engine upgrades.
 
 ExternalDNS v0.22.0 does not enforce `--dry-run` for its webhook provider. Do not use

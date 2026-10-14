@@ -28,6 +28,8 @@ spec:
           mon_data_avail_warn: "15"
           osd_pool_default_size: "2"
           osd_pool_default_min_size: "1"
+          # Never mark OSDs out when the whole host is down (a reboot of the one node).
+          mon_osd_down_out_subtree_limit: host
       mon:
         count: 1 # Single Node
         allowMultiplePerNode: false
@@ -36,6 +38,10 @@ spec:
         wipeDevicesFromOtherClusters: false
       crashCollector:
         disable: false
+      disruptionManagement:
+        # Single node: Rook's OSD/MDS/mon PDBs cannot be satisfied during a node drain
+        # and made Talos wait forever (Aug 2026). See kubernetes/REBOOT.md.
+        managePodBudgets: false
       csi:
         cephfs:
           kernelMountOptions: ms_mode=prefer-crc
