@@ -57,6 +57,19 @@ spec:
         urlPrefix: /
         ssl: false
         prometheusEndpoint: http://prometheus-operated.o11y.svc.cluster.local:9090
+      healthCheck:
+        # Until the first reboot after the CSI rotation: existing CSI mounts keep the prior
+        # aes key, and allowedCiphers can only be restricted once nothing uses aes. Then drop
+        # these mutes (kubernetes/REBOOT.md, last section).
+        muteHealthWarning:
+          AUTH_INSECURE_ROTATING_SERVICE_KEY_TYPE:
+            policy: mute
+          AUTH_INSECURE_CLIENT_KEY_TYPE:
+            policy: mute
+          AUTH_INSECURE_KEYS_ALLOWED:
+            policy: mute
+          AUTH_INSECURE_KEYS_CREATABLE:
+            policy: mute
       mgr:
         count: 1 # Single Node
         modules:
@@ -69,6 +82,20 @@ spec:
         osd:
           limits:
             memory: 8Gi # Required for bootstrap
+      security:
+        cephx:
+          daemon:
+            keyRotationPolicy: KeyGeneration
+            keyGeneration: 2
+          csi:
+            keyRotationPolicy: KeyGeneration
+            keyGeneration: 2
+            keepPriorKeyCountMax: 1 # existing mounts keep the aes key until Nyx reboots
+            keyType: aes256k # Talos 1.14 kernels (6.18.48) carry the aes256k backport
+          rbdMirrorPeer:
+            keyRotationPolicy: KeyGeneration
+            keyGeneration: 2
+            keyType: aes256k
       storage:
         useAllDevices: false
         devicePathFilter: "^/dev/disk/by-id/nvme-Micron_7450_MTFDKBA800TFS_(25124FA456CD|25124FA45676)$"
