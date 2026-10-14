@@ -150,7 +150,17 @@ Start a timer when the API drops.
    stuck in setup or the boot menu, pick the Talos EFI entry. Report BIOS errors
    rather than resetting repeatedly.
 4. The node is up but `SchedulingDisabled`: `kubectl uncordon nyx`.
-5. The API server doesn't return but Talos does: `talosctl -n 10.4.0.10 service kubelet restart`
+5. An OSD pod sits in `Init` with PGs `down`: check whether its `activate` container
+   is stuck in `lvs` (`ps` shows it in state `D`, with `/dev/rbd*` open). In raw mode,
+   Rook's activate script doesn't filter RBD devices from LVM, so `lvs` blocks on an
+   RBD image whose PGs need this very OSD. This happened on 2026-10-14. To break it:
+   scale `rook-ceph-operator` to 0 (suspend the `rook-ceph` HelmRelease first). Then,
+   in the OSD deployment's activate script, insert
+   `echo 'devices { filter = ["r|/dev/rbd.*|", "r|/dev/nbd.*|", "r|/dev/drbd.*|"] }' >> /etc/lvm/lvm.conf`
+   before `ceph-volume raw activate`, force-delete the stuck pod, wait for
+   `active+clean`, and restore the operator (resume, then scale to 1). Never mark the
+   OSD lost.
+6. The API server doesn't return but Talos does: `talosctl -n 10.4.0.10 service kubelet restart`
    (this recovered a stalled static pod in Sep 2026). Don't reboot again for this.
 
 ### 8. Verify
