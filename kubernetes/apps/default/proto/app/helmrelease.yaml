@@ -20,7 +20,7 @@ spec:
               repository: ghcr.io/marshall2hd/proto
               tag: rewrite-cleanroom@sha256:7c5405ac093e392f8866e3ca4035a48f7380c669eb2ef091790234c4dc2161bf
             env:
-              ELEVENLABS_VOICE_ID: 21m00Tcm4TlvDq8ikWAM
+              ELEVENLABS_VOICE_ID: G2Dg8KOxjwR9pkW7Prmp
               # yt-dlp writes its cache under HOME; the root filesystem is read-only.
               HOME: /tmp
               TZ: America/New_York
