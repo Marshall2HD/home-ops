@@ -18,7 +18,7 @@ spec:
           init:
             image: &image
               repository: ghcr.io/marshall2hd/remedyverse
-              tag: main@sha256:d815864a0969c91dc27aa930b3a154c315a54cb492d9a3f937fff51c37d4d4cf
+              tag: main@sha256:0f23ed0d8e85c029e9694cba4f841ab01e6102d0e58d7cd132658595ddbba112
             command: [remedyverse-init]
             env: &env
               MEDIAWIKI_DB_HOST: postgres.database.svc.cluster.local
