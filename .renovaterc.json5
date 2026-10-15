@@ -34,6 +34,15 @@
       ignoreTests: true,
     },
     {
+      description: "Commit Remedyverse image digests published by its own CI straight to main",
+      matchDatasources: ["docker"],
+      matchUpdateTypes: ["digest"],
+      matchPackageNames: ["ghcr.io/marshall2hd/remedyverse"],
+      automerge: true,
+      automergeType: "branch",
+      ignoreTests: true,
+    },
+    {
       description: "Auto-merge high-cadence OCI packages weekly",
       matchDatasources: ["docker"],
       matchUpdateTypes: ["minor", "patch"],
