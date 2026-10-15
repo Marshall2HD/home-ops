@@ -78,6 +78,8 @@ spec:
                   originServerName: external.hades.casa
                   tcpKeepAlive: 7200s
                 service: https://envoy-external.{{ .Release.Namespace }}.svc.cluster.local:443
+              - hostname: remedyverse.wiki
+                service: http://remedyverse.default.svc.cluster.local:80
               - service: http_status:404
     persistence:
       config-file:

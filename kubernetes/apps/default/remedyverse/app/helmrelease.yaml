@@ -1,0 +1,165 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: remedyverse
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: remedyverse
+  interval: 1h
+  values:
+    controllers:
+      remedyverse:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init:
+            image: &image
+              repository: ghcr.io/marshall2hd/remedyverse
+              tag: main@sha256:d815864a0969c91dc27aa930b3a154c315a54cb492d9a3f937fff51c37d4d4cf
+            command: [remedyverse-init]
+            env: &env
+              MEDIAWIKI_DB_HOST: postgres.database.svc.cluster.local
+              MEDIAWIKI_DB_NAME: remedyverse
+              MEDIAWIKI_DB_USER: remedyverse
+              TZ: America/New_York
+            envFrom: &envFrom
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 512Mi
+        containers:
+          app:
+            image: *image
+            env: *env
+            envFrom: *envFrom
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: &path /api.php?action=query&meta=siteinfo&format=json
+                    port: &port 8080
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: *path
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 10
+                  failureThreshold: 3
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+          jobs:
+            image: *image
+            command: [remedyverse-jobs]
+            env: *env
+            envFrom: *envFrom
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+      dump:
+        type: cronjob
+        cronjob:
+          schedule: 0 3 * * *
+          timeZone: America/New_York
+          backoffLimit: 2
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 1
+          ttlSecondsAfterFinished: 86400
+        containers:
+          app:
+            image:
+              repository: docker.io/tensorchord/vchord-suite
+              tag: pg18-20260501@sha256:c6e5e77a1180199f91b040b6e85c6d10b0ded6d49fb614dfd2e7272ffb91af08
+            command:
+              - /bin/sh
+              - -ec
+              - |
+                pg_dump --format=custom --no-owner --file=/dump/remedyverse.dump.tmp \
+                  --host=postgres.database.svc.cluster.local --username=remedyverse remedyverse
+                mv /dump/remedyverse.dump.tmp /dump/remedyverse.dump
+                ls -l /dump
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+        pod:
+          restartPolicy: Never
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        controller: remedyverse
+        ports:
+          http:
+            port: 80
+            targetPort: *port
+    persistence:
+      dump:
+        existingClaim: "{{ .Release.Name }}"
+        advancedMounts:
+          dump:
+            app:
+              - path: /dump
+      tmp:
+        type: emptyDir
+        advancedMounts:
+          remedyverse:
+            init:
+              - path: /tmp
+            app:
+              - path: /tmp
+            jobs:
+              - path: /tmp
+          dump:
+            app:
+              - path: /tmp
+      apache-run:
+        type: emptyDir
+        advancedMounts:
+          remedyverse:
+            app:
+              - path: /var/run/apache2
+      apache-lock:
+        type: emptyDir
+        advancedMounts:
+          remedyverse:
+            app:
+              - path: /var/lock/apache2
