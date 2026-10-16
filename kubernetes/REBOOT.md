@@ -107,7 +107,7 @@ the OSDs are not yet.
 Stop Flux from applying changes or remediating releases while storage comes back:
 
 ```sh
-flux suspend ks cluster-apps -n flux-system
+flux suspend ks flux-system -n flux-system
 flux suspend ks --all -n system-upgrade   # tuppr, tuppr-upgrades: no surprise upgrade
 ```
 
@@ -172,8 +172,8 @@ ceph osd unset norebalance
 ceph osd unset noout
 ceph status                            # HEALTH_OK
 flux resume ks --all -n system-upgrade
-flux resume ks cluster-apps -n flux-system
-flux reconcile ks cluster-apps -n flux-system --with-source
+flux resume ks flux-system -n flux-system
+flux reconcile ks flux-system -n flux-system --with-source
 kubectl get hr -A | awk '$4!="True"'   # wait until empty, except known failures
 kubectl get pvc -A --no-headers | awk '$3!="Bound"'   # compare with the saved list
 ```
