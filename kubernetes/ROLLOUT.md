@@ -105,20 +105,6 @@ GPU applications, or the credentialed CI runner.
    remains disabled. Check Kopiur maintenance and cache usage, Arr authentication,
    Home Assistant MCP authentication, monitoring, DNS and tunnel readiness.
 
-## Konflate activation
-
-Konflate targets this repository and uses the existing GitHub bot App.
-Required 1Password field/attachment names were checked without persisting secret values. The webhook
-secret is derived by External Secrets from the existing Flux token with a separate
-`konflate:` domain prefix; SHA-256 is the available Sprig template function.
-
-The chart polls every 30 minutes, so a GitHub webhook is not required for initial
-operation. After deployment, verify ExternalSecret synchronization, App repository
-access, chart rendering, checks/comments, and endpoint readiness. Configure
-an optional GitHub webhook only after confirming the deployed Konflate endpoint and
-event requirements, using the derived secret without logging it. No webhook or App
-permission changes were made during preparation.
-
 ## Verification limits
 
 Offline flate tests passed for all 237 Flux/chart sources at Kubernetes 1.37.0, and
