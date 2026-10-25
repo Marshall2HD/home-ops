@@ -19,9 +19,8 @@ spec:
         admin:
           password: { env: KRITIKA_AUTH_ADMIN_PASSWORD }
       review:
-        # ChatGPT plan (one-time `kritika chatgpt login chatgpt`); Claude through Metaxu until then
-        model: chatgpt/~sol-latest
-        fallback: metaxu/claude-sonnet-5-5
+        model: metaxu/claude-sonnet-5-5
+        effort: medium
       apps:
         github:
           accounts: [Marshall2HD]
@@ -29,7 +28,6 @@ spec:
           privateKey: { env: KRITIKA_GITHUB_PRIVATE_KEY }
           webhookSecret: { env: KRITIKA_GITHUB_WEBHOOK_SECRET }
       providers:
-        chatgpt: { type: chatgpt }
         metaxu:
           type: anthropic
           baseUrl: https://metaxu.falkerie.com
