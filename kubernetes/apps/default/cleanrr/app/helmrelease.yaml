@@ -48,7 +48,6 @@ spec:
                   httpGet:
                     path: /health/ready
                     port: *port
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
               startup:
@@ -59,7 +58,6 @@ spec:
                     path: /health/startup
                     port: *port
                   failureThreshold: 30
-                  periodSeconds: 10
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
