@@ -202,4 +202,31 @@ spec:
       name: csi-ceph-filesystem
       deletionPolicy: Delete
       isDefault: false
-    cephObjectStores: []
+    cephObjectStores:
+      - name: ceph-objectstore
+        spec:
+          defaultRealm: true
+          metadataPool:
+            failureDomain: osd # Single node
+            replicated:
+              size: 2 # Mirror across 2 drives
+          dataPool:
+            failureDomain: osd
+            replicated:
+              size: 2
+            quotas:
+              maxSize: 100Gi
+          preservePoolsOnDelete: true
+          gateway:
+            port: 80
+            resources:
+              requests:
+                cpu: 100m
+                memory: 1Gi
+              limits:
+                memory: 2Gi
+            instances: 1 # Single node
+            priorityClassName: system-cluster-critical
+        storageClass:
+          enabled: true
+          name: ceph-bucket
