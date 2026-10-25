@@ -42,7 +42,6 @@ spec:
           - backendRefs:
               - port: ui
       mcp:
-        enabled: true
         hostnames:
           - "{{ .Release.Name }}.hades.casa"
         parentRefs:
