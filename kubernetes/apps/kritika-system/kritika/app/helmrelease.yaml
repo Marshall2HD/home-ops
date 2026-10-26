@@ -65,8 +65,7 @@ spec:
               memory: 512Mi
             limits:
               memory: 2Gi
-          # Kata until Nyx is upgraded with the gVisor extension, then gvisor like upstream
-          runtimeClassName: kata
+          runtimeClassName: gvisor
     httpRoute:
       enabled: true
       annotations:
