@@ -24,9 +24,10 @@ spec:
               MEMINI_EMBED_BASE_URL: https://metaxu.falkerie.com/v1
               MEMINI_EMBED_MODEL: voyage-4-large
               MEMINI_EMBED_DIMS: "1024"
-              # memini's 0.46 vector floor is tuned for OpenAI embeddings; voyage-4-large scores correct
-              # matches 0.21-0.46 and unrelated queries at most 0.21 (26 KB cards, 2026-10-26)
-              MEMINI_RECALL_MIN_SEMANTIC_SCORE: "0.22"
+              # The sqlite store scores vectors as 1/(1+L2), which for unit vectors never goes below 0.414.
+              # With voyage-4-large, the KB cards (summary first) score their own "what is X" queries
+              # >= 0.4455 (cos 0.226) and unrelated queries <= 0.4407 (cos 0.195), 2026-10-26; 0.46 dropped real hits
+              MEMINI_RECALL_MIN_SEMANTIC_SCORE: "0.443"
               MEMINI_CLIENT_DEFAULTS: '{"namespace_scope":"owner_tree"}'
             envFrom:
               - secretRef:
