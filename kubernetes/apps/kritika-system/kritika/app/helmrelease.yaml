@@ -21,6 +21,17 @@ spec:
       review:
         model: metaxu/claude-sonnet-5-5
         effort: medium
+      # Score Renovate's PRs and fail `Kritika / Review` below 4, so Renovate
+      # (ignoreTests: false) only automerges what the scorer passes
+      confidence:
+        model: metaxu/claude-sonnet-5-5
+        threshold: 4
+        when:
+          - { name: renovate, expr: 'pr.headRef.startsWith("renovate/")' }
+        gate: true
+      # Turning the repo on reviews the open Renovate backlog; keep it off the Claude limits
+      limits:
+        reviewsPerDay: 20
       apps:
         github:
           accounts: [Marshall2HD]
