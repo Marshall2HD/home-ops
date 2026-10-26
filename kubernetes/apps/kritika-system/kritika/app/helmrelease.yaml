@@ -57,6 +57,19 @@ spec:
           type: anthropic
           baseUrl: https://metaxu.falkerie.com
           apiKey: { env: KRITIKA_METAXU_API_KEY }
+        # Voyage through Metaxu's /v1/embeddings: kritika always sends `dimensions`, which
+        # api.voyageai.com rejects, and Metaxu renames it to `output_dimension`
+        voyage:
+          type: openai
+          baseUrl: https://metaxu.falkerie.com/v1
+          apiKey: { env: KRITIKA_METAXU_API_KEY }
+      # Upstream's embedder and prompts, served by Voyage directly instead of OpenRouter
+      embedding:
+        model: voyage/voyage-code-4
+        dims: 1024
+        documentPrompt: "Represent the document for retrieval: "
+        queryPrompt: "Represent the query for retrieving supporting documents: "
+        similarFloor: 0.3
       egress:
         allow: ["*"]
         deny: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, "*.internal", "*.hades.casa"]
