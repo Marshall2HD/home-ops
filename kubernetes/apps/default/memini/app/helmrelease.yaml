@@ -19,8 +19,11 @@ spec:
             image:
               repository: ghcr.io/eleboucher/memini
             env:
-              MEMINI_EMBED_BASE_URL: https://openrouter.ai/api/v1
-              MEMINI_EMBED_MODEL: openai/text-embedding-3-small
+              # Voyage through Metaxu's /v1/embeddings: memini sends `encoding_format: float`,
+              # which api.voyageai.com rejects
+              MEMINI_EMBED_BASE_URL: https://metaxu.falkerie.com/v1
+              MEMINI_EMBED_MODEL: voyage-4-large
+              MEMINI_EMBED_DIMS: "1024"
               MEMINI_CLIENT_DEFAULTS: '{"namespace_scope":"owner_tree"}'
             envFrom:
               - secretRef:
@@ -30,6 +33,11 @@ spec:
                 cpu: 10m
               limits:
                 memory: 512Mi
+    defaultPodOptions:
+      # metaxu.falkerie.com resolves to Thanatos's tailnet address on the LAN, which pods can't reach
+      hostAliases:
+        - ip: 10.4.0.178
+          hostnames: [metaxu.falkerie.com]
     route:
       main:
         enabled: true
