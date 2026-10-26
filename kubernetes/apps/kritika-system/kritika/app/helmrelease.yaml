@@ -9,12 +9,26 @@ spec:
     kind: OCIRepository
     name: kritika
   interval: 1h
+  # metaxu.falkerie.com resolves to Thanatos's tailnet address on the LAN (unifi-dns), which pods can't
+  # reach; Caddy on Thanatos answers for it on the LAN too. The chart has no hostAliases value.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target: { kind: Deployment, name: kritika }
+            patch: |
+              - op: add
+                path: /spec/template/spec/hostAliases
+                value: [{ ip: 10.4.0.178, hostnames: [metaxu.falkerie.com] }]
   values:
     replicas: 2
     deploymentAnnotations:
       secret.reloader.stakater.com/auto: "true"
     config:
       webUrl: https://{{ .Release.Name }}.hades.casa
+      # Keep every review's full model transcript (model_calls) and the diff and context it read,
+      # instead of sweeping them after 30 days, as training data; the database is backed up
+      transcriptRetention: 87600h
+      diffRetention: 87600h
       auth:
         admin:
           password: { env: KRITIKA_AUTH_ADMIN_PASSWORD }
