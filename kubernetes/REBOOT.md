@@ -7,21 +7,24 @@ change, or a plain reboot.
 
 ## Precondition: a remote reset that has been tested
 
-Two graceful reboots have hung. Do not start one unless someone can reset Nyx if it
+Three graceful reboots have hung. Do not start one unless someone can reset Nyx if it
 wedges.
 
-- JetKVM: `http://jetkvm.internal` (10.4.0.40, HTTP only). It gives video and
-  keyboard. Power and reset only work with the ATX extension fitted and cabled to
-  Nyx's front-panel header. As of 2026-10-14, nobody had confirmed the extension,
-  and agents did not have the local password (it is not in 1Password).
+- JetKVM: `http://jetkvm.internal` (10.4.0.40, HTTP only). Its DC power extension
+  feeds Nyx and is the tested reset (2026-10-26): switching the extension off for
+  about 8 seconds and back on brought Nyx up cleanly from the hang described below.
+  The extension's reported state can lag after a toggle, so confirm with ping and the
+  Kubernetes API instead. The HDMI capture showed `no_signal` that day, so there was
+  no console. The JetKVM password is not in 1Password; the Thanatos knowledge base
+  note `jetkvm-nyx-power.md` says where it is and how to drive the extension.
 - No smart plug feeds Nyx. The Zigbee plugs are for Apollo, Athena, Momus and the
   AC. Home Assistant and Zigbee2MQTT run on Nyx, so they can't help once it wedges.
 - The SP5100 TCO watchdog (`/dev/watchdog0`, 5 minute timeout) is armed by Talos
   but has `nowayout=0`. It did not fire during the September hang. Do not count on it.
 
-Before rebooting, open the JetKVM page and confirm that the console shows Nyx and
-that ATX power state is reported. If there is no tested reset, the reboot needs a
-person at Nyx (or one who can reach it within minutes) for its whole duration.
+Before rebooting, confirm that the JetKVM answers and the DC power extension is
+active. If it is unreachable, the reboot needs a person at Nyx (or one who can reach
+it within minutes) for its whole duration.
 
 ## Known failure modes
 
@@ -30,6 +33,7 @@ person at Nyx (or one who can reach it within minutes) for its whole duration.
 | Aug 2026, manual `talosctl upgrade`                                         | Talos drained the node and waited forever on single-node PDBs (Ceph OSD/MDS, cert-manager and external-secrets webhooks).                                | Rook `managePodBudgets: false`; webhook PDBs removed. Tuppr already passes `--drain=false` on one node. `talosctl upgrade` defaults to a 5 minute drain timeout, after which it exits _without rebooting_. |
 | Aug 2026, `talosctl reboot -m powercycle`                                   | Shutdown stalled stopping containers and removing cgroups; the reboot lock then timed out.                                                               | Don't stack reboot requests. Wait, look at the console, then reset.                                                                                                                                        |
 | Sep 2026, `talosctl reboot --mode=powercycle` after a `--no-reboot` upgrade | RBD volumes unmounted cleanly, then Talos went silent after `stopAllServices`. Ping answered; ports 50000 and 6443 refused. A physical reset was needed. | Unknown root cause. Capture the JetKVM screen before resetting next time.                                                                                                                                  |
+| Oct 2026, `talosctl reboot --mode=powercycle` after a `--no-reboot` upgrade | Same as September: silent after `stopAllServices`, ping up, ports refused for 10+ minutes.                                                               | Reset with the JetKVM DC power extension. Tuppr upgrades will likely hit this too, so only let them run when a reset is reachable.                                                                         |
 
 Kexec is disabled (`sysctl.kernel.kexec_load_disabled=1`), so both reboot modes go
 through firmware. Use `powercycle` anyway: it is what Tuppr is configured for, and
