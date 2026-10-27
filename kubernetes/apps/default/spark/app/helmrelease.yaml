@@ -51,10 +51,11 @@ spec:
                   mv "$PLUGIN.tmp" "$PLUGIN"
                 fi
                 export PYTHONPATH="$PLUGIN"
-                # BF16, not the community NVFP4A16 build (tuevuong/Spark-X2.6-4B-NVFP4A16 @3411b3f): that one runs on the L4 through
-                # Marlin at 77 tok/s but scores 27/50 on BFCL against 36/50 for BF16 on the same server.
-                exec vllm serve XHToken/Spark-X2.6-4B \
-                  --revision d1b5f26071101c27fcd07728e7a7770e428281f4 \
+                # The vendor's FP8 build (W8A8, runs on the L4's FP8 tensor cores). The community NVFP4A16 build also runs here (Marlin,
+                # 77 tok/s) but scored 27/50 on BFCL against 36/50 for BF16 and 37/50 for this FP8 build; BF16 decodes at 29 tok/s and
+                # leaves a 92k-token KV cache against 129k here, which made the agent runs prefill-bound.
+                exec vllm serve XHToken/Spark-X2.6-4B-FP8 \
+                  --revision 15b16e794bf251505f68501294fce730cceaa4e9 \
                   --served-model-name spark-x2.6-4b \
                   --trust-remote-code \
                   --host 0.0.0.0 --port 8000 \
