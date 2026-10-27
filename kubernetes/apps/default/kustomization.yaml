@@ -21,6 +21,8 @@ resources:
   - ./flaresolverr/ks.yaml
   - ./home-assistant/ks.yaml
   - ./langfuse/ks.yaml
+  - ./lfm3-omni/ks.yaml
+  - ./lfm3-vl/ks.yaml
   - ./memini/ks.yaml
   - ./minecraft/ks.yaml
   - ./mosquitto/ks.yaml
