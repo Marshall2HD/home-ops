@@ -56,7 +56,7 @@ spec:
                   --trust-remote-code \
                   --host 0.0.0.0 --port 8000 \
                   --max-model-len 32768 \
-                  --gpu-memory-utilization 0.58 \
+                  --gpu-memory-utilization 0.78 \
                   --max-num-seqs 16 \
                   --max-num-batched-tokens 8192 \
                   --enable-prefix-caching \
