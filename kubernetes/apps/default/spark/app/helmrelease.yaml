@@ -48,13 +48,15 @@ spec:
                   mv "$PLUGIN.tmp" "$PLUGIN"
                 fi
                 export PYTHONPATH="$PLUGIN"
-                exec vllm serve tuevuong/Spark-X2.6-4B-NVFP4A16 \
-                  --revision 3411b3ffd8349090289d7e580e61aec2baf6b8ac \
+                # BF16, not the community NVFP4A16 build (tuevuong/Spark-X2.6-4B-NVFP4A16 @3411b3f): that one runs on the L4 through
+                # Marlin at 77 tok/s but scores 27/50 on BFCL against 36/50 for BF16 on the same server.
+                exec vllm serve XHToken/Spark-X2.6-4B \
+                  --revision d1b5f26071101c27fcd07728e7a7770e428281f4 \
                   --served-model-name spark-x2.6-4b \
                   --trust-remote-code \
                   --host 0.0.0.0 --port 8000 \
                   --max-model-len 65536 \
-                  --gpu-memory-utilization 0.40 \
+                  --gpu-memory-utilization 0.58 \
                   --max-num-seqs 16 \
                   --max-num-batched-tokens 8192 \
                   --enable-prefix-caching \
