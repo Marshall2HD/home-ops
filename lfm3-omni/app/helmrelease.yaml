@@ -1,0 +1,119 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app lfm3-omni
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  interval: 1h
+  # The first start pulls a 15 GB image and the weights.
+  timeout: 30m
+  values:
+    controllers:
+      lfm3-omni:
+        # Scaled to zero when no Aberrant test runs; `kubectl scale` brings it up for a run without a commit.
+        replicas: 0
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: docker.io/lmsysorg/sglang
+              # The dev image built from the LFM3 model-support PR (sgl-project/sglang#46858, not in a tagged release yet).
+              tag: dev-lfm3@sha256:b710010bdf234cf4f666b4f8679b95f0482f44200f1e6951a476b32e88b18eeb
+            command:
+              - sglang
+              - serve
+            args:
+              - --model-path
+              - LiquidAI/LFM3-Omni-2B
+              - --revision
+              - ce2458cbce4ad970f92032ed94e3d18d30b04f9c
+              - --trust-remote-code
+              - --reasoning-parser
+              - auto
+              - --tool-call-parser
+              - auto
+              - --served-model-name
+              - lfm3
+              - --host
+              - 0.0.0.0
+              - --port
+              - "8000"
+              - --context-length
+              - "32768"
+              - --mem-fraction-static
+              - "0.55"
+            env:
+              TZ: America/New_York
+              HF_HOME: /models/hf
+              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_VISIBLE_DEVICES: all
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 8000
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 180
+            resources:
+              requests:
+                cpu: 2
+                memory: 6Gi
+                nvidia.com/gpu: 1
+              limits:
+                memory: 16Gi
+                nvidia.com/gpu: 1
+    defaultPodOptions:
+      runtimeClassName: nvidia
+      nodeSelector:
+        node.kubernetes.io/gpu: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+    persistence:
+      models:
+        type: persistentVolumeClaim
+        storageClass: ceph-block
+        accessMode: ReadWriteOnce
+        size: 20Gi
+        globalMounts:
+          - path: /models
+      shm:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 2Gi
+        globalMounts:
+          - path: /dev/shm
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
