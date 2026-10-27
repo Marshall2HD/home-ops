@@ -16,8 +16,6 @@ spec:
       spark:
         # Scaled to zero when no Aberrant test runs (the L4 is shared with Parakeet); `kubectl scale` brings it up for a run.
         replicas: 0
-        # Scaled to zero between Aberrant test runs; the manifests stay so one commit brings it back.
-        replicas: 1
         strategy: Recreate
         containers:
           app:
