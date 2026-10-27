@@ -28,8 +28,10 @@ spec:
             args:
               - |
                 # Spark2_5 is not in vLLM 0.32 yet: install the vendor's out-of-tree plugin (pinned commit) onto the PVC
-                # and adapt its imports to the module moves since the vLLM commit it was vendored from.
-                PLUGIN=/models/spark-plugin-3e1040e
+                # and adapt its imports to the module moves since the vLLM commit it was vendored from. Its parser silently drops a call to
+                # a tool that was not declared, which would turn a model's mistake into an empty reply; pass those calls through so the
+                # client can answer "unknown tool" as it does for any other model.
+                PLUGIN=/models/spark-plugin-3e1040e-passthrough
                 if [ ! -d "$PLUGIN" ]; then
                   pip install --no-deps --target "$PLUGIN.tmp" https://github.com/XHToken/Spark-plugin/archive/3e1040e63a5907e4c748a485d6795d739dcd5bd6.tar.gz
                   python3 - "$PLUGIN.tmp/vllm_spark2_5_plugin" <<'PY'
@@ -39,6 +41,7 @@ spec:
                 model.write_text(model.read_text().replace("skip_prefixes=([\"lm_head.\"] if self.config.tie_word_embeddings else None),", ""))
                 parser = root / "spark2_5_tool_parser.py"
                 text = parser.read_text()
+                text = text.replace("    if tools and not find_tool_name(tools, function_name):\n        return None\n", "")
                 text = text.replace("from vllm.entrypoints.chat_utils import make_tool_call_id", "from vllm.renderers.chat_utils import make_tool_call_id")
                 old = text[text.index("from vllm.entrypoints.openai.engine.protocol import ("):]
                 old = old[: old.index(")") + 1]
