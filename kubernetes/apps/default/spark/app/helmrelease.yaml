@@ -1,0 +1,134 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app spark
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  interval: 1h
+  # The first start pulls a 10 GB image and the weights, then compiles.
+  timeout: 30m
+  values:
+    controllers:
+      spark:
+        # Scaled to zero between Aberrant test runs; the manifests stay so one commit brings it back.
+        replicas: 1
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: docker.io/vllm/vllm-openai
+              tag: v0.32.0@sha256:befccf0e7e4089aa23926bb6f887a85c0d46c2a99e6de5c5ffdf5cb7957c5b34
+            command:
+              - /bin/bash
+              - -ec
+            args:
+              - |
+                # Spark2_5 is not in vLLM 0.32 yet: install the vendor's out-of-tree plugin (pinned commit) onto the PVC
+                # and adapt its imports to the module moves since the vLLM commit it was vendored from.
+                PLUGIN=/models/spark-plugin-3e1040e
+                if [ ! -d "$PLUGIN" ]; then
+                  pip install --no-deps --target "$PLUGIN.tmp" https://github.com/XHToken/Spark-plugin/archive/3e1040e63a5907e4c748a485d6795d739dcd5bd6.tar.gz
+                  python3 - "$PLUGIN.tmp/vllm_spark2_5_plugin" <<'PY'
+                import pathlib, sys
+                root = pathlib.Path(sys.argv[1])
+                model = root / "spark2_5.py"
+                model.write_text(model.read_text().replace("skip_prefixes=([\"lm_head.\"] if self.config.tie_word_embeddings else None),", ""))
+                parser = root / "spark2_5_tool_parser.py"
+                text = parser.read_text()
+                text = text.replace("from vllm.entrypoints.chat_utils import make_tool_call_id", "from vllm.renderers.chat_utils import make_tool_call_id")
+                old = text[text.index("from vllm.entrypoints.openai.engine.protocol import ("):]
+                old = old[: old.index(")") + 1]
+                text = text.replace(old, "from vllm.entrypoints.generate.base.protocol import DeltaFunctionCall, DeltaToolCall, ExtractedToolCallInformation\nfrom vllm.entrypoints.openai.chat_completion.protocol import DeltaMessage, FunctionCall, ToolCall")
+                parser.write_text(text)
+                PY
+                  mv "$PLUGIN.tmp" "$PLUGIN"
+                fi
+                export PYTHONPATH="$PLUGIN"
+                exec vllm serve tuevuong/Spark-X2.6-4B-NVFP4A16 \
+                  --revision 3411b3ffd8349090289d7e580e61aec2baf6b8ac \
+                  --served-model-name spark-x2.6-4b \
+                  --trust-remote-code \
+                  --host 0.0.0.0 --port 8000 \
+                  --max-model-len 65536 \
+                  --gpu-memory-utilization 0.40 \
+                  --max-num-seqs 16 \
+                  --max-num-batched-tokens 8192 \
+                  --enable-prefix-caching \
+                  --enable-auto-tool-choice --tool-call-parser spark25 \
+                  --reasoning-parser qwen3
+            env:
+              TZ: America/New_York
+              HF_HOME: /models/hf
+              VLLM_CACHE_ROOT: /models/vllm-cache
+              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_VISIBLE_DEVICES: all
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 8000
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 180
+            resources:
+              requests:
+                cpu: 2
+                memory: 6Gi
+                nvidia.com/gpu: 1
+              limits:
+                memory: 16Gi
+                nvidia.com/gpu: 1
+    defaultPodOptions:
+      runtimeClassName: nvidia
+      nodeSelector:
+        node.kubernetes.io/gpu: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+    persistence:
+      models:
+        type: persistentVolumeClaim
+        storageClass: ceph-block
+        accessMode: ReadWriteOnce
+        size: 30Gi
+        globalMounts:
+          - path: /models
+      shm:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 2Gi
+        globalMounts:
+          - path: /dev/shm
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
