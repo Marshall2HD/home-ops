@@ -12,8 +12,10 @@ spec:
   postBuild:
     substitute:
       APP: proto
-      # Holds only settings.json (the TTS channel per server).
-      KOPIUR_CAPACITY: 1Gi
+      # Holds only settings.json (the TTS channel per server). The same value
+      # sizes the Kopia cache PVC, which needs more than 1Gi (512 MB content
+      # cache plus 1 GiB metadata cache), so snapshots failed with ENOSPC.
+      KOPIUR_CAPACITY: 2Gi
   prune: true
   sourceRef:
     kind: GitRepository
