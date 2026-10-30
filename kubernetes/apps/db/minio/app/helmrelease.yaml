@@ -17,7 +17,7 @@ spec:
           app:
             image:
               repository: cgr.dev/chainguard/minio
-              tag: latest@sha256:dc455cdd4db6e390b1b26514f15ff37681a777bf8dab41aac445a0259f751e56
+              tag: latest@sha256:3b6e40c30ecd5cea627e382ff0b82ca841f58c52294578787043ee80c8ef7c82
             args:
               - server
               - /data
