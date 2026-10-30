@@ -3,7 +3,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: nano-embed
+  name: embedding
 spec:
   interval: 15m
   layerSelector:

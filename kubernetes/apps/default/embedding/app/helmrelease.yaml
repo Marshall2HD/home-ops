@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app nano-embed
+  name: &app embedding
 spec:
   chartRef:
     kind: OCIRepository
@@ -12,7 +12,7 @@ spec:
   timeout: 30m
   values:
     controllers:
-      nano-embed:
+      embedding:
         strategy: Recreate
         containers:
           app:
@@ -26,7 +26,7 @@ spec:
             args:
               - |
                 # Our distilled voyage-4-nano (0.34B, embedding-research clean3-s0, BF16 checkpoint). The weights are not public: they are
-                # copied onto the PVC once with `kubectl cp` (KnowledgeBase infra note nano-embed-l4-2026-10-30.md), so wait for them.
+                # copied onto the PVC once with `kubectl cp` (KnowledgeBase infra note embedding-l4-2026-10-30.md), so wait for them.
                 MODEL=/models/clean3-s0
                 until [ -f "$MODEL/model.safetensors" ] && [ -f "$MODEL/.complete" ]; do echo "waiting for $MODEL"; sleep 10; done
                 # FP8 W8A8 (dynamic, from the BF16 weights): the L4 has FP8 tensor cores but no FP4 ones, where NVFP4 would run as
@@ -35,7 +35,7 @@ spec:
                 #   document: "Represent the document for retrieval: "
                 # and `dimensions: 1024` for memini and Kritika's 1024-d prefix (trained with MRL at 1024/512/256).
                 exec vllm serve "$MODEL" \
-                  --served-model-name nano-embed \
+                  --served-model-name voyage-4-nano-distill \
                   --runner pooling --convert embed \
                   --trust-remote-code \
                   --hf-overrides '{"architectures":["VoyageQwen3BidirectionalEmbedModel"],"is_matryoshka":true}' \

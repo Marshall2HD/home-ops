@@ -18,6 +18,7 @@ resources:
   - ./chaski/ks.yaml
   - ./cleanrr/ks.yaml
   - ./cobalt/ks.yaml
+  - ./embedding/ks.yaml
   - ./flaresolverr/ks.yaml
   - ./home-assistant/ks.yaml
   - ./langfuse/ks.yaml
@@ -26,7 +27,6 @@ resources:
   - ./memini/ks.yaml
   - ./minecraft/ks.yaml
   - ./mosquitto/ks.yaml
-  - ./nano-embed/ks.yaml
   - ./open-webui/ks.yaml
   - ./plex/ks.yaml
   - ./proto/ks.yaml

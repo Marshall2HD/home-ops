@@ -3,7 +3,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: nano-embed
+  name: embedding
 spec:
   dependsOn:
     - name: rook-ceph-cluster
@@ -11,7 +11,7 @@ spec:
     - name: nvidia-device-plugin
       namespace: kube-system
   interval: 1h
-  path: ./kubernetes/apps/default/nano-embed/app
+  path: ./kubernetes/apps/default/embedding/app
   prune: true
   sourceRef:
     kind: GitRepository
