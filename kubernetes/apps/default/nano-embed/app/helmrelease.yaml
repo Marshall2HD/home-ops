@@ -1,0 +1,120 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app nano-embed
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  interval: 1h
+  timeout: 30m
+  values:
+    controllers:
+      nano-embed:
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              # Same image as spark, so the node already has it.
+              repository: docker.io/vllm/vllm-openai
+              tag: v0.32.0@sha256:befccf0e7e4089aa23926bb6f887a85c0d46c2a99e6de5c5ffdf5cb7957c5b34
+            command:
+              - /bin/bash
+              - -ec
+            args:
+              - |
+                # Our distilled voyage-4-nano (0.34B, embedding-research clean3-s0, BF16 checkpoint). The weights are not public: they are
+                # copied onto the PVC once with `kubectl cp` (KnowledgeBase infra note nano-embed-l4-2026-10-30.md), so wait for them.
+                MODEL=/models/clean3-s0
+                until [ -f "$MODEL/model.safetensors" ] && [ -f "$MODEL/.complete" ]; do echo "waiting for $MODEL"; sleep 10; done
+                # FP8 W8A8 (dynamic, from the BF16 weights): the L4 has FP8 tensor cores but no FP4 ones, where NVFP4 would run as
+                # weight-only W4A16 with BF16 math. Clients send the prompts themselves:
+                #   query:    "Represent the query for retrieving supporting documents: "
+                #   document: "Represent the document for retrieval: "
+                # and `dimensions: 1024` for memini and Kritika's 1024-d prefix (trained with MRL at 1024/512/256).
+                exec vllm serve "$MODEL" \
+                  --served-model-name nano-embed \
+                  --runner pooling --convert embed \
+                  --trust-remote-code \
+                  --hf-overrides '{"architectures":["VoyageQwen3BidirectionalEmbedModel"],"is_matryoshka":true}' \
+                  --pooler-config '{"pooling_type":"MEAN"}' \
+                  --quantization fp8 \
+                  --host 0.0.0.0 --port 8000 \
+                  --max-model-len 32768 \
+                  --max-num-seqs 256 \
+                  --gpu-memory-utilization 0.12
+            env:
+              TZ: America/New_York
+              HF_HUB_OFFLINE: "1"
+              VLLM_CACHE_ROOT: /models/vllm-cache
+              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_VISIBLE_DEVICES: all
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 8000
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  # The first start waits for the weights to be copied in.
+                  failureThreshold: 360
+            resources:
+              requests:
+                cpu: 1
+                memory: 3Gi
+                nvidia.com/gpu: 1
+              limits:
+                memory: 8Gi
+                nvidia.com/gpu: 1
+    defaultPodOptions:
+      runtimeClassName: nvidia
+      nodeSelector:
+        node.kubernetes.io/gpu: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+    persistence:
+      models:
+        type: persistentVolumeClaim
+        storageClass: ceph-block
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        globalMounts:
+          - path: /models
+      shm:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 1Gi
+        globalMounts:
+          - path: /dev/shm
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.hades.casa"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
