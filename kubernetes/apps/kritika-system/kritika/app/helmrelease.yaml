@@ -63,13 +63,19 @@ spec:
           type: openai
           baseUrl: https://metaxu.falkerie.com/v1
           apiKey: { env: KRITIKA_METAXU_API_KEY }
-      # Upstream's embedder and prompts, served by Voyage directly instead of OpenRouter
+        # Our distilled voyage-4-nano on the L4 (the `embedding` app), 2026-10-31; was voyage/voyage-code-4
+        embedding:
+          type: openai
+          baseUrl: http://embedding.default.svc.cluster.local:8000/v1
+      # Same prompts as voyage-code-4 used (the model was trained with them)
       embedding:
-        model: voyage/voyage-code-4
+        model: embedding/voyage-4-nano-distill
         dims: 1024
         documentPrompt: "Represent the document for retrieval: "
         queryPrompt: "Represent the query for retrieving supporting documents: "
-        similarFloor: 0.3
+        # voyage-code-4 packs home-ops's chunk pairs near cosine 0.8 (median 0.80), so 0.3 cut only the bottom 5.5%;
+        # the same quantile on our model is 0.155
+        similarFloor: 0.15
       egress:
         allow: ["*"]
         deny: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, "*.internal", "*.hades.casa"]
@@ -138,6 +144,16 @@ spec:
                   rook_object_store: ceph-objectstore
           ports:
             - port: 8080
+        # the `embedding` app in default (vLLM listens on 8000)
+        - to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: default
+              podSelector:
+                matchLabels:
+                  app.kubernetes.io/name: embedding
+          ports:
+            - port: 8000
       postgres:
         podSelector:
           cnpg.io/cluster: kritika-postgres
