@@ -1,0 +1,81 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app anvil-dev
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: *app
+  interval: 1h
+  timeout: 30m
+  values:
+    controllers:
+      anvil-dev:
+        # Development pod for Anvil (internal/private/anvil), the hand-built embedding engine that will replace vLLM in
+        # `embedding`. Scaled to zero at rest like `spark`; `kubectl -n default scale deploy/anvil-dev --replicas=1` for a
+        # session and back to 0 after. It builds and runs on the L4 itself; toolchains, weights and traces live on the PVC.
+        replicas: 0
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              # Same image as `embedding`, so the node already has it and the vLLM baseline can be profiled here.
+              repository: docker.io/vllm/vllm-openai
+              tag: v0.32.0@sha256:befccf0e7e4089aa23926bb6f887a85c0d46c2a99e6de5c5ffdf5cb7957c5b34
+            command:
+              - /bin/bash
+              - -c
+            args:
+              - |
+                # /work/env.sh (on the PVC) puts the Rust, LLVM and Nsight installs on PATH.
+                [ -f /work/env.sh ] && . /work/env.sh
+                exec sleep infinity
+            env:
+              TZ: America/New_York
+              HF_HUB_OFFLINE: "1"
+              VLLM_CACHE_ROOT: /work/vllm-cache
+              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_VISIBLE_DEVICES: all
+            securityContext:
+              # Nsight Compute reads the GPU performance counters, which the driver restricts to admin processes.
+              capabilities:
+                add:
+                  - SYS_ADMIN
+            resources:
+              requests:
+                cpu: 2
+                memory: 4Gi
+                nvidia.com/gpu: 1
+              limits:
+                memory: 48Gi
+                nvidia.com/gpu: 1
+    defaultPodOptions:
+      runtimeClassName: nvidia
+      nodeSelector:
+        node.kubernetes.io/gpu: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+    persistence:
+      work:
+        type: persistentVolumeClaim
+        storageClass: ceph-block
+        accessMode: ReadWriteOnce
+        size: 80Gi
+        globalMounts:
+          - path: /work
+      shm:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 4Gi
+        globalMounts:
+          - path: /dev/shm
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 8000
