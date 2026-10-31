@@ -33,13 +33,14 @@ spec:
                 # weight-only W4A16 with BF16 math. Clients send the prompts themselves:
                 #   query:    "Represent the query for retrieving supporting documents: "
                 #   document: "Represent the document for retrieval: "
-                # and `dimensions: 1024` for memini and Kritika's 1024-d prefix (trained with MRL at 1024/512/256).
+                # Output defaults to the 1024-d prefix memini and Kritika store (MRL-trained at 1024/512/256; memini sends no
+                # `dimensions`); a request can still ask for another size.
                 exec vllm serve "$MODEL" \
                   --served-model-name voyage-4-nano-distill \
                   --runner pooling --convert embed \
                   --trust-remote-code \
                   --hf-overrides '{"architectures":["VoyageQwen3BidirectionalEmbedModel"],"is_matryoshka":true}' \
-                  --pooler-config '{"pooling_type":"MEAN"}' \
+                  --pooler-config '{"pooling_type":"MEAN","dimensions":1024}' \
                   --quantization fp8 \
                   --host 0.0.0.0 --port 8000 \
                   --max-model-len 32768 \

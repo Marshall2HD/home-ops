@@ -67,6 +67,8 @@ spec:
         embedding:
           type: openai
           baseUrl: http://embedding.default.svc.cluster.local:8000/v1
+          # The config requires an env reference; vLLM ignores the header
+          apiKey: { env: KRITIKA_METAXU_API_KEY }
       # Same prompts as voyage-code-4 used (the model was trained with them)
       embedding:
         model: embedding/voyage-4-nano-distill
