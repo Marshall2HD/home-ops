@@ -196,6 +196,13 @@
       allowedVersions: ">=1.20.0 <1.21.0",
     },
     {
+      // MAM's tracker answers 5.3.0 with "client not allowed"; lift this once
+      // MAM lists 5.3 as an approved client
+      description: "Hold qBittorrent at 5.2.x, which MyAnonamouse accepts",
+      matchPackageNames: ["/qbittorrent/"],
+      allowedVersions: "<5.3.0",
+    },
+    {
       description: "1Password CLI is not resolvable on GitHub, bump manually",
       matchManagers: ["mise"],
       matchDepNames: ["1password-cli"],
