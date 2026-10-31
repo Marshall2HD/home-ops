@@ -25,9 +25,9 @@ spec:
               - -ec
             args:
               - |
-                # Our distilled voyage-4-nano (0.34B, embedding-research clean3-s0, BF16 checkpoint). The weights are not public: they are
+                # Our distilled voyage-4-nano (0.34B, embedding-research clean-long-s0, BF16 checkpoint; clean3-s0 until 2026-10-31). The weights are not public: they are
                 # copied onto the PVC once with `kubectl cp` (KnowledgeBase infra note embedding-l4-2026-10-30.md), so wait for them.
-                MODEL=/models/clean3-s0
+                MODEL=/models/clean-long-s0
                 until [ -f "$MODEL/model.safetensors" ] && [ -f "$MODEL/.complete" ]; do echo "waiting for $MODEL"; sleep 10; done
                 # FP8 W8A8 (dynamic, from the BF16 weights): the L4 has FP8 tensor cores but no FP4 ones, where NVFP4 would run as
                 # weight-only W4A16 with BF16 math. Clients send the prompts themselves:
