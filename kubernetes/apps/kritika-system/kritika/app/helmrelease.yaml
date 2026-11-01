@@ -75,8 +75,11 @@ spec:
         dims: 1024
         documentPrompt: "Represent the document for retrieval: "
         queryPrompt: "Represent the query for retrieving supporting documents: "
-        # voyage-code-4 packs home-ops's chunk pairs near cosine 0.8 (median 0.80), so 0.3 cut only the bottom 5.5%;
-        # the same quantile on our model is 0.155
+        # Checked 2026-11-01 by replaying stage 4 on 105 home-ops commits (214 hunk queries, top 4 each, margin 0.1).
+        # On voyage-code-4, 0.3 dropped 7% of hits, all from 8 queries that had no hit at 0.3; those were misses
+        # (an envoy bump whose best hit was flux-metrics.yaml) that our model answers with the right sibling file.
+        # Our hits run 0.52-0.78 (p5-p95) and no score separates junk, so 0.15 drops nothing in practice; set a
+        # real floor only once there are labelled junk hits to calibrate it on.
         similarFloor: 0.15
       egress:
         allow: ["*"]
