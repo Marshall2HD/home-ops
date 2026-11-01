@@ -52,6 +52,10 @@ spec:
                 memory: 48Gi
                 nvidia.com/gpu: 1
     defaultPodOptions:
+      # Host PID namespace: the benchmark contamination guard needs to see the co-tenants' GPU processes
+      # (`nvidia-smi pmon` / compute-apps only list PIDs visible to the caller; with time-slicing that otherwise
+      # hides `embedding` and `whisper`) and builds or other heavy processes on the node.
+      hostPID: true
       runtimeClassName: nvidia
       nodeSelector:
         node.kubernetes.io/gpu: "true"
