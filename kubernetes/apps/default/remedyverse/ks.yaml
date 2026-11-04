@@ -3,6 +3,40 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: remedyverse-database
+spec:
+  components:
+    - ../../../../components/kopiur/cnpg
+  dependsOn:
+    - name: cloudnative-pg
+      namespace: cnpg-system
+    - name: kopiur-repository
+      namespace: kopiur-system
+  healthChecks:
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      name: remedyverse-postgres
+      namespace: default
+  healthCheckExprs:
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      current: status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
+  interval: 1h
+  path: ./kubernetes/apps/default/remedyverse/database
+  postBuild:
+    substitute:
+      APP: remedyverse
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: default
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: remedyverse
 spec:
   components:
@@ -10,8 +44,7 @@ spec:
   dependsOn:
     - name: kopiur-repository
       namespace: kopiur-system
-    - name: postgres
-      namespace: database
+    - name: remedyverse-database
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h

@@ -21,7 +21,7 @@ spec:
               tag: main@sha256:0f23ed0d8e85c029e9694cba4f841ab01e6102d0e58d7cd132658595ddbba112
             command: [remedyverse-init]
             env: &env
-              MEDIAWIKI_DB_HOST: postgres.database.svc.cluster.local
+              MEDIAWIKI_DB_HOST: remedyverse-postgres-rw.default.svc.cluster.local
               MEDIAWIKI_DB_NAME: remedyverse
               MEDIAWIKI_DB_USER: remedyverse
               TZ: America/New_York
@@ -103,7 +103,7 @@ spec:
               - -ec
               - |
                 pg_dump --format=custom --no-owner --file=/dump/remedyverse.dump.tmp \
-                  --host=postgres.database.svc.cluster.local --username=remedyverse remedyverse
+                  --host=remedyverse-postgres-rw.default.svc.cluster.local --username=remedyverse remedyverse
                 mv /dump/remedyverse.dump.tmp /dump/remedyverse.dump
                 ls -l /dump
             envFrom:

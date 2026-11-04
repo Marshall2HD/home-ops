@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: open-webui-postgres
+spec:
+  instances: 1 # Single node: a standby would share the same host and disks
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bookworm
+  storage:
+    size: 5Gi
+    storageClass: ceph-block
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  bootstrap:
+    initdb:
+      database: open_webui
+      owner: open_webui
+      secret:
+        name: open-webui-postgres-credentials
+      # One-time copy from the shared Postgres this replaced; only read at creation.
+      import:
+        type: microservice
+        databases:
+          - open_webui
+        source:
+          externalCluster: database-postgres
+  externalClusters:
+    - name: database-postgres
+      connectionParameters:
+        host: postgres.database.svc.cluster.local
+        user: postgres
+        dbname: postgres
+      password:
+        name: open-webui-postgres-credentials
+        key: import-password

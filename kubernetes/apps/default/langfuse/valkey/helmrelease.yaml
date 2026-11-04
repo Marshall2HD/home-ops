@@ -1,0 +1,103 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: langfuse-valkey
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: langfuse-valkey
+  interval: 1h
+  values:
+    controllers:
+      langfuse-valkey:
+        type: statefulset
+        containers:
+          app:
+            image:
+              repository: docker.io/valkey/valkey
+              tag: 9-alpine@sha256:48332870af354a799964c0012ae1194a0bf2bf894eb508f945810596dc2d8d11
+            command:
+              - /bin/sh
+              - -ec
+              - exec valkey-server --appendonly yes --dir /data --requirepass "$VALKEY_PASSWORD" --maxmemory-policy noeviction --save ""
+            env:
+              VALKEY_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: langfuse-valkey-secret
+                    key: VALKEY_PASSWORD
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /bin/sh
+                      - -ec
+                      - valkey-cli -a "$VALKEY_PASSWORD" ping | grep -q PONG
+                  initialDelaySeconds: 20
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /bin/sh
+                      - -ec
+                      - valkey-cli -a "$VALKEY_PASSWORD" ping | grep -q PONG
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /bin/sh
+                      - -ec
+                      - valkey-cli -a "$VALKEY_PASSWORD" ping | grep -q PONG
+                  initialDelaySeconds: 10
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 25m
+                memory: 512Mi
+              # An AOF rewrite forks a copy-on-write child, and the cgroup is
+              # charged for its dirtied pages, so peak usage is roughly double
+              # the dataset. 512Mi only fit the job until the queue outgrew it
+              # and valkey started getting OOM-killed mid-rewrite.
+              limits:
+                memory: 3Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        ports:
+          redis:
+            port: 6379
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        storageClass: ceph-block
+        accessMode: ReadWriteOnce
+        size: 2Gi
+        globalMounts:
+          - path: /data

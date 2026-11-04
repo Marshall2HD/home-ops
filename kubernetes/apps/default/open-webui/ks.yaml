@@ -3,6 +3,40 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: open-webui-database
+spec:
+  components:
+    - ../../../../components/kopiur/cnpg
+  dependsOn:
+    - name: cloudnative-pg
+      namespace: cnpg-system
+    - name: kopiur-repository
+      namespace: kopiur-system
+  healthChecks:
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      name: open-webui-postgres
+      namespace: default
+  healthCheckExprs:
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      current: status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
+  interval: 1h
+  path: ./kubernetes/apps/default/open-webui/database
+  postBuild:
+    substitute:
+      APP: open-webui
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: default
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: open-webui
 spec:
   components:
@@ -10,8 +44,7 @@ spec:
   dependsOn:
     - name: kopiur-repository
       namespace: kopiur-system
-    - name: postgres
-      namespace: database
+    - name: open-webui-database
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
