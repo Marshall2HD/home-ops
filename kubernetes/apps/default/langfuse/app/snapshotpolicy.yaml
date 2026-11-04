@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kopiur.home-operations.com/snapshotpolicy_v1alpha1.json
+# ClickHouse holds Langfuse's traces. It recovers from a crash-consistent
+# volume snapshot, so the volume is backed up like any other app's.
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: langfuse-clickhouse
+spec:
+  compression:
+    compressor: zstd
+  mover:
+    cache:
+      capacity: 10Gi
+      mode: Persistent
+      storageClassName: miroir-slow
+    securityContext:
+      runAsUser: 1001 # ClickHouse's user
+      runAsGroup: 1001
+  repository:
+    kind: ClusterRepository
+    name: hypnos
+  retention:
+    keepLatest: 3
+    keepHourly: 24
+    keepDaily: 7
+    keepWeekly: 4
+  sources:
+    - pvc:
+        name: data-langfuse-clickhouse-shard0-0
+  volumeSnapshotClassName: csi-ceph-blockpool

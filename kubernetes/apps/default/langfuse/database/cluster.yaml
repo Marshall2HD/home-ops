@@ -22,3 +22,8 @@ spec:
       owner: langfuse
       secret:
         name: langfuse-postgres-credentials
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: langfuse-postgres

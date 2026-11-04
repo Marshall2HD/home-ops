@@ -22,3 +22,8 @@ spec:
       owner: open_webui
       secret:
         name: open-webui-postgres-credentials
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: open-webui-postgres

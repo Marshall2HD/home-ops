@@ -22,3 +22,8 @@ spec:
       owner: remedyverse
       secret:
         name: remedyverse-postgres-credentials
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: remedyverse-postgres

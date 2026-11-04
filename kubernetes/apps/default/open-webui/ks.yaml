@@ -6,12 +6,13 @@ metadata:
   name: open-webui-database
 spec:
   components:
+    - ../../../../components/cnpg/backup
     - ../../../../components/kopiur/cnpg
   dependsOn:
-    - name: cloudnative-pg
-      namespace: cnpg-system
     - name: kopiur-repository
       namespace: kopiur-system
+    - name: plugin-barman-cloud
+      namespace: cnpg-system
   healthChecks:
     - apiVersion: postgresql.cnpg.io/v1
       kind: Cluster

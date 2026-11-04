@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/barmancloud.cnpg.io/objectstore_v1.json
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: ${APP}-postgres
+spec:
+  configuration:
+    # Barman adds the cluster name, so each cluster lands in cnpg/<cluster>/.
+    destinationPath: s3://cnpg/
+    endpointURL: http://hypnos.internal:3900
+    s3Credentials:
+      accessKeyId:
+        name: ${APP}-postgres-backup
+        key: AWS_ACCESS_KEY_ID
+      secretAccessKey:
+        name: ${APP}-postgres-backup
+        key: AWS_SECRET_ACCESS_KEY
+      region:
+        name: ${APP}-postgres-backup
+        key: AWS_REGION
+    data:
+      compression: gzip
+    wal:
+      compression: gzip
+  retentionPolicy: 30d
