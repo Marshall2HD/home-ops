@@ -22,19 +22,3 @@ spec:
       owner: open_webui
       secret:
         name: open-webui-postgres-credentials
-      # One-time copy from the shared Postgres this replaced; only read at creation.
-      import:
-        type: microservice
-        databases:
-          - open_webui
-        source:
-          externalCluster: database-postgres
-  externalClusters:
-    - name: database-postgres
-      connectionParameters:
-        host: postgres.database.svc.cluster.local
-        user: postgres
-        dbname: postgres
-      password:
-        name: open-webui-postgres-credentials
-        key: import-password

@@ -22,19 +22,3 @@ spec:
       owner: remedyverse
       secret:
         name: remedyverse-postgres-credentials
-      # One-time copy from the shared Postgres this replaced; only read at creation.
-      import:
-        type: microservice
-        databases:
-          - remedyverse
-        source:
-          externalCluster: database-postgres
-  externalClusters:
-    - name: database-postgres
-      connectionParameters:
-        host: postgres.database.svc.cluster.local
-        user: postgres
-        dbname: postgres
-      password:
-        name: remedyverse-postgres-credentials
-        key: import-password
