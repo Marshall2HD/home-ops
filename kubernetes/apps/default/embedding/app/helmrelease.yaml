@@ -17,40 +17,34 @@ spec:
         containers:
           app:
             image:
-              # Same image as spark, so the node already has it.
-              repository: docker.io/vllm/vllm-openai
-              tag: v0.32.0@sha256:befccf0e7e4089aa23926bb6f887a85c0d46c2a99e6de5c5ffdf5cb7957c5b34
+              # Anvil (github.com/Marshall2HD/anvil, v1.0.0-l4) is one static Rust/CUDA binary that needs only glibc and the
+              # driver's libcuda, which the NVIDIA runtime injects. The repository is private and the cluster pulls only
+              # public images, so the binary sits on the PVC next to the private weights (copied once, like them; the
+              # release asset of the tag) and this stock image runs it. Built on Ubuntu 24.04, so the same glibc.
+              repository: docker.io/library/ubuntu
+              tag: 24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852
             command:
               - /bin/bash
               - -ec
             args:
               - |
-                # Our distilled voyage-4-nano (0.34B, embedding-research clean-long-s0, BF16 checkpoint; clean3-s0 until 2026-10-31). The weights are not public: they are
-                # copied onto the PVC once with `kubectl cp` (KnowledgeBase infra note embedding-l4-2026-10-30.md), so wait for them.
-                MODEL=/models/clean-long-s0
-                until [ -f "$MODEL/model.safetensors" ] && [ -f "$MODEL/.complete" ]; do echo "waiting for $MODEL"; sleep 10; done
-                # FP8 W8A8 (dynamic, from the BF16 weights): the L4 has FP8 tensor cores but no FP4 ones, where NVFP4 would run as
-                # weight-only W4A16 with BF16 math. Clients send the prompts themselves:
+                # Our distilled voyage-4-nano (0.34B, embedding-research clean-long-s0, BF16 checkpoint), served by Anvil:
+                # FP8 W8A8 GEMMs and 8-bit attention (INT8 Q·Kᵀ, FP8 P·V), quantized from the BF16 weights at start.
+                # Same contract as vLLM 0.32 before it (/v1/embeddings, /v1/models, /health, /metrics; served name
+                # voyage-4-nano-distill; 1024-d default output, `dimensions` honoured). Clients send the prompts themselves:
                 #   query:    "Represent the query for retrieving supporting documents: "
                 #   document: "Represent the document for retrieval: "
-                # Output defaults to the 1024-d prefix memini and Kritika store (MRL-trained at 1024/512/256; memini sends no
-                # `dimensions`); a request can still ask for another size.
-                exec vllm serve "$MODEL" \
-                  --served-model-name voyage-4-nano-distill \
-                  --runner pooling --convert embed \
-                  --trust-remote-code \
-                  --hf-overrides '{"architectures":["VoyageQwen3BidirectionalEmbedModel"],"is_matryoshka":true}' \
-                  --pooler-config '{"pooling_type":"MEAN","dimensions":1024}' \
-                  --quantization fp8 \
-                  --host 0.0.0.0 --port 8000 \
-                  --max-model-len 32768 \
-                  --max-num-seqs 256 \
-                  --gpu-memory-utilization 0.12
+                # vLLM's manifest is the previous commit of this file (revert it to go back).
+                MODEL=/models/clean-long-s0
+                BIN=/models/anvil/v1.0.0-l4/anvil
+                until [ -f "$MODEL/model.safetensors" ] && [ -f "$MODEL/.complete" ] && [ -f "$BIN" ]; do
+                  echo "waiting for $MODEL and $BIN"; sleep 10
+                done
+                echo "7fa898fa4a71e1502211001a44b99a07829bf88ae72ada0f27fe2310fb6cddc2  $BIN" | sha256sum -c -
+                exec "$BIN" serve "$MODEL" --host 0.0.0.0 --port 8000 --served-model-name voyage-4-nano-distill
             env:
               TZ: America/New_York
-              HF_HUB_OFFLINE: "1"
-              VLLM_CACHE_ROOT: /models/vllm-cache
-              NVIDIA_DRIVER_CAPABILITIES: all
+              NVIDIA_DRIVER_CAPABILITIES: compute,utility
               NVIDIA_VISIBLE_DEVICES: all
             probes:
               liveness: &probes
