@@ -215,7 +215,7 @@ spec:
             replicated:
               size: 2
             quotas:
-              maxSize: 100Gi
+              maxSize: 200Gi # Langfuse's event bucket alone is about 65Gi
           preservePoolsOnDelete: true
           gateway:
             port: 80
