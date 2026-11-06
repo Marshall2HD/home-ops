@@ -1,0 +1,100 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: teamspeak
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: teamspeak
+  interval: 1h
+  values:
+    controllers:
+      teamspeak:
+        # One WireGuard key and one RWO volume: never run two pods at once.
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          # Public traffic reaches TeamSpeak only through Hades (teamspeak.falkerie.com):
+          # Hades DNATs 9987/udp and 30033/tcp to 10.254.66.2 without SNAT, so the server
+          # sees real client IPs. This puts 10.254.66.2 on a WireGuard link to Hades in the
+          # pod's network namespace, which outlives this container, and sends all internet
+          # traffic (replies included) back through Hades. Cluster and LAN ranges stay on eth0.
+          wireguard:
+            image:
+              repository: lscr.io/linuxserver/wireguard
+              tag: 1.0.20260223-r0-ls129@sha256:236f9a9a89c701bc83f6d41007157dc77361114d14e56a08e846bb4499622e97
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                set -eu
+                gateway="$(ip -4 route show default | awk '{print $3; exit}')"
+                ip link delete wg0 2>/dev/null || true
+                ip link add wg0 type wireguard
+                wg setconf wg0 /wireguard/wg0.conf
+                ip address add 10.254.66.2/32 dev wg0
+                ip link set wg0 mtu 1420 up
+                endpoint="$(wg show wg0 endpoints | awk '{print $2}' | cut -d: -f1)"
+                for net in "$endpoint/32" 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do
+                  ip route replace "$net" via "$gateway" dev eth0
+                done
+                ip route replace default dev wg0
+                ip route
+            securityContext:
+              runAsUser: 0
+              runAsGroup: 0
+              runAsNonRoot: false
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"], add: ["NET_ADMIN"] }
+        containers:
+          app:
+            image:
+              repository: docker.io/teamspeaksystems/teamspeak6-server
+              tag: 6.0.0-beta13.1@sha256:d845f803aecf842c2df034c959c23ff2462357bacafb3807500885c5ec170fa1
+            env:
+              TSSERVER_LICENSE_ACCEPTED: accept
+              TZ: America/New_York
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 30033
+                  periodSeconds: 30
+                  failureThreshold: 3
+              readiness: *probe
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 512Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 9987
+        runAsGroup: 9987
+        fsGroup: 9987
+        fsGroupChangePolicy: OnRootMismatch
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        advancedMounts:
+          teamspeak:
+            app:
+              - path: /var/tsserver
+      wireguard:
+        type: secret
+        name: teamspeak-secret
+        advancedMounts:
+          teamspeak:
+            wireguard:
+              - path: /wireguard
+                readOnly: true

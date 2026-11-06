@@ -45,6 +45,7 @@ resources:
   - ./sonarr/ks.yaml
   - ./spark/ks.yaml
   - ./tautulli/ks.yaml
+  - ./teamspeak/ks.yaml
   - ./thelounge/ks.yaml
   - ./whisper/ks.yaml
   - ./zigbee/ks.yaml

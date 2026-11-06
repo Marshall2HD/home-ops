@@ -203,6 +203,16 @@
       allowedVersions: "<5.3.0",
     },
     {
+      // Each TeamSpeak 6 beta has a built-in license that expires
+      // (6.0.0-beta13.1: 2026-12-01), so updates must keep coming. Docker
+      // versioning treats -betaN as an incompatible suffix and never offers
+      // the next beta; the old v-prefixed tags (v6.0.0-beta2..8) don't match
+      // this regex, so they can't sort above the newer betas.
+      description: "Track TeamSpeak 6 betas and the eventual stable release",
+      matchPackageNames: ["/teamspeak6-server/"],
+      versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-(?<prerelease>beta\\d+(?:\\.\\d+)?))?$",
+    },
+    {
       description: "1Password CLI is not resolvable on GitHub, bump manually",
       matchManagers: ["mise"],
       matchDepNames: ["1password-cli"],
