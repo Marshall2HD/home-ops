@@ -28,19 +28,21 @@ spec:
               EULA: true
               FORCE_GAMEMODE: true
               ICON: https://i.imgur.com/1Pzv8xx.png
-              MAX_MEMORY: 8G
+              # Sets -Xms and -Xmx together, as Aikar's flags expect
+              MEMORY: 8G
               MODE: survival
               MOTD: "Powered by 100% §kVOID §r energy.§r\n                     (っ◕‿◕)っ"
               OVERRIDE_ICON: true
-              PAPER_BUILD: "121"
               PAUSE_WHEN_EMPTY_SECONDS: "600"
               SEED: 1691256543523180978
               SERVER_NAME: Gaia
               SPAWN_PROTECTION: 0
               TZ: America/New_York
               TYPE: PAPER
-              USE_MEOWICE_FLAGS: true
-              VERSION: "26.2"
+              # Paper's own recommended set for 26.x (fill API version.java.flags)
+              USE_AIKAR_FLAGS: true
+              # No PAPER_BUILD: the image takes the newest stable Paper build for VERSION
+              VERSION: "26.3"
               VIEW_DISTANCE: 32
             envFrom:
               - secretRef:
@@ -80,7 +82,8 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                memory: 2Gi
+                # AlwaysPreTouch commits the whole 8G heap at startup
+                memory: 8Gi
               limits:
                 memory: 10Gi
     defaultPodOptions:
@@ -101,7 +104,9 @@ spec:
           external-dns.alpha.kubernetes.io/target: mc-router.hades.casa
           external-dns.kubernetes.io/hostname: mc.hades.casa
           external-dns.kubernetes.io/target: mc-router.hades.casa
-          mc-router.itzg.me/externalServerName: mc.hades.casa
+          # hades.casa: from 26.4, clients that follow the _minecraft._tcp.hades.casa SRV
+          # record send the name the player typed, and mc-router routes on that
+          mc-router.itzg.me/externalServerName: mc.hades.casa,hades.casa
         ports:
           minecraft:
             port: 25565

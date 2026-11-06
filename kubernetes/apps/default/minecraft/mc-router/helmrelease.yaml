@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -11,8 +11,9 @@ spec:
     name: mc-router
   values:
     image:
-      repository: itzg/mc-router
+      repository: docker.io/itzg/mc-router
       tag: 1.54.2@sha256:1b2a7d924351b5ec9abe9e2c065ccdd3537043e008f892b5b9bdafecf1234975
+      # The chart defaults to Always
       pullPolicy: IfNotPresent
     podSecurityContext:
       runAsNonRoot: true
@@ -39,6 +40,15 @@ spec:
           lbipam.cilium.io/ips: 10.8.0.130
       extraServiceSpec:
         externalTrafficPolicy: Local
+    extraEnv:
+      # Paper is the only backend; don't watch Services cluster-wide
+      KUBE_NAMESPACE: default
+      # Player login log lines and Prometheus metrics
+      RECORD_LOGINS: "true"
+      TZ: America/New_York
     minecraftRouter:
+      # One token bucket for all clients (burst 2x), taken before the handshake, so
+      # internet scanners share it with players; a join is two connections (ping, login)
+      connectionRateLimit: 5
       metrics:
         backend: prometheus
