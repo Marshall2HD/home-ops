@@ -159,6 +159,7 @@
         commitMessageTopic: "{{{groupName}}} group",
       },
       minimumGroupSize: 5,
+      separateMinorPatch: true,
     },
     {
       // Scheduled tools stay out: a grouped branch takes its schedule from
