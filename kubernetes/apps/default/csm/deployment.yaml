@@ -35,7 +35,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: csm
-          image: pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime@sha256:417bd75df6365104c283ea4c1651fb3530d9eb5a4c2fafa51943cff2a94e6385
+          image: pytorch/pytorch:2.11.0-cuda12.8-cudnn9-runtime@sha256:eee11b3b3872a8c838e35ef48f08b2d5def2080902c7f666831310ca1a0ef2be
           command: [bash, /app/bootstrap.sh]
           env:
             - name: CSM_API_KEY
