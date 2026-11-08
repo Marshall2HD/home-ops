@@ -75,9 +75,12 @@ The `kata` RuntimeClass uses Cloud Hypervisor, not QEMU's nested-virtualization 
 Cilium now targets veth because released Kata does not support netkit. Preserve BPF
 host routing, BBR, native routing, BIG TCP and the single operator replica. Existing
 netkit pods must be recreated in a coordinated maintenance window, not silently left
-on a mixed datapath. Follow the [Kata rollout and isolation checks](apps/sandbox/README.md)
-before admitting workloads. This is not a default runtime change for infrastructure,
+on a mixed datapath. This is not a default runtime change for infrastructure,
 GPU applications, or the credentialed CI runner.
+
+Removed 2026-11-08: no workload ever used Kata, so the `sandbox` namespace, `kata`
+RuntimeClass, Talos extension and readiness label were dropped to match upstream.
+Cilium stays on veth, as upstream does.
 
 ## Roll out in stages
 
