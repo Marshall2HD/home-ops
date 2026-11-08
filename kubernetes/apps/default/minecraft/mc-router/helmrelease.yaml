@@ -52,3 +52,61 @@ spec:
       connectionRateLimit: 5
       metrics:
         backend: prometheus
+  # Public traffic reaches mc-router only through Hades (mc.hades.casa, mc.nyxta.net):
+  # Hades DNATs 25565/tcp to 10.254.66.3 without SNAT, so mc-router sees real client
+  # IPs. As for TeamSpeak, the init container puts 10.254.66.3 on a WireGuard link to
+  # Hades in the pod's network namespace and sends internet traffic (replies included)
+  # back through Hades; cluster and LAN ranges, so LAN players on 10.8.0.130, stay on
+  # eth0. The chart has no init container values, hence the post-render patch.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: mc-router
+            patch: |
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: mc-router
+                annotations:
+                  reloader.stakater.com/auto: "true"
+              spec:
+                template:
+                  spec:
+                    initContainers:
+                      - name: wireguard
+                        image: lscr.io/linuxserver/wireguard:1.0.20260223-r0-ls129@sha256:236f9a9a89c701bc83f6d41007157dc77361114d14e56a08e846bb4499622e97
+                        command: ["/bin/sh", "-c"]
+                        args:
+                          - |
+                            set -eu
+                            gateway="$(ip -4 route show default | awk '{print $3; exit}')"
+                            ip link delete wg0 2>/dev/null || true
+                            ip link add wg0 type wireguard
+                            wg setconf wg0 /wireguard/wg0.conf
+                            ip address add 10.254.66.3/32 dev wg0
+                            ip link set wg0 mtu 1420 up
+                            endpoint="$(wg show wg0 endpoints | awk '{print $2}' | cut -d: -f1)"
+                            for net in "$endpoint/32" 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do
+                              ip route replace "$net" via "$gateway" dev eth0
+                            done
+                            ip route replace default dev wg0
+                            ip route
+                        securityContext:
+                          runAsUser: 0
+                          runAsGroup: 0
+                          runAsNonRoot: false
+                          allowPrivilegeEscalation: false
+                          readOnlyRootFilesystem: true
+                          capabilities:
+                            drop: ["ALL"]
+                            add: ["NET_ADMIN"]
+                        volumeMounts:
+                          - name: wireguard
+                            mountPath: /wireguard
+                            readOnly: true
+                    volumes:
+                      - name: wireguard
+                        secret:
+                          secretName: mc-router-secret
