@@ -22,7 +22,7 @@ spec:
               # public images, so the binary sits on the PVC next to the private weights (copied once, like them; the
               # release asset of the tag) and this stock image runs it. Built on Ubuntu 24.04, so the same glibc.
               repository: docker.io/library/ubuntu
-              tag: 24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852
+              tag: 24.10@sha256:cdf755952ed117f6126ff4e65810bf93767d4c38f5c7185b50ec1f1078b464cc
             command:
               - /bin/bash
               - -ec
