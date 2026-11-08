@@ -10,6 +10,9 @@
   // main does not require up-to-date branches, and `auto` would
   // still rebase every automerge PR each time main moves
   rebaseWhen: "conflicted",
+  // The Mend app defaults this repo to dashboard approval after leaving Silent mode;
+  // updates should open PRs on their own, as upstream's do
+  dependencyDashboardApproval: false,
   fetchChangeLogs: "off",
   prFooter: "",
   packageRules: [
