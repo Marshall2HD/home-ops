@@ -161,11 +161,8 @@
       separateMinorPatch: true,
     },
     {
-      // Scheduled tools stay out: a grouped branch takes its schedule from
-      // whichever update sorts first
       description: "Mise Tools Group",
       matchManagers: ["mise"],
-      matchDepNames: ["!node", "!oxfmt"],
       groupName: "mise tools",
       groupSlug: "mise-tools",
     },
@@ -180,8 +177,7 @@
       minimumGroupSize: 2,
     },
     {
-      // After the mise tools catch-all so talos wins its own group; unites the
-      // mise pin, the factory installer image, and the tuppr upgrade version
+      // Unites the factory installer image and the tuppr upgrade version
       description: "Talos Group",
       groupName: "talos",
       matchPackageNames: ["siderolabs/talos"],
@@ -217,19 +213,6 @@
       description: "Track TeamSpeak 6 betas and the eventual stable release",
       matchPackageNames: ["/teamspeak6-server/"],
       versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-(?<prerelease>beta\\d+(?:\\.\\d+)?))?$",
-    },
-    {
-      description: "1Password CLI is not resolvable on GitHub, bump manually",
-      matchManagers: ["mise"],
-      matchDepNames: ["1password-cli"],
-      enabled: false,
-    },
-    // Scheduling rules
-    {
-      description: "High-cadence mise tools monthly",
-      matchManagers: ["mise"],
-      matchDepNames: ["node", "oxfmt"],
-      schedule: ["before 3am on the first day of the month"],
     },
     // Labeling rules
     {
