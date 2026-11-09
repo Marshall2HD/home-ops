@@ -108,9 +108,7 @@ spec:
           external-dns.alpha.kubernetes.io/target: mc-router.hades.casa
           external-dns.kubernetes.io/hostname: mc.hades.casa
           external-dns.kubernetes.io/target: mc-router.hades.casa
-          # hades.casa: from 26.4, clients that follow the _minecraft._tcp.hades.casa SRV
-          # record send the name the player typed, and mc-router routes on that
-          mc-router.itzg.me/externalServerName: mc.hades.casa,hades.casa
+          mc-router.itzg.me/externalServerName: mc.hades.casa
         ports:
           minecraft:
             port: 25565

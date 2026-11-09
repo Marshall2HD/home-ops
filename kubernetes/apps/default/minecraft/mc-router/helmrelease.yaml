@@ -56,7 +56,7 @@ spec:
       useProxyProtocol: true
       metrics:
         backend: prometheus
-  # Public traffic reaches mc-router only through Hades (mc.hades.casa, mc.nyxta.net):
+  # Public traffic reaches mc-router only through Hades (mc.hades.casa):
   # Hades DNATs 25565/tcp to 10.254.66.3 without SNAT, so mc-router sees real client
   # IPs. As for TeamSpeak, the init container puts 10.254.66.3 on a WireGuard link to
   # Hades in the pod's network namespace and sends internet traffic (replies included)
