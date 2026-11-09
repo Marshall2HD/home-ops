@@ -47,9 +47,10 @@ spec:
       RECORD_LOGINS: "true"
       TZ: America/New_York
     minecraftRouter:
-      # One token bucket for all clients (burst 2x), taken before the handshake, so
-      # internet scanners share it with players; a join is two connections (ping, login)
-      connectionRateLimit: 5
+      # One token bucket for all clients (burst 2x), taken before each accept. It delays
+      # new connections instead of dropping them, so it is only a ceiling on floods; the
+      # real peak is about 2/s and a join is two connections (ping, login)
+      connectionRateLimit: 30
       metrics:
         backend: prometheus
   # Public traffic reaches mc-router only through Hades (mc.hades.casa, mc.nyxta.net):
