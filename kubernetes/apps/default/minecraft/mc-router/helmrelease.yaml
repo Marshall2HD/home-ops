@@ -51,6 +51,9 @@ spec:
       # new connections instead of dropping them, so it is only a ceiling on floods; the
       # real peak is about 2/s and a join is two connections (ping, login)
       connectionRateLimit: 30
+      # PROXY protocol v2 to Paper, so Paper sees each player's real IP for its login
+      # throttle, logs and bans (Paper has proxies.proxy-protocol on to match)
+      useProxyProtocol: true
       metrics:
         backend: prometheus
   # Public traffic reaches mc-router only through Hades (mc.hades.casa, mc.nyxta.net):

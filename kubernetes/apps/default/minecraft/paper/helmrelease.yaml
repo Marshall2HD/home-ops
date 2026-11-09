@@ -44,6 +44,10 @@ spec:
               # No PAPER_BUILD: the image takes the newest stable Paper build for VERSION
               VERSION: "26.3"
               VIEW_DISTANCE: 32
+              # mc-router sends a PROXY protocol header (the patches ConfigMap turns it on
+              # in Paper), so the health check has to send one too
+              MC_HEALTH_EXTRA_ARGS: --use-proxy
+              PATCH_DEFINITIONS: /patches
             envFrom:
               - secretRef:
                   name: paper-secret
@@ -116,11 +120,28 @@ spec:
           rcon:
             port: 25575
             targetPort: 25575
+    configMaps:
+      patches:
+        data:
+          # Applied by the image at every start; the file lives on the data PVC
+          paper.json: |-
+            {
+              "file": "/data/config/paper-global.yml",
+              "ops": [
+                { "$set": { "path": "$.proxies['proxy-protocol']", "value": true } }
+              ]
+            }
     persistence:
       data:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /data
+      patches:
+        type: configMap
+        identifier: patches
+        globalMounts:
+          - path: /patches
+            readOnly: true
       tmpfs:
         type: emptyDir
         medium: Memory
