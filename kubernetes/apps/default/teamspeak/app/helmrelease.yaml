@@ -18,10 +18,11 @@ spec:
           reloader.stakater.com/auto: "true"
         initContainers:
           # Public traffic reaches TeamSpeak only through Hades (teamspeak.falkerie.com):
-          # Hades DNATs 9987/udp and 30033/tcp to 10.254.66.2 without SNAT, so the server
-          # sees real client IPs. This puts 10.254.66.2 on a WireGuard link to Hades in the
-          # pod's network namespace, which outlives this container, and sends all internet
-          # traffic (replies included) back through Hades. Cluster and LAN ranges stay on eth0.
+          # Hades DNATs 9987/udp and 30033/tcp to 10.254.66.2 and fd10:254:66::2 without
+          # SNAT, so the server sees real client IPs. This puts those addresses on a
+          # WireGuard link to Hades in the pod's network namespace, which outlives this
+          # container, and sends only traffic from them (replies to players) back through
+          # Hades. Everything else, TeamSpeak's own internet traffic included, uses eth0.
           wireguard:
             image:
               repository: lscr.io/linuxserver/wireguard
@@ -30,18 +31,20 @@ spec:
             args:
               - |
                 set -eu
-                gateway="$(ip -4 route show default | awk '{print $3; exit}')"
                 ip link delete wg0 2>/dev/null || true
                 ip link add wg0 type wireguard
                 wg setconf wg0 /wireguard/wg0.conf
                 ip address add 10.254.66.2/32 dev wg0
+                ip -6 address add fd10:254:66::2/128 dev wg0
                 ip link set wg0 mtu 1420 up
-                endpoint="$(wg show wg0 endpoints | awk '{print $2}' | cut -d: -f1)"
-                for net in "$endpoint/32" 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do
-                  ip route replace "$net" via "$gateway" dev eth0
-                done
-                ip route replace default dev wg0
-                ip route
+                ip route replace default dev wg0 table 66
+                ip -6 route replace default dev wg0 table 66
+                ip rule del priority 100 2>/dev/null || true
+                ip -6 rule del priority 100 2>/dev/null || true
+                ip rule add from 10.254.66.2 lookup 66 priority 100
+                ip -6 rule add from fd10:254:66::2 lookup 66 priority 100
+                ip rule
+                ip -6 rule
             securityContext:
               runAsUser: 0
               runAsGroup: 0
@@ -54,6 +57,10 @@ spec:
             image:
               repository: docker.io/teamspeaksystems/teamspeak6-server
               tag: 6.0.0-beta13.1@sha256:d845f803aecf842c2df034c959c23ff2462357bacafb3807500885c5ec170fa1
+            # Voice binds only to the tunnel addresses, so its UDP replies leave from them
+            # and take the tunnel; bound to 0.0.0.0 they would leave from eth0's address.
+            # TSSERVER_VOICE_IP takes a single address, hence the flags.
+            command: ["tsserver", "--voice-ip", "10.254.66.2", "--voice-ip", "fd10:254:66::2"]
             env:
               TSSERVER_LICENSE_ACCEPTED: accept
               TZ: America/New_York

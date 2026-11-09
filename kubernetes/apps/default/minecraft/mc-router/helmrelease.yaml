@@ -56,12 +56,12 @@ spec:
       useProxyProtocol: true
       metrics:
         backend: prometheus
-  # Public traffic reaches mc-router only through Hades (mc.hades.casa):
-  # Hades DNATs 25565/tcp to 10.254.66.3 without SNAT, so mc-router sees real client
-  # IPs. As for TeamSpeak, the init container puts 10.254.66.3 on a WireGuard link to
-  # Hades in the pod's network namespace and sends internet traffic (replies included)
-  # back through Hades; cluster and LAN ranges, so LAN players on 10.8.0.130, stay on
-  # eth0. The chart has no init container values, hence the post-render patch.
+  # Public traffic reaches mc-router only through Hades (mc.hades.casa): Hades DNATs
+  # 25565/tcp to 10.254.66.3 and fd10:254:66::3 without SNAT, so mc-router sees real
+  # client IPs. As for TeamSpeak, the init container puts those addresses on a WireGuard
+  # link to Hades in the pod's network namespace and sends only traffic from them
+  # (replies to players) back through Hades. Everything else, LAN players on 10.8.0.130
+  # included, uses eth0. The chart has no init container values, hence the post-render patch.
   postRenderers:
     - kustomize:
         patches:
@@ -85,18 +85,20 @@ spec:
                         args:
                           - |
                             set -eu
-                            gateway="$(ip -4 route show default | awk '{print $3; exit}')"
                             ip link delete wg0 2>/dev/null || true
                             ip link add wg0 type wireguard
                             wg setconf wg0 /wireguard/wg0.conf
                             ip address add 10.254.66.3/32 dev wg0
+                            ip -6 address add fd10:254:66::3/128 dev wg0
                             ip link set wg0 mtu 1420 up
-                            endpoint="$(wg show wg0 endpoints | awk '{print $2}' | cut -d: -f1)"
-                            for net in "$endpoint/32" 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do
-                              ip route replace "$net" via "$gateway" dev eth0
-                            done
-                            ip route replace default dev wg0
-                            ip route
+                            ip route replace default dev wg0 table 66
+                            ip -6 route replace default dev wg0 table 66
+                            ip rule del priority 100 2>/dev/null || true
+                            ip -6 rule del priority 100 2>/dev/null || true
+                            ip rule add from 10.254.66.3 lookup 66 priority 100
+                            ip -6 rule add from fd10:254:66::3 lookup 66 priority 100
+                            ip rule
+                            ip -6 rule
                         securityContext:
                           runAsUser: 0
                           runAsGroup: 0
