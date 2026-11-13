@@ -35,7 +35,7 @@ Two conventions keep the layers honest:
 - **Directory placement is the single source of truth for a node's role.** The role patch is chosen
   by which `nodes/<role>/` directory contains the node file, and `machine.type` is set by the role
   patch, not the node file. A node cannot claim one role by filename and another by content.
-- **Secrets never live in this repo.** All sensitive values are `op://kubernetes/xxx-talos/<section>/<field>`
+- **Secrets never live in this repo.** All sensitive values are `op://kubernetes/talos/<section>/<field>`
   references resolved at render time.
 
 ## Schematics
