@@ -1,0 +1,49 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/batch/cronjob_v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-defrag
+spec:
+  schedule: "0 4 * * 0"
+  timeZone: America/New_York
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          automountServiceAccountToken: false
+          nodeSelector:
+            node-role.kubernetes.io/control-plane: ""
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            runAsGroup: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: talosctl
+              image: ghcr.io/siderolabs/talosctl:v1.14.0@sha256:ff9b1177abf0874e963261c4937ce5f5e8080adde6ae49b4e13195f37bee1a67
+              args: ["--nodes", "$(NODE)", "etcd", "defrag"]
+              env:
+                - name: NODE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: status.hostIP
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: talos
+                  mountPath: /var/run/secrets/talos.dev
+                  readOnly: true
+          volumes:
+            - name: talos
+              secret:
+                secretName: etcd-defrag
