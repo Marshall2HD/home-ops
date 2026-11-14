@@ -14,7 +14,7 @@ spec:
     - type: External
       external:
         metric:
-          name: ${ZEROSCALER_METRIC_NAME:=probe_success}
+          name: probe_success
           selector:
             matchLabels:
               job: ${ZEROSCALER_JOB_NAME:=nfs_probe}

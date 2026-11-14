@@ -26,8 +26,8 @@ describes.
 ### The update
 
 Take from the title, body, labels and diff: the package and its datasource
-(container image, Helm chart as an `OCIRepository`, GitHub Action, mise
-tool, Grafana dashboard, Renovate preset), the old and new version or
+(container image, Helm chart as an `OCIRepository`, GitHub Action,
+Grafana dashboard, Renovate preset), the old and new version or
 digest, the update type from the `type/*` label, and the changed files,
 which are the call sites that consume the dependency.
 

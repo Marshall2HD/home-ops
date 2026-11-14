@@ -16,7 +16,6 @@
   "files.trimTrailingWhitespace": true,
   "material-icon-theme.files.associations": {
     "*.gotmpl": "smarty",
-    "helmfile.yaml": "helm",
     "kubeconfig": "kubernetes",
     "talosconfig": "kubernetes"
   },
@@ -24,10 +23,7 @@
     // top level
     ".github/workflows": "ci",
     ".private": "archive",
-    ".renovate": "robot",
     "bootstrap": "seeders",
-    "bootstrap/helmfile.d": "helm",
-    "flux": "pipe",
     "talos": "linux",
     // namespaces
     "actions-runner-system": "github",
@@ -38,7 +34,6 @@
     "kube-system": "kubernetes",
     "network": "connection",
     "o11y": "event",
-    "openebs-system": "base",
     "rook-ceph": "dump",
     "system-upgrade": "update",
     "kopiur-system": "aws"

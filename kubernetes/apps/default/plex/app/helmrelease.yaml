@@ -12,8 +12,6 @@ spec:
   values:
     controllers:
       plex:
-        annotations:
-          reloader.stakater.com/auto: "true"
         initContainers:
           cleanup-plex-next-cache:
             image:

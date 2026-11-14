@@ -26,8 +26,6 @@ spec:
     plugins:
       plugin_admin_enabled: "false"
       preinstall_auto_update: "false"
-    security:
-      angular_support_enabled: "true"
     server:
       enable_gzip: "true"
   deployment:

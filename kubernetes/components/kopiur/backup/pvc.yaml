@@ -5,7 +5,7 @@ metadata:
   name: ${APP}
 spec:
   accessModes:
-    - ${KOPIUR_ACCESSMODES:=ReadWriteOnce}
+    - ReadWriteOnce
   dataSourceRef:
     apiGroup: kopiur.home-operations.com
     kind: Restore
@@ -13,4 +13,4 @@ spec:
   resources:
     requests:
       storage: ${KOPIUR_CAPACITY:=5Gi}
-  storageClassName: ${KOPIUR_STORAGECLASS:=ceph-block}
+  storageClassName: ceph-block
