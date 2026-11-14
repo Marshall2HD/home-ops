@@ -31,13 +31,6 @@ spec:
         labels:
           runner: *name
       spec:
-        affinity:
-          podAntiAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              - labelSelector:
-                  matchLabels:
-                    runner: *name
-                topologyKey: kubernetes.io/hostname
         containers:
           - name: runner
             image: ghcr.io/home-operations/actions-runner:2.338.2@sha256:2dd7caa094a425c041539447cb0e6ae63cda10b5242773764683b695b8fa5613
