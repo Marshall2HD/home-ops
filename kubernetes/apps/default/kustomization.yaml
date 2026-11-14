@@ -47,5 +47,6 @@ resources:
   - ./tautulli/ks.yaml
   - ./teamspeak/ks.yaml
   - ./thelounge/ks.yaml
+  - ./unifi-mcp/ks.yaml
   - ./whisper/ks.yaml
   - ./zigbee/ks.yaml
