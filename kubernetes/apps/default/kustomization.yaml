@@ -15,6 +15,7 @@ resources:
   - ./atuin/ks.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
+  - ./board-persona/ks.yaml
   - ./brrpolice/ks.yaml
   - ./chaski/ks.yaml
   - ./cleanrr/ks.yaml
