@@ -29,7 +29,6 @@ resources:
   - ./memini/ks.yaml
   - ./minecraft/ks.yaml
   - ./mosquitto/ks.yaml
-  - ./open-webui/ks.yaml
   - ./plex/ks.yaml
   - ./proto/ks.yaml
   - ./prowlarr/ks.yaml
