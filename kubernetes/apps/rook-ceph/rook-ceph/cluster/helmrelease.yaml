@@ -48,6 +48,7 @@ spec:
         # and made Talos wait forever (Aug 2026). See kubernetes/REBOOT.md.
         managePodBudgets: false
       csi:
+        cephfs: {}
         readAffinity:
           enabled: false # https://github.com/ceph/ceph-csi/issues/5772
       dashboard:
