@@ -19,7 +19,6 @@ resources:
   - ./brrpolice/ks.yaml
   - ./chaski/ks.yaml
   - ./cleanrr/ks.yaml
-  - ./cobalt/ks.yaml
   - ./embedding/ks.yaml
   - ./flaresolverr/ks.yaml
   - ./home-assistant/ks.yaml
