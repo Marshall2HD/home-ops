@@ -56,7 +56,7 @@ spec:
           app:
             image:
               repository: docker.io/teamspeaksystems/teamspeak6-server
-              tag: 6.0.0-beta13.1@sha256:d845f803aecf842c2df034c959c23ff2462357bacafb3807500885c5ec170fa1
+              tag: 6.0.0-beta14@sha256:324c5a1e6d22e12b78f4342f7dbe215edcf4ca2fda6205c25ffb504e81463bc4
             # Voice binds only to the tunnel addresses, so its UDP replies leave from them
             # and take the tunnel; bound to 0.0.0.0 they would leave from eth0's address.
             # TSSERVER_VOICE_IP takes a single address, hence the flags.
