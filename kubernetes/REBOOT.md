@@ -1,7 +1,7 @@
 # Rebooting Nyx
 
 Nyx is the only node, so every reboot is a full outage of the cluster, Ceph and
-everything that uses them (Deadlock's Postgres, Langfuse, whisper/csm, the arrs).
+everything that uses them (Deadlock's Postgres, Langfuse, whisper, the arrs).
 Follow this for any planned reboot: a Talos upgrade, a schematic or kernel argument
 change, or a plain reboot.
 

@@ -31,13 +31,8 @@ spec:
         controllerPlugin:
           replicas: 1
       cephfs:
-        enabled: true
+        enabled: false
         name: rook-ceph.cephfs.csi.ceph.com
-        fsGroupPolicy: None
-        grpcTimeout: 30
-        snapshotPolicy: volumeSnapshot
-        controllerPlugin:
-          replicas: 1
       nfs:
         enabled: false
         name: rook-ceph.nfs.csi.ceph.com
