@@ -76,3 +76,8 @@ arg "<ns>"
 arg "<ks>"
 '''
 run = 'flate build ks --namespace "$usage_ns" --output yaml "$usage_ks"'
+
+[tasks.lint-vault]
+description = "Lint a 1Password vault against Option A+ hygiene and cluster references (metadata-only)"
+usage = 'arg "[vault]" default="Kubernetes" help="1Password vault name"'
+run = 'uv run --with pyyaml python "$MISE_CONFIG_ROOT/../scripts/lint-vault.py" --vault "$usage_vault" --repo-root "$MISE_CONFIG_ROOT/.."'
