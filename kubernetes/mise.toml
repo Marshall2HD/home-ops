@@ -38,9 +38,9 @@ arg "<ks>" help="Name of the Flux Kustomization"
 run = 'mise run //kubernetes:render-local-ks "$usage_ns" "$usage_ks" | kubectl delete -f -'
 
 [tasks.prune-pods]
-description = "Prune pods in Failed, Pending, or Succeeded state"
+description = "Prune pods in Failed or Succeeded state"
 run = '''
-for phase in Failed Pending Succeeded; do
+for phase in Failed Succeeded; do
     kubectl delete pods -A --field-selector status.phase="$phase" --ignore-not-found=true
 done
 '''
