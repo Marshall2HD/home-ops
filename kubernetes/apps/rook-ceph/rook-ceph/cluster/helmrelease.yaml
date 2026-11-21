@@ -81,6 +81,11 @@ spec:
             keyGeneration: 2
             keepPriorKeyCountMax: 0
             keyType: aes256k # Talos 1.14 kernels (6.18.48) carry the aes256k backport
+          # Keep non-empty: SSA collapses removed rbdMirrorPeer to null, which the CephCluster CRD rejects (same as #1162).
+          rbdMirrorPeer:
+            keyRotationPolicy: KeyGeneration
+            keyGeneration: 2
+            keyType: aes256k
       storage:
         useAllDevices: false
         devicePathFilter: "^/dev/disk/by-id/nvme-Micron_7450_MTFDKBA800TFS_(25124FA456CD|25124FA45676)$"
