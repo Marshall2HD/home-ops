@@ -70,7 +70,7 @@ flux get ks -A --status-selector ready=false
 
 Every Kopiur policy must have a successful snapshot from the last two hours.
 Trigger one per policy, wait for all to show `Succeeded`, and don't continue if
-any fails. ClickHouse (`langfuse-clickhouse`) is covered by Kopiur, while `langfuse-bucket` (~73 GB in Rook-Ceph RGW) is not yet backed up off-node.
+any fails. ClickHouse (`langfuse-clickhouse`) is covered by Kopiur, and `langfuse-bucket` syncs nightly to Hypnos Garage (`s3://langfuse`) via `cronjob/langfuse-bucket-backup`.
 
 ```sh
 for p in $(kubectl get snapshotpolicies -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" "}{end}'); do
