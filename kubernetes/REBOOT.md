@@ -192,12 +192,3 @@ and the NVIDIA device plugin.
 - Resume nyx-autopilot:
   `sudo launchctl bootstrap system /Library/LaunchDaemons/com.falke.nyx-autopilot.plist`.
 - Confirm the window is over and tell GPU pod owners to restart their pods.
-
-## After the first reboot following a cephx CSI rotation
-
-Existing CSI mounts keep their old `aes` keys until they remount, so on Nyx the
-CSI migration to `aes256k` is only finished by a reboot. After one, check
-`ceph auth dump-keys --format=json-pretty` (no `aes` keys left), then set
-`keepPriorKeyCountMax: 0` and `allowedCiphers: [aes256k]` and drop the
-`AUTH_INSECURE_*` health mutes in `rook-ceph/rook-ceph/cluster/helmrelease.yaml`,
-following onedr0p's `8571459f12`, `079ea76ac5` and `5c1386680a`.
