@@ -13,8 +13,6 @@ spec:
     controllers:
       whisper:
         type: statefulset
-        annotations:
-          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:

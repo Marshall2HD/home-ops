@@ -32,3 +32,8 @@ spec:
       database: kritika
       secret:
         name: kritika-postgres-credentials
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: kritika-postgres

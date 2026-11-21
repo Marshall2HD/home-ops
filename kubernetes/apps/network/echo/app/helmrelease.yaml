@@ -10,7 +10,7 @@ spec:
     name: echo
   interval: 1h
   values:
-    replicaCount: 2
+    replicaCount: 1
     config:
       kubernetes: true
       trustedProxies:

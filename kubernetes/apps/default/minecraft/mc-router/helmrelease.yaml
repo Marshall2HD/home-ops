@@ -76,6 +76,9 @@ spec:
                 annotations:
                   reloader.stakater.com/auto: "true"
               spec:
+                # One WireGuard key: never run two pods at once.
+                strategy:
+                  type: Recreate
                 template:
                   spec:
                     initContainers:
