@@ -50,6 +50,12 @@
         "!/cloudnative-pg/",
         "!/postgres/",
         "!/langfuse/",
+        "!/envoy/",
+        "!/cert-manager/",
+        "!/kopiur/",
+        "!/miroir/",
+        "!/nvidia/",
+        "!/kritika/",
       ],
       automerge: true,
       automergeType: "pr",
@@ -118,7 +124,7 @@
       ignoreTests: false,
     },
     {
-      description: "Auto-merge Renovate Presents",
+      description: "Auto-merge Renovate Presets",
       matchManagers: ["renovate-config"],
       matchUpdateTypes: ["minor", "patch"],
       automerge: true,
@@ -210,6 +216,12 @@
       description: "Track TeamSpeak 6 betas and the eventual stable release",
       matchPackageNames: ["/teamspeak6-server/"],
       versioning: "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:-(?<prerelease>beta\\d+(?:\\.\\d+)?))?$",
+    },
+    {
+      description: "Pin embedding runtime ubuntu image to 24.04 LTS to match the Anvil build glibc",
+      matchFileNames: ["kubernetes/apps/default/embedding/**"],
+      matchPackageNames: ["docker.io/library/ubuntu"],
+      allowedVersions: "/^24\\.04$/",
     },
     // Labeling rules
     {

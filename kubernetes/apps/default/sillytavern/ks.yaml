@@ -6,7 +6,6 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-    - ../../../../components/zeroscaler
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph

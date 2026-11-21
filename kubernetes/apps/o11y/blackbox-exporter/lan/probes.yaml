@@ -13,7 +13,6 @@ spec:
       static:
         - hypnos.internal
         - jetkvm.internal
-        - nyx.internal
   metricRelabelings:
     - targetLabel: service
       replacement: blackbox-exporter-lan

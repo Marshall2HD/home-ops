@@ -83,40 +83,6 @@ spec:
                 memory: 128Mi
               limits:
                 memory: 512Mi
-      dump:
-        type: cronjob
-        cronjob:
-          schedule: 0 3 * * *
-          timeZone: America/New_York
-          backoffLimit: 2
-          concurrencyPolicy: Forbid
-          successfulJobsHistory: 1
-          failedJobsHistory: 1
-          ttlSecondsAfterFinished: 86400
-        containers:
-          app:
-            image:
-              repository: docker.io/tensorchord/vchord-suite
-              tag: pg18-20260501@sha256:c6e5e77a1180199f91b040b6e85c6d10b0ded6d49fb614dfd2e7272ffb91af08
-            command:
-              - /bin/sh
-              - -ec
-              - |
-                pg_dump --format=custom --no-owner --file=/dump/remedyverse.dump.tmp \
-                  --host=remedyverse-postgres-rw.default.svc.cluster.local --username=remedyverse remedyverse
-                mv /dump/remedyverse.dump.tmp /dump/remedyverse.dump
-                ls -l /dump
-            envFrom:
-              - secretRef:
-                  name: "{{ .Release.Name }}-secret"
-            securityContext: *securityContext
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 512Mi
-        pod:
-          restartPolicy: Never
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -132,12 +98,6 @@ spec:
             port: 80
             targetPort: *port
     persistence:
-      dump:
-        existingClaim: "{{ .Release.Name }}"
-        advancedMounts:
-          dump:
-            app:
-              - path: /dump
       tmp:
         type: emptyDir
         advancedMounts:
@@ -147,9 +107,6 @@ spec:
             app:
               - path: /tmp
             jobs:
-              - path: /tmp
-          dump:
-            app:
               - path: /tmp
       apache-run:
         type: emptyDir

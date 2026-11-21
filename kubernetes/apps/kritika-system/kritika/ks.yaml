@@ -5,8 +5,12 @@ kind: Kustomization
 metadata:
   name: kritika-database
 spec:
+  components:
+    - ../../../../components/cnpg/backup
   dependsOn:
     - name: cloudnative-pg
+      namespace: cnpg-system
+    - name: plugin-barman-cloud
       namespace: cnpg-system
   healthChecks:
     - apiVersion: postgresql.cnpg.io/v1
@@ -19,6 +23,9 @@ spec:
       current: status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
   interval: 1h
   path: ./kubernetes/apps/kritika-system/kritika/database
+  postBuild:
+    substitute:
+      APP: kritika
   prune: true
   sourceRef:
     kind: GitRepository

@@ -1,7 +1,7 @@
 # Rebooting Nyx
 
 Nyx is the only node, so every reboot is a full outage of the cluster, Ceph and
-everything that uses them (Deadlock's Postgres, Langfuse, whisper, the arrs).
+everything that uses them (Langfuse, Remedyverse, Kritika, whisper, the arrs).
 Follow this for any planned reboot: a Talos upgrade, a schematic or kernel argument
 change, or a plain reboot.
 
@@ -48,9 +48,9 @@ All commands are run from the home-ops checkout with its `kubeconfig` and
 
 ### 1. Announce and pause automation
 
-- Tell the Deadlock thread not to deploy, and tell the owner of any live GPU pod
-  (for example `default/lark-l4`) that it will be killed and must be restarted by
-  them afterwards.
+- Pause any active dev workflows targeting Nyx, and tell the owner of any live
+  GPU pod (for example `aberrant` or `anvil-dev`) that it will be killed and must
+  be restarted afterwards.
 - Pause nyx-autopilot: `sudo launchctl bootout system/com.falke.nyx-autopilot`.
   Check `state/run/*.lock` for a job thread that is still running and wait for it
   or stop it.
@@ -70,7 +70,7 @@ flux get ks -A --status-selector ready=false
 
 Every Kopiur policy must have a successful snapshot from the last two hours.
 Trigger one per policy, wait for all to show `Succeeded`, and don't continue if
-any fails. ClickHouse (Langfuse) has no Kopiur policy.
+any fails. ClickHouse (`langfuse-clickhouse`) is covered by Kopiur, while `langfuse-bucket` (~73 GB in Rook-Ceph RGW) is not yet backed up off-node.
 
 ```sh
 for p in $(kubectl get snapshotpolicies -A -o jsonpath='{range .items[*]}{.metadata.namespace}/{.metadata.name}{" "}{end}'); do
@@ -191,8 +191,7 @@ and the NVIDIA device plugin.
 
 - Resume nyx-autopilot:
   `sudo launchctl bootstrap system /Library/LaunchDaemons/com.falke.nyx-autopilot.plist`.
-- Tell the Deadlock thread the window is over, and tell GPU pod owners to restart
-  their pods.
+- Confirm the window is over and tell GPU pod owners to restart their pods.
 
 ## After the first reboot following a cephx CSI rotation
 

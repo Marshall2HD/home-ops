@@ -42,11 +42,6 @@ spec:
                 cpu: 10m
               limits:
                 memory: 512Mi
-    defaultPodOptions:
-      # metaxu.falkerie.com resolves to Thanatos's tailnet address on the LAN, which pods can't reach
-      hostAliases:
-        - ip: 10.4.0.178
-          hostnames: [metaxu.falkerie.com]
     route:
       main:
         enabled: true
