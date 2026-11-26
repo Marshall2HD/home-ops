@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/homeassistant-ai/ha-mcp
-              tag: 8.7.0@sha256:600677bbd7574dfb59682e40d6945f73fcc8852d3684b3671506602473942448
+              tag: 9.3.0@sha256:8da893a58da84be7c6e2a8057dfac4fc74821bc5bf17676b5223e439e914db2b
             command: ["ha-mcp-web"]
             env:
               FASTMCP_CHECK_FOR_UPDATES: "off"
