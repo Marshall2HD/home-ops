@@ -27,7 +27,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: talosctl
-              image: ghcr.io/siderolabs/talosctl:v1.14.0@sha256:ff9b1177abf0874e963261c4937ce5f5e8080adde6ae49b4e13195f37bee1a67
+              image: ghcr.io/siderolabs/talosctl:v1.14.7@sha256:5567c99a07bec8415dd863c182e2854a93e81c97d7efc87ce06d7802e17a9d93
               args: ["--nodes", "$(NODE)", "etcd", "defrag"]
               env:
                 - name: NODE
