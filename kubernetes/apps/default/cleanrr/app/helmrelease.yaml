@@ -19,7 +19,7 @@ spec:
           app:
             image:
               repository: ghcr.io/zariel/cleanrr
-              tag: v0.1.7@sha256:b5a7a2ac327327daf4fb7ed6fb89997b8aa5527867684b29de381c58ebabad26
+              tag: v0.3.0@sha256:a74f5055dcd287aa4003070bbc77d1581f4bb326c1e48cc29402ce67ae25a480
             env:
               CLEANRR_LISTEN_ADDR: 0.0.0.0:80
               CLEANRR_MINIMUM_AGE: 5m
